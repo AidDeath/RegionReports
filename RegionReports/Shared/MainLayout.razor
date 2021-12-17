@@ -1,0 +1,51 @@
+﻿@inherits LayoutComponentBase
+@inject DialogService DialogService
+
+<PageTitle>RegionReports</PageTitle>
+
+<RadzenDialog/>
+<RadzenNotification/>
+<RadzenContextMenu/>
+<RadzenTooltip/>
+
+<div class="page">
+@*    <div class="sidebar">
+        <NavMenu />
+    </div>*@
+
+    <main>
+        <div class="top-row px-4 auth">
+            <LoginDisplay />
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+
+    <RadzenFooter style="height: 61px"> 
+      <ChildContent>
+        <div style="display: flex; float: none; position: relative; text-align: left" class="row">
+          <div class="col-md-6">
+            <RadzenLabel style="vertical-align: middle" Text="Система сбора отчетности">
+            </RadzenLabel>
+          </div>
+          <div class="col-md-6" style="text-align: right">
+            <RadzenButton Icon="info" IsBusy="false" Size="ButtonSize.Medium" Text="О программе" Click="@ShowAbout">
+            </RadzenButton>
+          </div>
+        </div>
+      </ChildContent>
+    </RadzenFooter>
+
+</div>
+
+
+@code{
+    protected async Task ShowAbout(MouseEventArgs args)
+        {
+            await DialogService.OpenAsync<RegionReports.Pages.About>("О программе", null, new DialogOptions(){ Width = "599px", CloseDialogOnOverlayClick = true });
+            
+        }
+}
