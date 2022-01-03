@@ -14,12 +14,32 @@ namespace RegionReports.Data.Entities
     {
         public int Id { get; set; }
 
+        /// <summary>
+        /// Полное имя пользователя.
+        /// </summary>
+        public string FullName { get; set; } = "";
+
+        public string Email { get; set; } = "";
+
+        /// <summary>
+        /// Имя, под которым пользователь вошёл в систему
+        /// </summary>
         public string WindowsUserName { get; set; } = "";
 
-        [ForeignKey("District")]
-        public int DistrictId { get; set; }
 
-        public District? District { get; set; }
+        /// <summary>
+        /// Обслуживаемые районы
+        /// </summary>
+        public List<District>? Districts { get; set; }
 
+        /// <summary>
+        /// Информация о пользователе подтверждена администратором
+        /// </summary>
+        public bool IsAproved { get; set; } = false;
+
+        /// <summary>
+        /// Пользователь активен. Не заблокирован
+        /// </summary>
+        public bool IsActive { get; set; } = true;
     }
 }

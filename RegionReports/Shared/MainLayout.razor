@@ -15,8 +15,9 @@
 
     <main>
         <div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <MainMenu/>
+            @*<LoginDisplay />
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>*@
         </div>
 
         <article class="content px-4">
@@ -28,7 +29,9 @@
       <ChildContent>
         <div style="display: flex; float: none; position: relative; text-align: left" class="row">
           <div class="col-md-6">
-            <RadzenLabel style="vertical-align: middle" Text="Система сбора отчетности">
+            <RadzenLabel style="vertical-align: middle" Text="Система сбора отчетности"/>
+            <RadzenLabel>
+                <LoginDisplay/>
             </RadzenLabel>
           </div>
           <div class="col-md-6" style="text-align: right">
@@ -46,6 +49,5 @@
     protected async Task ShowAbout(MouseEventArgs args)
         {
             await DialogService.OpenAsync<RegionReports.Pages.About>("О программе", null, new DialogOptions(){ Width = "599px", CloseDialogOnOverlayClick = true });
-            
         }
 }

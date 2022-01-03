@@ -1,0 +1,12 @@
+﻿
+
+@code {
+
+    public List<Region> regions { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        // Отбираю доступные для назначения районы
+        regions = db.Districts.GetAll().Where(d => d.ReportUserId == null);
+    }
+}

@@ -16,10 +16,20 @@ namespace RegionReports.Data.Entities
 
         public string DistrictName { get; set; } = "";
 
+        /// <summary>
+        /// Область, к которой относится этот район
+        /// </summary>
         [ForeignKey("Region")]
         public int RegionId { get; set; }
 
         public Region? Region { get; set; }
 
+        /// <summary>
+        /// Пользователь, ответственный за район
+        /// </summary>
+        [ForeignKey("ReportUser")]
+        public int? ReportUserId { get; set; }
+
+        public ReportUser? ReportUser { get; set; }
     }
 }

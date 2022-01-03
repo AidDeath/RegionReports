@@ -25,6 +25,9 @@ namespace RegionReports.Data
             modelBuilder.Entity<District>().Property(p => p.RegionId).IsRequired();
             modelBuilder.Entity<ReportUser>().Property(p => p.WindowsUserName).IsRequired();
 
+            modelBuilder.Entity<ReportUser>().Property(p => p.IsAproved).HasDefaultValue(false);
+            modelBuilder.Entity<ReportUser>().Property(p => p.IsActive).HasDefaultValue(true);
+
             modelBuilder.Entity<Region>().HasData(
                  new Region { Id= 1, RegionName = "Брестская область"},
                  new Region { Id= 2, RegionName = "Гродненская область"},

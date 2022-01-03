@@ -1,0 +1,102 @@
+﻿@page "/userinfo"
+@inject IHttpContextAccessor contextAccessor
+
+@using Microsoft.Extensions.Logging
+@inject ILogger<UserInfo> Logger
+
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+
+
+<PageTitle>Кабинет</PageTitle>
+<RadzenCard>
+    <h3>В системе работает пользователь @LogonName</h3>
+</RadzenCard>
+
+<div class="col-md-6 col-lg-4 col-xl-3 p-3">
+    <RadzenCard>
+        <h4 class="mb-4">Обслуживаемый регион </h4>
+        <RadzenDropDown AllowClear="false" TValue="int" AllowFiltering="true"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        FilterOperator="StringFilterOperator.StartsWith"
+                        Class="w-100" Placeholder="Район..." Data=@Districts TextProperty="DistrictName" ValueProperty="Id" Change=@(args => OnChange(args)) />
+    </RadzenCard>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-sm-12 col-md-8 col-lg-6">
+        <RadzenTemplateForm TItem="ReportUser" Data=@CurrentUser Submit="@((ReportUser args) => { SubmitChanges(args); })">
+            <RadzenFieldset Text="Информация о пользователе">
+                <div class="row row-cols-2">
+                    <RadzenLabel class=col Component="FullName" Text="Полное имя" />
+                    <RadzenTextBox class=col Name="FullName" Value=@CurrentUser.FullName/>
+                </div>
+                <p><RadzenRequiredValidator Component="FullName" Text="Необходимо ввести имя пользователя" /></p>
+
+                <div class="row row-cols-2">
+                    <RadzenLabel class=col Component="Email" Text="Адрес электронной почты" />
+                    <RadzenTextBox class=col Name="Email" Value=@CurrentUser.Email/>
+                    
+                </div>
+                <p>
+                    <RadzenRequiredValidator Component="Email" Text="Нужно ввести адрес почты" />
+                    <RadzenEmailValidator Component="Email" Text="Адрес почты ввден некорректно!" />
+                </p>
+
+                <div class="row row-cols-2">
+                    <RadzenLabel class=col Component="Region" Text="Обслуживаемые регионы"/>
+                    <RadzenButton class=col Text="Выбрать район" ButtonStyle="ButtonStyle.Secondary"/>
+                </div>
+
+                <div>
+                    <div style="margin-top: 16px;">
+                        <RadzenButton ButtonType="ButtonType.Submit" Icon="save" Text="Сохранить изменения" Disabled=true />
+                    </div>
+                </div>
+            </RadzenFieldset>
+
+        </RadzenTemplateForm>
+    </div>
+</div>
+
+    
+
+    
+
+@code {
+
+
+    private ReportUser CurrentUser { get; set; }
+    private IQueryable<District> Districts {  get;  set; }
+
+    private string LogonName => contextAccessor?.HttpContext?.User?.Identity?.Name ?? "~не определено~";
+
+    protected override async Task OnInitializedAsync()
+    {
+        DialogService.Open<LoadingDialog>("Loading");
+
+        Districts = db.Districts.GetAll();
+
+        CurrentUser = await db.ReportUsers.Find(u => u.WindowsUserName == LogonName).FirstOrDefaultAsync() ?? 
+        new ReportUser(){WindowsUserName = LogonName};
+
+        DialogService.Close();
+
+    }
+
+    private void SubmitChanges(ReportUser user)
+    {
+       
+        Logger.Log(LogLevel.Information, "User Data Saved");
+        NotificationService.Notify(NotificationSeverity.Success, "Успешно");
+        
+    }
+
+    private void OnChange(object value)
+    {
+        //CurrentUser.DistrictId = value is int ? (int)value : 0;
+
+        Logger.Log(LogLevel.Information, $"Selected {value}"); 
+    }
+
+}

@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Radzen;
 using RegionReports.Data;
 using RegionReports.Data.Interfaces;
@@ -20,6 +23,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContext<RegionReportsContext>();
 builder.Services.AddScoped<IDbAccessor, DbAccessor>();
+builder.Services.AddHttpContextAccessor();
 
 //Radzen services
 builder.Services.AddScoped<DialogService>();
