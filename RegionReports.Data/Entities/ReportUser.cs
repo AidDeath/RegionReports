@@ -35,7 +35,12 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Информация о пользователе подтверждена администратором
         /// </summary>
-        public bool IsAproved { get; set; } = false;
+        public bool IsApproved { get; set; } = false;
+
+        /// <summary>
+        /// Дата последней заявки на утверждение данных пользователя
+        /// </summary>
+        public DateTime? ApproveClaimDate { get;set; }
 
         /// <summary>
         /// Пользователь активен. Не заблокирован

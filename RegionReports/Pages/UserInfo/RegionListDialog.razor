@@ -1,12 +1,49 @@
-﻿
+﻿     <div style="max-height: 400px ">
+         <RadzenCard>
+            <RadzenListBox 
+                Data=@Districts 
+                TValue="IEnumerable<District>" 
+                Multiple=true 
+                AllowClear=false 
+                TextProperty="DistrictName" 
+                LoadData=@LoadData 
+                AllowFiltering=true
+                Value=@CurrentUser.Districts
+                Change=@(args => OnChange(args))
+                />
+        </RadzenCard>
+     </div>
+
+
 
 @code {
+    public List<District>? Districts;
 
-    public List<Region> regions { get; set; }
+    public List<District> SelectedDistricts { get; set; } = new();
 
-    protected override Task OnInitializedAsync()
+    [Parameter]
+    public ReportUser CurrentUser { get; set; }
+
+    private void OnChange(object value)
     {
-        // Отбираю доступные для назначения районы
-        regions = db.Districts.GetAll().Where(d => d.ReportUserId == null);
+        // Change=@(args => OnChange(args) - добавить в событие изменения ListBox
+        CurrentUser.Districts = new List<District>((IEnumerable<District>)value);
+
+    }
+
+    private void LoadData(LoadDataArgs args)
+    {
+        var query = db.Districts.GetAll();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            //Убираю занятые районы из списка, кроме своих
+            query = query.Where(district => district.ReportUserId == null || district.ReportUserId == CurrentUser.Id);
+            //Применяю фильтр
+            query = query.Where(d => d.DistrictName.ToLower().Contains(args.Filter.ToLower()));
+        }
+
+        Districts = query.ToList();
+
     }
 }

@@ -23,7 +23,7 @@ namespace RegionReports.Data.Migrations
                 defaultValue: true);
 
             migrationBuilder.AddColumn<bool>(
-                name: "IsAproved",
+                name: "IsApproved",
                 table: "ReportUsers",
                 type: "INTEGER",
                 nullable: false,
@@ -41,7 +41,7 @@ namespace RegionReports.Data.Migrations
                 table: "ReportUsers");
 
             migrationBuilder.DropColumn(
-                name: "IsAproved",
+                name: "IsApproved",
                 table: "ReportUsers");
         }
     }

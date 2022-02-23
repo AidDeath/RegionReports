@@ -243,7 +243,7 @@ namespace RegionReports.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(true);
 
-                    b.Property<bool>("IsAproved")
+                    b.Property<bool>("IsApproved")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
