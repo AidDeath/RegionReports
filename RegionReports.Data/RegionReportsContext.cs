@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RegionReports.Data.Entities;
 
 namespace RegionReports.Data
@@ -9,15 +10,18 @@ namespace RegionReports.Data
         public DbSet<District> Districts { get; set; }
         public DbSet<ReportUser> ReportUsers { get; set; }
 
-        public string DbPath { get; }
-        public RegionReportsContext()
+
+        private readonly IConfiguration _configuration;
+        public RegionReportsContext(IConfiguration Configuration)
         {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = Path.Join(path, "data.db");
+            _configuration = Configuration;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var a = _configuration.GetConnectionString("MsSqlConnectionString");
+            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MsSqlConnectionString"));
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
