@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RegionReports.Data.Migrations
 {
-    public partial class Initialmigration : Migration
+    public partial class Initialmirgation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -30,10 +30,12 @@ namespace RegionReports.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WindowsUserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    ApproveClaimDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
+                    UserDomain = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WindowsUserName = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "False"),
+                    RelatedDistrictId = table.Column<int>(type: "int", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    LastLoginDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastChangesDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -64,6 +66,48 @@ namespace RegionReports.Data.Migrations
                         column: x => x.ReportUserId,
                         principalTable: "ReportUsers",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReportUserApprovalClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReportUserId = table.Column<int>(type: "int", nullable: false),
+                    IsClaimProcessed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReportUserApprovalClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReportUserApprovalClaims_ReportUsers_ReportUserId",
+                        column: x => x.ReportUserId,
+                        principalTable: "ReportUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReportUserSuggestedChanges",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RelatedDistrictId = table.Column<int>(type: "int", nullable: false),
+                    ReportUserApprovalClaimId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReportUserSuggestedChanges", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReportUserSuggestedChanges_ReportUserApprovalClaims_ReportUserApprovalClaimId",
+                        column: x => x.ReportUserApprovalClaimId,
+                        principalTable: "ReportUserApprovalClaims",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -117,7 +161,20 @@ namespace RegionReports.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Districts_ReportUserId",
                 table: "Districts",
+                column: "ReportUserId",
+                unique: true,
+                filter: "[ReportUserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReportUserApprovalClaims_ReportUserId",
+                table: "ReportUserApprovalClaims",
                 column: "ReportUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReportUserSuggestedChanges_ReportUserApprovalClaimId",
+                table: "ReportUserSuggestedChanges",
+                column: "ReportUserApprovalClaimId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -126,7 +183,13 @@ namespace RegionReports.Data.Migrations
                 name: "Districts");
 
             migrationBuilder.DropTable(
+                name: "ReportUserSuggestedChanges");
+
+            migrationBuilder.DropTable(
                 name: "Regions");
+
+            migrationBuilder.DropTable(
+                name: "ReportUserApprovalClaims");
 
             migrationBuilder.DropTable(
                 name: "ReportUsers");

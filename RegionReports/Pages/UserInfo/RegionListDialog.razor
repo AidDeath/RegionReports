@@ -3,12 +3,12 @@
             <RadzenListBox 
                 Data=@Districts 
                 TValue="IEnumerable<District>" 
-                Multiple=true 
+                Multiple=false 
                 AllowClear=false 
                 TextProperty="DistrictName" 
                 LoadData=@LoadData 
                 AllowFiltering=true
-                Value=@CurrentUser.Districts
+                Value=@CurrentUser.RelatedDistrictId
                 Change=@(args => OnChange(args))
                 />
         </RadzenCard>
@@ -27,7 +27,9 @@
     private void OnChange(object value)
     {
         // Change=@(args => OnChange(args) - добавить в событие изменения ListBox
-        CurrentUser.Districts = new List<District>((IEnumerable<District>)value);
+        var district = (District)value;
+        CurrentUser.RelatedDistrict = district;
+        CurrentUser.RelatedDistrictId = district.Id;
 
     }
 

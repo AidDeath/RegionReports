@@ -15,5 +15,7 @@ namespace RegionReports.Data.Entities
 
         public string RegionName { get; set; } = "";
 
+        public List<District> Districts { get; set; } = new();
+
     }
 }

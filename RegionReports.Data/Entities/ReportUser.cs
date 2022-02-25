@@ -23,29 +23,51 @@ namespace RegionReports.Data.Entities
         public string Email { get; set; } = "";
 
         /// <summary>
+        /// Имя домена пользователя
+        /// </summary>
+        public string UserDomain { get; set; } = "";
+
+        /// <summary>
         /// Имя, под которым пользователь вошёл в систему
         /// </summary>
         public string WindowsUserName { get; set; } = "";
 
+       
+        /// <summary>
+        /// Идентификатор обслуживаемого района
+        /// </summary>
+        public int? RelatedDistrictId { get; set; }
 
         /// <summary>
-        /// Обслуживаемые районы
+        /// Обслуживаемый район
         /// </summary>
-        public List<District>? Districts { get; set; }
+        public District? RelatedDistrict { get; set; }
 
         /// <summary>
         /// Информация о пользователе подтверждена администратором
         /// </summary>
+        [Required]
         public bool IsApproved { get; set; } = false;
 
         /// <summary>
-        /// Дата последней заявки на утверждение данных пользователя
+        /// Дата последнего входа пользователя в систему
         /// </summary>
-        public DateTime? ApproveClaimDate { get;set; }
+        public DateTime? LastLoginDate { get;set; }
+
+        public DateTime? LastChangesDate { get; set; }
+
+        public List<ReportUserApprovalClaim>? UserApprovalClaims { get; set; }  
 
         /// <summary>
-        /// Пользователь активен. Не заблокирован
+        /// Принять изменения данных из предлагаемых
         /// </summary>
-        public bool IsActive { get; set; } = true;
+        /// <param name="suggested"></param>
+        public void TakeSuggestedChanges(ReportUserApprovalClaim claim)
+        {
+            this.FullName = claim.ReportUserSuggestedChanges.FullName;
+            this.Email = claim.ReportUserSuggestedChanges.Email;
+            this.LastChangesDate = DateTime.Now;
+            
+        }
     }
 }

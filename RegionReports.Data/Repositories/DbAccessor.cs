@@ -17,5 +17,9 @@ namespace RegionReports.Data.Repositories
         private IRepository<ReportUser> _reportUsers { get; set; }
         public IRepository<ReportUser> ReportUsers => _reportUsers ??= new Repository<ReportUser>(_context);
 
+        private IRepository<ReportUserApprovalClaim> _userApprovalClaims { get; set; }
+        public IRepository<ReportUserApprovalClaim> UserApprovalClaims => _userApprovalClaims ??=new Repository<ReportUserApprovalClaim>(_context);
+
+
     }
 }

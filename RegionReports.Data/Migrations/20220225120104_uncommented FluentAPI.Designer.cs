@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220225120104_uncommented FluentAPI")]
+    partial class uncommentedFluentAPI
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,8 +330,6 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RelatedDistrictId");
-
                     b.HasIndex("ReportUserApprovalClaimId")
                         .IsUnique();
 
@@ -366,19 +366,11 @@ namespace RegionReports.Data.Migrations
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserSuggestedChanges", b =>
                 {
-                    b.HasOne("RegionReports.Data.Entities.District", "RelatedDistrict")
-                        .WithMany()
-                        .HasForeignKey("RelatedDistrictId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("RegionReports.Data.Entities.ReportUserApprovalClaim", "ReportUserApprovalClaim")
                         .WithOne("ReportUserSuggestedChanges")
                         .HasForeignKey("RegionReports.Data.Entities.ReportUserSuggestedChanges", "ReportUserApprovalClaimId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("RelatedDistrict");
 
                     b.Navigation("ReportUserApprovalClaim");
                 });

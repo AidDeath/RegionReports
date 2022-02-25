@@ -12,8 +12,8 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    [Migration("20220223083457_Initial migration")]
-    partial class Initialmigration
+    [Migration("20220225115232_Initial mirgation")]
+    partial class Initialmirgation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -46,7 +46,9 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.HasIndex("ReportUserId");
+                    b.HasIndex("ReportUserId")
+                        .IsUnique()
+                        .HasFilter("[ReportUserId] IS NOT NULL");
 
                     b.ToTable("Districts");
 
@@ -248,8 +250,69 @@ namespace RegionReports.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("ApproveClaimDate")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastChangesDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastLoginDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RelatedDistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserDomain")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WindowsUserName")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("False");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReportUsers");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("IsClaimProcessed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReportUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportUserId");
+
+                    b.ToTable("ReportUserApprovalClaims");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportUserSuggestedChanges", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -259,45 +322,75 @@ namespace RegionReports.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                    b.Property<int>("RelatedDistrictId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsApproved")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("WindowsUserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ReportUserApprovalClaimId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportUsers");
+                    b.HasIndex("ReportUserApprovalClaimId")
+                        .IsUnique();
+
+                    b.ToTable("ReportUserSuggestedChanges");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.District", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.Region", "Region")
-                        .WithMany()
+                        .WithMany("Districts")
                         .HasForeignKey("RegionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("RegionReports.Data.Entities.ReportUser", "ReportUser")
-                        .WithMany("Districts")
-                        .HasForeignKey("ReportUserId");
+                        .WithOne("RelatedDistrict")
+                        .HasForeignKey("RegionReports.Data.Entities.District", "ReportUserId");
 
                     b.Navigation("Region");
 
                     b.Navigation("ReportUser");
                 });
 
-            modelBuilder.Entity("RegionReports.Data.Entities.ReportUser", b =>
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.ReportUser", "ReportUser")
+                        .WithMany("UserApprovalClaims")
+                        .HasForeignKey("ReportUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportUser");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportUserSuggestedChanges", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.ReportUserApprovalClaim", "ReportUserApprovalClaim")
+                        .WithOne("ReportUserSuggestedChanges")
+                        .HasForeignKey("RegionReports.Data.Entities.ReportUserSuggestedChanges", "ReportUserApprovalClaimId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportUserApprovalClaim");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.Region", b =>
                 {
                     b.Navigation("Districts");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportUser", b =>
+                {
+                    b.Navigation("RelatedDistrict");
+
+                    b.Navigation("UserApprovalClaims");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
+                {
+                    b.Navigation("ReportUserSuggestedChanges")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

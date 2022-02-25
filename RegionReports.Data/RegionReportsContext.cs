@@ -9,6 +9,8 @@ namespace RegionReports.Data
         public DbSet<Region> Regions { get; set; }
         public DbSet<District> Districts { get; set; }
         public DbSet<ReportUser> ReportUsers { get; set; }
+        public DbSet<ReportUserApprovalClaim> ReportUserApprovalClaims { get; set; }
+        public DbSet<ReportUserSuggestedChanges> ReportUserSuggestedChanges { get; set; }
 
 
         private readonly IConfiguration _configuration;
@@ -19,18 +21,49 @@ namespace RegionReports.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var a = _configuration.GetConnectionString("MsSqlConnectionString");
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MsSqlConnectionString"));
+
+            //optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MsSqlConnectionString"));
+            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=RegionReport;Trusted_Connection=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Region>().Property(p => p.RegionName).IsRequired();
             modelBuilder.Entity<District>().Property(p => p.RegionId).IsRequired();
-            modelBuilder.Entity<ReportUser>().Property(p => p.WindowsUserName).IsRequired();
+            modelBuilder.Entity<ReportUser>()
+                .Property(p => p.WindowsUserName)
+                    .IsRequired()
+                    .HasDefaultValue(false);
 
-            modelBuilder.Entity<ReportUser>().Property(p => p.IsApproved).HasDefaultValue(false);
-            modelBuilder.Entity<ReportUser>().Property(p => p.IsActive).HasDefaultValue(true);
+            modelBuilder.Entity<ReportUser>()
+                .HasMany(user => user.UserApprovalClaims)
+                .WithOne(claim => claim.ReportUser)
+                .HasForeignKey(claim => claim.ReportUserId);
+
+            modelBuilder.Entity<Region>()
+                .HasMany(region => region.Districts)
+                .WithOne(district => district.Region)
+                .HasForeignKey(district => district.RegionId);
+
+            modelBuilder.Entity<ReportUser>()
+                .HasOne(user => user.RelatedDistrict)
+                .WithOne(district => district.ReportUser)
+                .HasForeignKey<District>(district => district.ReportUserId);
+
+            modelBuilder.Entity<ReportUserApprovalClaim>()
+                 .HasOne(claim => claim.ReportUserSuggestedChanges)
+                 .WithOne(changes => changes.ReportUserApprovalClaim)
+                 .HasForeignKey<ReportUserSuggestedChanges>(claim => claim.ReportUserApprovalClaimId);
+
+            modelBuilder.Entity<ReportUserSuggestedChanges>()
+                .HasOne(changes => changes.RelatedDistrict)
+                .WithMany()
+                .HasForeignKey(changes => changes.RelatedDistrictId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
+
 
             modelBuilder.Entity<Region>().HasData(
                  new Region { Id= 1, RegionName = "Брестская область"},

@@ -76,8 +76,8 @@
     private string ServicingDistricts { 
         get 
         {
-            if (CurrentUser?.Districts != null && CurrentUser.Districts.Count > 0 )
-                return CurrentUser?.Districts?.Select(district => district.DistrictName)?.Aggregate((a, b) => $"{a}, {b}") ?? "Не выбраны";
+            if (CurrentUser?.RelatedDistrict != null && CurrentUser.RelatedDistrictId != null)
+                return CurrentUser.RelatedDistrict.DistrictName;
             else return "Не выбраны";
         }
 
@@ -91,7 +91,7 @@
 
         CurrentUser = await db.ReportUsers
                                 .Find(u => u.WindowsUserName == LogonName)
-                                .Include(u => u.Districts).FirstOrDefaultAsync() ?? 
+                                .Include(u => u.RelatedDistrict).FirstOrDefaultAsync() ?? 
                       new ReportUser(){WindowsUserName = LogonName};
         //Если пользователь впервые вошёл - записываем его в БД
         if (CurrentUser.Id == 0) db.ReportUsers.Create(CurrentUser);
@@ -114,8 +114,7 @@
         try
         {
             //Пока заявка не утверждена - делаем пользователя неактивным
-            user.IsActive = user.IsApproved = false;
-            user.ApproveClaimDate = DateTime.Now;
+            user.IsApproved = false;
             CurrentUser = user;
             db.ReportUsers.Update(user);
             Logger.Log(LogLevel.Information, $"User info approve request - {user.WindowsUserName}");

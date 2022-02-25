@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -19,17 +20,15 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Область, к которой относится этот район
         /// </summary>
-        [ForeignKey("Region")]
         public int RegionId { get; set; }
 
         public Region? Region { get; set; }
 
-        /// <summary>
-        /// Пользователь, ответственный за район
-        /// </summary>
-        [ForeignKey("ReportUser")]
         public int? ReportUserId { get; set; }
-
+        /// <summary>
+        /// Пользователь, закрепленный за районом
+        /// </summary>
         public ReportUser? ReportUser { get; set; }
+
     }
 }
