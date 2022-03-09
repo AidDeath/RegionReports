@@ -1,7 +1,12 @@
-﻿<CascadingAuthenticationState>
+﻿@inject NavigationManager NavigationManager
+@inject UserService UserService
+
+<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            @* ! НЕ РАБОТАЕТ! При если пользователь не утвержден администратором - перенаправляем его с любых страниц на страницу данных пользователя*@
+                @*@if (!UserService.IsCurrentUserAproved()) NavigationManager.NavigateTo("userinfo");*@
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
@@ -12,3 +17,12 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+
+@code{
+
+    protected override async Task OnInitializedAsync() 
+    {  //При открытии любой страницы проверяем, убедимся, что пользователь есть в БД
+        await UserService.EnsureUserCreated();
+    }
+}

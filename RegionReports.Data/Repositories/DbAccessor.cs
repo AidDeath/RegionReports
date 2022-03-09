@@ -14,12 +14,11 @@ namespace RegionReports.Data.Repositories
         private IRepository<Region> _regions { get; set; }
         public IRepository<Region> Regions => _regions ??= new Repository<Region>(_context);
 
-        private IRepository<ReportUser> _reportUsers { get; set; }
-        public IRepository<ReportUser> ReportUsers => _reportUsers ??= new Repository<ReportUser>(_context);
+        private ReportUserRepository _reportUsers { get; set; }
+        public ReportUserRepository ReportUsers => _reportUsers ??= new ReportUserRepository(_context);
 
-        private IRepository<ReportUserApprovalClaim> _userApprovalClaims { get; set; }
-        public IRepository<ReportUserApprovalClaim> UserApprovalClaims => _userApprovalClaims ??=new Repository<ReportUserApprovalClaim>(_context);
-
+        private IReportUserApprovalClaimRepository _reportUserApprovalClaims { get; set; }
+        public IReportUserApprovalClaimRepository ReportUserApprovalClaims => _reportUserApprovalClaims ??= new ReportUserApprovalClaimRepository(_context);
 
     }
 }

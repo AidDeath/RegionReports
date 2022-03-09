@@ -26,7 +26,7 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Признак обработки заявки
         /// </summary>
-        public bool IsClaimProcessed { get; set; }
+        public bool IsClaimProcessed { get; set; } = false;
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using RegionReports.Data.Entities;
+using RegionReports.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,11 @@ namespace RegionReports.Data.Interfaces
     {
         public IRepository<Region> Regions { get; }
 
-        public IRepository<ReportUser> ReportUsers { get; }
+        public ReportUserRepository ReportUsers { get; }
 
         public IRepository<District> Districts { get; }
+        
+        public IReportUserApprovalClaimRepository ReportUserApprovalClaims { get; }
+
     }
 }

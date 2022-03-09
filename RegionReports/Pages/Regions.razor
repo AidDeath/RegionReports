@@ -58,7 +58,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        regions = await db.Regions.GetAll().ToListAsync();
-        districts = await db.Districts.GetAll().Include(d => d.Region).ToListAsync();
+        //regions = await db.Regions.GetQueryable().ToListAsync();
+        //districts = await db.Districts.GetQueryable().Include(d => d.Region).ToListAsync();
     }
 }

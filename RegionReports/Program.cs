@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Radzen;
+using RegionReports.Services;
 using RegionReports.Data;
 using RegionReports.Data.Interfaces;
 using RegionReports.Data.Repositories;
@@ -21,7 +19,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddDbContext<RegionReportsContext>();
+builder.Services.AddDbContext<RegionReportsContext>(ServiceLifetime.Scoped);
 builder.Services.AddScoped<IDbAccessor, DbAccessor>();
 builder.Services.AddHttpContextAccessor();
 
@@ -30,7 +28,8 @@ builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
-
+builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<DistrictService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

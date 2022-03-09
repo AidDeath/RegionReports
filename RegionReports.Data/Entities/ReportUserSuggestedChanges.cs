@@ -21,19 +21,19 @@ namespace RegionReports.Data.Entities
         /// <summary> 
         /// Полное имя пользователя.
         /// </summary>
-        public string FullName { get; set; } = "";
+        public string? FullName { get; set; }
 
         /// <summary>
         /// Адрес электронной почты
         /// </summary>
-        public string Email { get; set; } = "";
+        public string? Email { get; set; } 
 
         /// <summary>
         /// Идентификатор обслуживаемого района
         /// </summary>
-        public int RelatedDistrictId { get; set; }
+        public int? RelatedDistrictId { get; set; }
 
-        public District RelatedDistrict { get; set; } = new ();
+        public District? RelatedDistrict { get; set; }
 
 
         public int ReportUserApprovalClaimId { get; set; }

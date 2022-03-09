@@ -53,7 +53,7 @@ namespace RegionReports.Data
             modelBuilder.Entity<ReportUserApprovalClaim>()
                  .HasOne(claim => claim.ReportUserSuggestedChanges)
                  .WithOne(changes => changes.ReportUserApprovalClaim)
-                 .HasForeignKey<ReportUserSuggestedChanges>(claim => claim.ReportUserApprovalClaimId);
+                 .HasForeignKey<ReportUserSuggestedChanges>(changes => changes.ReportUserApprovalClaimId);
 
             modelBuilder.Entity<ReportUserSuggestedChanges>()
                 .HasOne(changes => changes.RelatedDistrict)

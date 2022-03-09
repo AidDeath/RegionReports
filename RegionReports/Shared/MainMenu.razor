@@ -4,34 +4,36 @@
           <div class="text-lg-right col-md-12  d-flex justify-content-center">
             <RadzenMenu style="display: flex; float: none; height: 51px; width: 760px">
               <ChildContent>
-                <RadzenMenuItem Icon="admin_panel_settings" Text="Администрирование">
-                  <ChildContent>
-                    <RadzenMenuItem Icon="book" Text="Справочники">
-                    </RadzenMenuItem>
-                    <RadzenMenuItem Icon="supervised_user_circle" Text="Пользователи">
-                    </RadzenMenuItem>
-                    <RadzenMenuItem Icon="settings" Text="Настройки системы">
+                 <AuthorizeView Roles="RegionReportAdmins"> 
+                    <RadzenMenuItem Icon="admin_panel_settings" Text="Администрирование">
                       <ChildContent>
-                        <RadzenMenuItem Icon="mark_email_read" Text="Почта">
+                        <RadzenMenuItem Icon="book" Text="Справочники">
                         </RadzenMenuItem>
-                        <RadzenMenuItem Icon="description" Text="Управление файлами">
+                        <RadzenMenuItem Icon="supervised_user_circle" Text="Пользователи">
                         </RadzenMenuItem>
-                        <RadzenMenuItem Icon="accessibility" Text="Настройки доступа">
+                        <RadzenMenuItem Icon="settings" Text="Настройки системы">
+                          <ChildContent>
+                            <RadzenMenuItem Icon="mark_email_read" Text="Почта">
+                            </RadzenMenuItem>
+                            <RadzenMenuItem Icon="description" Text="Управление файлами">
+                            </RadzenMenuItem>
+                            <RadzenMenuItem Icon="accessibility" Text="Настройки доступа">
+                            </RadzenMenuItem>
+                          </ChildContent>
                         </RadzenMenuItem>
                       </ChildContent>
                     </RadzenMenuItem>
-                  </ChildContent>
-                </RadzenMenuItem>
-                <RadzenMenuItem Icon="next_week" Text="Управление отчетностью">
-                  <ChildContent>
-                    <RadzenMenuItem Icon="rule" Text="Шаблоны отчетов">
+                    <RadzenMenuItem Icon="next_week" Text="Управление отчетностью">
+                      <ChildContent>
+                        <RadzenMenuItem Icon="rule" Text="Шаблоны отчетов">
+                        </RadzenMenuItem>
+                        <RadzenMenuItem Icon="published_with_changes" Text="Прогресс сбора">
+                        </RadzenMenuItem>
+                        <RadzenMenuItem Icon="wysiwyg" Text="Просмотр отчетов">
+                        </RadzenMenuItem>
+                      </ChildContent>
                     </RadzenMenuItem>
-                    <RadzenMenuItem Icon="published_with_changes" Text="Прогресс сбора">
-                    </RadzenMenuItem>
-                    <RadzenMenuItem Icon="wysiwyg" Text="Просмотр отчетов">
-                    </RadzenMenuItem>
-                  </ChildContent>
-                </RadzenMenuItem>
+                </AuthorizeView>
                 <RadzenMenuItem Icon="work_outline" Text="Мои отчеты" Path="regions">
                 </RadzenMenuItem>
                 <RadzenMenuItem Icon="account_box" Text="Кабинет" Path="userinfo">

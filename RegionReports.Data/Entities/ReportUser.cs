@@ -32,11 +32,6 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public string WindowsUserName { get; set; } = "";
 
-       
-        /// <summary>
-        /// Идентификатор обслуживаемого района
-        /// </summary>
-        public int? RelatedDistrictId { get; set; }
 
         /// <summary>
         /// Обслуживаемый район

@@ -12,7 +12,7 @@ namespace RegionReports.Data.Repositories
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         protected readonly RegionReportsContext Context;
-        private readonly DbSet<TEntity> _dbSet;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public Repository(RegionReportsContext context)
         {
@@ -20,12 +20,17 @@ namespace RegionReports.Data.Repositories
             _dbSet = Context.Set<TEntity>();
         }
 
-        public virtual TEntity Get(int id)
+        public virtual TEntity? Get(int id)
         {
             return _dbSet.Find(id);
         }
 
-        public virtual IQueryable<TEntity> GetAll()
+        public virtual IEnumerable<TEntity> GetAll()
+        {
+            return _dbSet.AsEnumerable();
+        }
+
+        public virtual IQueryable<TEntity> GetQueryable()
         {
             return _dbSet;
         }

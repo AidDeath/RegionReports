@@ -1,0 +1,12 @@
+﻿@page "/test"
+@inject UserService UserService
+
+<h3>Test</h3>
+
+@code {
+    protected override void OnInitialized()
+    {
+        UserService.TestMethod();
+    }
+
+}

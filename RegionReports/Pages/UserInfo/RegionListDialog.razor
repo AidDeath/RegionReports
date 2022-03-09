@@ -1,14 +1,16 @@
-﻿     <div style="max-height: 400px ">
+﻿@inject DistrictService DistrictService
+
+    <div style="max-height: 400px ">
          <RadzenCard>
             <RadzenListBox 
                 Data=@Districts 
-                TValue="IEnumerable<District>" 
+                TValue="District" 
                 Multiple=false 
                 AllowClear=false 
                 TextProperty="DistrictName" 
                 LoadData=@LoadData 
                 AllowFiltering=true
-                Value=@CurrentUser.RelatedDistrictId
+                Value=@CurrentUser.RelatedDistrict
                 Change=@(args => OnChange(args))
                 />
         </RadzenCard>
@@ -17,9 +19,18 @@
 
 
 @code {
-    public List<District>? Districts;
+    public IEnumerable<District>? Districts;
+
 
     public List<District> SelectedDistricts { get; set; } = new();
+
+    //-
+    [Parameter]
+    public District SelectedDistrict { get; set; }
+
+    //-
+    [Parameter]
+    public District SuggestedDistrict { get; set; }
 
     [Parameter]
     public ReportUser CurrentUser { get; set; }
@@ -29,23 +40,20 @@
         // Change=@(args => OnChange(args) - добавить в событие изменения ListBox
         var district = (District)value;
         CurrentUser.RelatedDistrict = district;
-        CurrentUser.RelatedDistrictId = district.Id;
 
     }
 
     private void LoadData(LoadDataArgs args)
     {
-        var query = db.Districts.GetAll();
-
         if (!string.IsNullOrEmpty(args.Filter))
         {
-            //Убираю занятые районы из списка, кроме своих
-            query = query.Where(district => district.ReportUserId == null || district.ReportUserId == CurrentUser.Id);
-            //Применяю фильтр
-            query = query.Where(d => d.DistrictName.ToLower().Contains(args.Filter.ToLower()));
+            Districts = DistrictService.GetFilteredDistrictsList(args.Filter.ToLower());
+        }
+        else
+        {
+            Districts = DistrictService.GetFullDistrictsList();
         }
 
-        Districts = query.ToList();
-
     }
+
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220302111040_ReportUser field DistrictId removed")]
+    partial class ReportUserfieldDistrictIdremoved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,12 +312,14 @@ namespace RegionReports.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RelatedDistrictId")
+                    b.Property<int>("RelatedDistrictId")
                         .HasColumnType("int");
 
                     b.Property<int>("ReportUserApprovalClaimId")
@@ -364,7 +368,8 @@ namespace RegionReports.Data.Migrations
                     b.HasOne("RegionReports.Data.Entities.District", "RelatedDistrict")
                         .WithMany()
                         .HasForeignKey("RelatedDistrictId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("RegionReports.Data.Entities.ReportUserApprovalClaim", "ReportUserApprovalClaim")
                         .WithOne("ReportUserSuggestedChanges")
