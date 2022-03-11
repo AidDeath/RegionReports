@@ -1,38 +1,107 @@
 ﻿@page "/usermanagment"
 @inject UserService UserService
+@inject ApprovalClaimService ApprovalClaimService 
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
 
+<PageTitle>Управление пользователями</PageTitle>
 <h3>Управление пользователями</h3>
 
 <RadzenTabs>
     <Tabs>
         <RadzenTabsItem Text="Список">
-        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-            Data="@users" TItem="ReportUser" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
-            <Columns>
-                <RadzenDataGridColumn TItem="ReportUser" Property="FullName" Filterable="false" Title="ФИО" Frozen="true" Width="200px" />
-                <RadzenDataGridColumn TItem="ReportUser" Property="Email" Title="Почта" Frozen="true" Width="140px" />
-                <RadzenDataGridColumn TItem="ReportUser" Property="WindowsUserName" Title="Системное имя" Width="140px"/>
-            </Columns>
-        </RadzenDataGrid>
+
+        <RadzenCheckBox TValue=bool Name="ShowApprovedUsersOnly" @bind-Value="@ShowApprovedUsersOnly" Change="@RefreshUsersList"></RadzenCheckBox>
+        <RadzenLabel Component ="ShowApprovedUsersOnly" Text="Показывать только утвержденных"/>
+                
+            <RadzenDataGrid AllowColumnResize="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" 
+            PagerPosition="PagerPosition.Bottom" ShowPagingSummary="true" Data="@users" TItem="ReportUser" ColumnWidth="300px" EmptyText="Нет пользователей">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ReportUser" Property="WindowsUserName" Title="Системное имя" Width="140px">
+                        <Template Context="data">
+                            <p class="mb-1">@data.WindowsUserName</p>
+                            @if (!data.IsApproved)
+                            {
+                                 <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Не утвержден" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ReportUser" Property="FullName" Filterable="false" Title="ФИО" Frozen="true" Width="200px" />
+                    <RadzenDataGridColumn TItem="ReportUser" Property="Email" Title="Почта" Frozen="true" Width="140px" />
+                    <RadzenDataGridColumn TItem="ReportUser" Title="Действия" Width="90px">
+                        <Template Context="data">
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Изменить"))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"/>
+
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
 
         </RadzenTabsItem>
 
         <RadzenTabsItem Text="Заявки на изменение">
-
-        </RadzenTabsItem>
-
-        <RadzenTabsItem Text="Третья вкладка">
-
+            <RadzenCheckBox TValue=bool Name="ShowUnprocessedClaimsOnly" @bind-Value="@ShowUnprocessedClaimsOnly" Change="@RefreshClaimsList"></RadzenCheckBox>
+            <RadzenLabel Component ="ShowUnprocessedClaimsOnly" Text="Показывать только необработанные заявки"/>
+            <RadzenDataGrid AllowCompositeDataCells="true" AllowColumnResize="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" 
+                PagerPosition="PagerPosition.Bottom" ShowPagingSummary="true" Data="@claims" TItem="ReportUserApprovalClaim" EmptyText="Нет заявок">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUser.WindowsUserName" Title="Пользователь">
+                            <Template Context="data">
+                            <p class="mb-1">@data.ReportUser.WindowsUserName</p>
+                            @if (data.IsClaimProcessed)
+                            {
+                                 <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Обработана"/>
+                            }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Title="Предложенные изменения" TextAlign="TextAlign.Center">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUserSuggestedChanges.FullName" Title="ФИО" />
+                                <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUserSuggestedChanges.Email" Title="Почта" />
+                                <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUserSuggestedChanges.RelatedDistrict.DistrictName" Title="Район" />
+                            </Columns>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Title="Действия">
+                            <Template>
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="done" MouseEnter="@((args) => TooltipService.Open(args, "Принять"))" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="do_disturb" MouseEnter="@((args) => TooltipService.Open(args, "Отклонить"))"/>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+            </RadzenDataGrid>
         </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
 
 @code {
+
+    private bool ShowApprovedUsersOnly = false;
+    private bool ShowUnprocessedClaimsOnly = true;
     private IEnumerable<ReportUser>? users { get; set; }
+    private IEnumerable<ReportUserApprovalClaim>? claims { get; set; }
 
     protected override void OnInitialized()
     {
-        users = UserService.GetAllUsersWithDistricts();
+        RefreshUsersList();
+        RefreshClaimsList();
     }
+
+    /// <summary>
+    /// Обновить список пользователей
+    /// </summary>
+    private void RefreshUsersList()
+    {
+        users = UserService.GetAllUsersWithDistricts(ShowApprovedUsersOnly);
+    }
+
+    /// <summary>
+    /// Обновить список заявок на изменение данных
+    /// </summary>
+    private void RefreshClaimsList()
+    {
+        claims = ApprovalClaimService.GetAllClaims(ShowUnprocessedClaimsOnly);
+    }
+
 
 }

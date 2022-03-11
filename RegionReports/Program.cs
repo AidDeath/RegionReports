@@ -30,6 +30,7 @@ builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<DistrictService>();
+builder.Services.AddTransient<ApprovalClaimService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

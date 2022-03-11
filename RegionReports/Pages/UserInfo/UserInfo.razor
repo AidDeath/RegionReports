@@ -10,7 +10,7 @@
 
 <PageTitle>Кабинет</PageTitle>
 <RadzenCard>
-    <h2>В системе работает пользователь <em>@currentUser?.WindowsUserName</em></h2>
+    <h3>В системе работает пользователь <em>@currentUser?.WindowsUserName</em></h3>
 </RadzenCard>
 
 <div class="row justify-content-center">
@@ -135,8 +135,8 @@
     // Редактирование запрещено, если пользователь не утвержден и есть необработанные заявки от него
     private bool isUserDataReadOnly => (!currentUser?.IsApproved ?? false) && (isUnprocessedClaimsFound);
 
-    private string suggestedDistrictText => (tempUserData is not null && tempUserData.RelatedDistrict.DistrictName != currentUser.RelatedDistrict.DistrictName) 
-    ? $"Замена на {tempUserData.RelatedDistrict.DistrictName}" 
+    private string suggestedDistrictText => (tempUserData is not null && tempUserData.RelatedDistrict?.DistrictName != currentUser?.RelatedDistrict?.DistrictName) 
+    ? $"Замена на {tempUserData.RelatedDistrict?.DistrictName}" 
     : string.Empty;
 
 
@@ -175,7 +175,7 @@
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Ошибка обработки заявки");
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка обработки заявки", "Обратитесь к администратору", 5000);
             Logger.Log(LogLevel.Error, ex.GetBaseException().Message);
         }
         finally

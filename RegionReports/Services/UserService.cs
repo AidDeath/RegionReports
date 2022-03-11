@@ -126,6 +126,12 @@ namespace RegionReports.Services
             return GetCurrentUserModel().IsApproved;
         }
 
+        /// <summary>
+        /// Создание новой заявки на изменение данных пользователя
+        /// </summary>
+        /// <param name="actualUser"></param>
+        /// <param name="tempData"></param>
+        /// <returns></returns>
         public ReportUser CreateNewApprovalClaim(ReportUser? actualUser, ReportUser tempData)
         {
 
@@ -202,9 +208,17 @@ namespace RegionReports.Services
         /// Получить полный список пользователей с районами
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ReportUser> GetAllUsersWithDistricts()
+        public IEnumerable<ReportUser> GetAllUsersWithDistricts(bool approvedOnly = false)
         {
-            return _database.ReportUsers.GetQueryable().Include(u => u.RelatedDistrict).AsEnumerable();
+            if (approvedOnly) return _database.ReportUsers.GetQueryable().Where(u => u.IsApproved ).Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
+
+            return _database.ReportUsers.GetQueryable().Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
+        }
+
+        public void DeleteUserRecord(ReportUser user)
+        {
+            if (user.WindowsUserName != GetCurrentUserModel().WindowsUserName)
+                _database.ReportUsers.Delete(user);
         }
     }
 }
