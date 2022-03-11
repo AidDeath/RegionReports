@@ -1,0 +1,38 @@
+﻿@page "/usermanagment"
+@inject UserService UserService
+
+<h3>Управление пользователями</h3>
+
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Список">
+        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Simple" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            Data="@users" TItem="ReportUser" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or">
+            <Columns>
+                <RadzenDataGridColumn TItem="ReportUser" Property="FullName" Filterable="false" Title="ФИО" Frozen="true" Width="200px" />
+                <RadzenDataGridColumn TItem="ReportUser" Property="Email" Title="Почта" Frozen="true" Width="140px" />
+                <RadzenDataGridColumn TItem="ReportUser" Property="WindowsUserName" Title="Системное имя" Width="140px"/>
+            </Columns>
+        </RadzenDataGrid>
+
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Заявки на изменение">
+
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Третья вкладка">
+
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    private IEnumerable<ReportUser>? users { get; set; }
+
+    protected override void OnInitialized()
+    {
+        users = UserService.GetAllUsersWithDistricts();
+    }
+
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220311054418_ReportUser field added")]
+    partial class ReportUserfieldadded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +50,7 @@ namespace RegionReports.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ReportUserId] IS NOT NULL");
 
-                    b.ToTable("Districts", (string)null);
+                    b.ToTable("Districts");
 
                     b.HasData(
                         new
@@ -205,7 +207,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("Regions");
 
                     b.HasData(
                         new
@@ -280,7 +282,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportUsers", (string)null);
+                    b.ToTable("ReportUsers");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
@@ -301,7 +303,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportUserId");
 
-                    b.ToTable("ReportUserApprovalClaims", (string)null);
+                    b.ToTable("ReportUserApprovalClaims");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserSuggestedChanges", b =>
@@ -331,7 +333,7 @@ namespace RegionReports.Data.Migrations
                     b.HasIndex("ReportUserApprovalClaimId")
                         .IsUnique();
 
-                    b.ToTable("ReportUserSuggestedChanges", (string)null);
+                    b.ToTable("ReportUserSuggestedChanges");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.District", b =>

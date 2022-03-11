@@ -45,6 +45,11 @@ namespace RegionReports.Data.Entities
         public bool IsApproved { get; set; } = false;
 
         /// <summary>
+        /// Предыдущее состояние подтверждения пользователя
+        /// </summary>
+        public bool? PreviousApprovalState { get; set; }
+
+        /// <summary>
         /// Дата последнего входа пользователя в систему
         /// </summary>
         public DateTime? LastLoginDate { get;set; }

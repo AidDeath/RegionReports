@@ -142,6 +142,7 @@ namespace RegionReports.Services
                 }
             };
 
+            actualUser.PreviousApprovalState = actualUser.IsApproved;
             actualUser.IsApproved = false;
 
             _database.ReportUserApprovalClaims.Create(newClaim);
@@ -154,6 +155,28 @@ namespace RegionReports.Services
             return actualUser;
         }
 
+        public bool RevokeApprovalClaim(ReportUserApprovalClaim claim) 
+        {
+            try
+            {
+                var previousState = claim.ReportUser.PreviousApprovalState;
+
+                claim.ReportUser.PreviousApprovalState = claim.ReportUser.IsApproved;
+
+                claim.ReportUser.IsApproved = previousState ?? false;
+
+                claim.IsClaimProcessed = true;
+
+                _database.ReportUserApprovalClaims.Update(claim);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        //TODO
         //- Метод для тестирования разного рода штук. Удалить потом.
         public void TestMethod()
         {
@@ -173,6 +196,15 @@ namespace RegionReports.Services
 
             _database.ReportUserApprovalClaims.Create(newClaim);
 
+        }
+
+        /// <summary>
+        /// Получить полный список пользователей с районами
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ReportUser> GetAllUsersWithDistricts()
+        {
+            return _database.ReportUsers.GetQueryable().Include(u => u.RelatedDistrict).AsEnumerable();
         }
     }
 }

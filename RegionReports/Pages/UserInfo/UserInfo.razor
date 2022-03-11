@@ -63,7 +63,10 @@
 <div class="row justify-content-center mt-3">
     <div class="col-sm-12 col-md-8 col-lg-6 m-3">
         <RadzenCard  Visible=isUnprocessedClaimsFound>
-            <h3>Заявка на изменение данных ожидает обработки</h3>
+            <div class="row text-thin">
+                <h3 class="col-8">Заявка на изменение данных ожидает обработки</h3>
+                <RadzenButton class="col-4" ButtonStyle="ButtonStyle.Danger" Text="Отменить" Icon="highlight_off" Click="@RevokApprovalClaim"/>
+            </div>
             <h5 class="text-info">Предложенные изменения</h5>
             @if(suggestedName is not null)
             {
@@ -165,12 +168,10 @@
 
         try
         {
-            currentUser.IsApproved = false;
             currentUser = UserService.CreateNewApprovalClaim(currentUser, editedUserData);
-
-
-            Logger.Log(LogLevel.Information, $"User info approve request - {editedUserData.WindowsUserName}");
-            NotificationService.Notify(NotificationSeverity.Success, "Заявка отправлена успешно");
+            Logger.Log(LogLevel.Information, $"User info approve request - {currentUser.WindowsUserName}");
+            NotificationService.Notify(NotificationSeverity.Success, "Заявка отправлена успешно", "Дождитесь утверждения заявки администратором", 5000);
+            RetreiveUnprocessedClaim();
         }
         catch (Exception ex)
         {
@@ -179,7 +180,6 @@
         }
         finally
         {
-            RetreiveUnprocessedClaim();
             StateHasChanged();
         }
 
@@ -195,9 +195,11 @@
 
     }
 
-
-    private void RetreiveUnprocessedClaim(){
-        
+    /// <summary>
+    /// Заполнить на странице данные о заявке на изменения
+    /// </summary>
+    private void RetreiveUnprocessedClaim()
+    {  
         unprocessedClaim = currentUser.UserApprovalClaims?.FirstOrDefault(c => !c.IsClaimProcessed);
         if (unprocessedClaim is not null)
         {
@@ -206,6 +208,28 @@
             suggestedDistrictName = unprocessedClaim.ReportUserSuggestedChanges.RelatedDistrict.DistrictName;
         }
     }
-   
+
+    /// <summary>
+    /// Отменить свою заявку на изменение данных
+    /// </summary>
+    private void RevokApprovalClaim()
+    {
+        if (unprocessedClaim is not null)
+        {
+            if (UserService.RevokeApprovalClaim(unprocessedClaim))
+            {
+                NotificationService.Notify(NotificationSeverity.Success, "Заявка удалена");
+                RetreiveUnprocessedClaim();
+                StateHasChanged();
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Ошибка удаления заявки");
+            }
+
+
+        }
+    }
+
 
 }
