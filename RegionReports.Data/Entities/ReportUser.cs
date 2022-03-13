@@ -64,8 +64,9 @@ namespace RegionReports.Data.Entities
         /// <param name="suggested"></param>
         public void TakeSuggestedChanges(ReportUserApprovalClaim claim)
         {
-            this.FullName = claim.ReportUserSuggestedChanges.FullName;
-            this.Email = claim.ReportUserSuggestedChanges.Email;
+            this.FullName = claim.ReportUserSuggestedChanges.FullName ?? String.Empty ;
+            this.Email = claim.ReportUserSuggestedChanges.Email ?? String.Empty;
+            this.RelatedDistrict = claim.ReportUserSuggestedChanges.RelatedDistrict;
             this.LastChangesDate = DateTime.Now;
             
         }

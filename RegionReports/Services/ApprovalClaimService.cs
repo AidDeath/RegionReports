@@ -27,5 +27,22 @@ namespace RegionReports.Services
                     .ThenBy(c => c.ReportUser.WindowsUserName)
                     .AsEnumerable();
         }
+
+        public ReportUserApprovalClaim AcceptApprovalClaim(ReportUserApprovalClaim claim)
+        {
+            
+            claim.ReportUser.TakeSuggestedChanges(claim);
+            claim.ReportUser.IsApproved = true;
+            claim.IsClaimProcessed = true;
+
+            _database.ReportUserApprovalClaims.Update(claim);
+
+            
+
+            return claim;
+
+        }
+
+
     }
 }

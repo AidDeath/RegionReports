@@ -63,9 +63,12 @@
                             </Columns>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Title="Действия">
-                            <Template>
-                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="done" MouseEnter="@((args) => TooltipService.Open(args, "Принять"))" />
-                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="do_disturb" MouseEnter="@((args) => TooltipService.Open(args, "Отклонить"))"/>
+                            <Template Context="data">
+                            @if (!data.IsClaimProcessed)
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="done" MouseEnter="@((args) => TooltipService.Open(args, "Принять"))" Click="@(() => AcceptClaimChanges(data))"/>
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="do_disturb" MouseEnter="@((args) => TooltipService.Open(args, "Отклонить"))" Click="@(() => DeclineClaimChanges(data))"/>
+                            }
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -101,6 +104,25 @@
     private void RefreshClaimsList()
     {
         claims = ApprovalClaimService.GetAllClaims(ShowUnprocessedClaimsOnly);
+    }
+
+    private void AcceptClaimChanges(ReportUserApprovalClaim claim)
+    {
+        ApprovalClaimService.AcceptApprovalClaim(claim);
+    }
+
+    private void DeclineClaimChanges(ReportUserApprovalClaim claim)
+    {
+        try
+        {
+            UserService.RevokeApprovalClaim(claim);
+            NotificationService.Notify(NotificationSeverity.Success, "Заявка отклонена");
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка", e.GetBaseException().Message, 5000);
+        }
+        
     }
 
 

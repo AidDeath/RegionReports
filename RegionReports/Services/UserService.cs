@@ -153,14 +153,14 @@ namespace RegionReports.Services
 
             _database.ReportUserApprovalClaims.Create(newClaim);
 
-            //Оказывается - не нужно. EF сам справился
-            //if (actualUser.UserApprovalClaims is null) 
-            //    actualUser.UserApprovalClaims = new();
-            //actualUser.UserApprovalClaims.Add(newClaim);
-
             return actualUser;
         }
 
+        /// <summary>
+        /// Отозвать смою заявку на изменение данных и вернуть предыдущее состояние
+        /// </summary>
+        /// <param name="claim"></param>
+        /// <returns></returns>
         public bool RevokeApprovalClaim(ReportUserApprovalClaim claim) 
         {
             try
