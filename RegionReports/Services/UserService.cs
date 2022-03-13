@@ -157,7 +157,7 @@ namespace RegionReports.Services
         }
 
         /// <summary>
-        /// Отозвать смою заявку на изменение данных и вернуть предыдущее состояние
+        /// Пометить заявку обработанной, отклонить изменения из неё, вернуть пользователю предыдущее состояние
         /// </summary>
         /// <param name="claim"></param>
         /// <returns></returns>
@@ -180,6 +180,23 @@ namespace RegionReports.Services
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Пометить заявку обработанной, принять изменения из неё, утвердить пользователя
+        /// </summary>
+        /// <param name="claim"></param>
+        /// <returns></returns>
+        public ReportUserApprovalClaim AcceptApprovalClaim(ReportUserApprovalClaim claim)
+        {
+
+            claim.ReportUser.TakeSuggestedChanges(claim);
+            claim.ReportUser.IsApproved = true;
+            claim.IsClaimProcessed = true;
+
+            _database.ReportUserApprovalClaims.Update(claim);
+
+            return claim;
         }
 
         //TODO
@@ -213,6 +230,27 @@ namespace RegionReports.Services
             if (approvedOnly) return _database.ReportUsers.GetQueryable().Where(u => u.IsApproved ).Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
 
             return _database.ReportUsers.GetQueryable().Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
+        }
+
+        /// <summary>
+        /// Получить полный список заявок на изменение пользователей
+        /// </summary>
+        /// <param name="unprocessedOnly"></param>
+        /// <returns></returns>
+        public IEnumerable<ReportUserApprovalClaim> GetAllClaims(bool unprocessedOnly = false)
+        {
+            if (unprocessedOnly) return _database.ReportUserApprovalClaims.GetQueryable()
+                    .Where(c => !c.IsClaimProcessed).Include(c => c.ReportUser)
+                    .Include(c => c.ReportUserSuggestedChanges).ThenInclude(c => c.RelatedDistrict)
+                    .OrderByDescending(c => c.ReportUser.WindowsUserName)
+                    .AsEnumerable();
+
+            return _database.ReportUserApprovalClaims.GetQueryable()
+                    .Include(c => c.ReportUser)
+                    .Include(c => c.ReportUserSuggestedChanges).ThenInclude(c => c.RelatedDistrict)
+                    .OrderBy(c => c.IsClaimProcessed)
+                    .ThenBy(c => c.ReportUser.WindowsUserName)
+                    .AsEnumerable();
         }
 
         public void DeleteUserRecord(ReportUser user)

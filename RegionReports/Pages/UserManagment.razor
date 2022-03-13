@@ -1,6 +1,5 @@
 ﻿@page "/usermanagment"
 @inject UserService UserService
-@inject ApprovalClaimService ApprovalClaimService 
 @inject TooltipService TooltipService
 @inject NotificationService NotificationService
 
@@ -103,12 +102,12 @@
     /// </summary>
     private void RefreshClaimsList()
     {
-        claims = ApprovalClaimService.GetAllClaims(ShowUnprocessedClaimsOnly);
+        claims = UserService.GetAllClaims(ShowUnprocessedClaimsOnly);
     }
 
     private void AcceptClaimChanges(ReportUserApprovalClaim claim)
     {
-        ApprovalClaimService.AcceptApprovalClaim(claim);
+        UserService.AcceptApprovalClaim(claim);
     }
 
     private void DeclineClaimChanges(ReportUserApprovalClaim claim)
