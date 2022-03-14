@@ -34,7 +34,7 @@
                 </p>
 
                 <div class="row row-cols-2">
-                    <RadzenLabel class=col Component="Region" Text="Обслуживаемые регионы"/>
+                    <RadzenLabel class=col Component="Region" Text="Обслуживаемый регион"/>
                     <div class=col>
                         <h3><RadzenLabel class=text-primary Text=@relatedDistrictName/></h3>
                         @if (!string.IsNullOrEmpty(suggestedDistrictText))
@@ -42,7 +42,7 @@
                             <h3><RadzenLabel class=text-info Text=@suggestedDistrictText/></h3>
                         }
                         
-                        <RadzenButton class=col Text="Выбрать район" ButtonStyle="ButtonStyle.Secondary" Click=@SelectDistricts Visible=!isUserDataReadOnly/>
+                        <RadzenButton class=col Text="Выбрать район" ButtonStyle="ButtonStyle.Secondary" Click=@SelectDistrict Visible=!isUserDataReadOnly/>
                         
                     </div>
                     
@@ -187,7 +187,7 @@
     }
 
     //Вызов диалога для выбора обслуживаемых районов
-    private void SelectDistricts()
+    private void SelectDistrict()
     {
         DialogService.Open<RegionListDialog>("Обслуживаемые район", new Dictionary<string, object>(){
             {"CurrentUser", tempUserData }

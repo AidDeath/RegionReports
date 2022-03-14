@@ -2,6 +2,7 @@
 @inject UserService UserService
 @inject TooltipService TooltipService
 @inject NotificationService NotificationService
+@inject DialogService DialogService
 
 <PageTitle>Управление пользователями</PageTitle>
 <h3>Управление пользователями</h3>
@@ -27,9 +28,10 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="ReportUser" Property="FullName" Filterable="false" Title="ФИО" Frozen="true" Width="200px" />
                     <RadzenDataGridColumn TItem="ReportUser" Property="Email" Title="Почта" Frozen="true" Width="140px" />
+                    <RadzenDataGridColumn TItem="ReportUser" Property="RelatedDistrict.DistrictName" Title="Район" Frozen="true" Width="140px" />
                     <RadzenDataGridColumn TItem="ReportUser" Title="Действия" Width="90px">
                         <Template Context="data">
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Изменить"))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Изменить"))" Click=@(() => ShowEditUserDialog(data)) />
                             <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"/>
 
                         </Template>
@@ -59,6 +61,7 @@
                                 <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUserSuggestedChanges.FullName" Title="ФИО" />
                                 <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUserSuggestedChanges.Email" Title="Почта" />
                                 <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ReportUserSuggestedChanges.RelatedDistrict.DistrictName" Title="Район" />
+                                <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Property="ClaimDate" Title="Дата заявки" />
                             </Columns>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="ReportUserApprovalClaim" Title="Действия">
@@ -87,6 +90,8 @@
     {
         RefreshUsersList();
         RefreshClaimsList();
+        //Включаю перерисовку при закрытии диалогового окна.
+        DialogService.OnClose += (dynamic obj) => StateHasChanged();
     }
 
     /// <summary>
@@ -105,8 +110,26 @@
         claims = UserService.GetAllClaims(ShowUnprocessedClaimsOnly);
     }
 
-    private void AcceptClaimChanges(ReportUserApprovalClaim claim)
+
+    private async Task AcceptClaimChanges(ReportUserApprovalClaim claim)
     {
+        var currentDistrictUser = UserService.CheckIfDistrictAssigned(claim.ReportUserSuggestedChanges.RelatedDistrict);
+        if (currentDistrictUser is not null)
+        {
+            var result = await DialogService.OpenAsync("Конфликт назначения района", ds =>
+                @<div>
+                    <p class="mb-4">Район занят пользователем <b>@currentDistrictUser.WindowsUserName</b>, заменить?</p>
+                    <div class="row">
+                        <div class="col">
+                            <RadzenButton Text="Да" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
+                            <RadzenButton Text="Нет" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" Class="mr-1" Style="width: 80px;" />
+                        </div>
+                    </div>
+            </div>
+            );
+            if (result == false || result is  null) return;
+        } 
+
         UserService.AcceptApprovalClaim(claim);
     }
 
@@ -121,8 +144,15 @@
         {
             NotificationService.Notify(NotificationSeverity.Error, "Ошибка", e.GetBaseException().Message, 5000);
         }
-        
+
     }
 
+
+    private void ShowEditUserDialog(ReportUser user)
+    {
+        DialogService.Open<UserInfoEditingDialog>($"Редактирование данных {user.WindowsUserName}",
+            new Dictionary<string, object>() { { "editingUser", user } },
+            new DialogOptions() { Width = "700px", Height = "570px", Resizable = true, Draggable = true });
+    }
 
 }

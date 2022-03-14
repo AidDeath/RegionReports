@@ -11,7 +11,7 @@ namespace RegionReports.Data.Entities
     /// <summary>
     /// Информация о пользователе из БД
     /// </summary>
-    public class ReportUser 
+    public class ReportUser
     {
         public int Id { get; set; }
 
@@ -56,7 +56,7 @@ namespace RegionReports.Data.Entities
 
         public DateTime? LastChangesDate { get; set; }
 
-        public List<ReportUserApprovalClaim>? UserApprovalClaims { get; set; }  
+        public List<ReportUserApprovalClaim>? UserApprovalClaims { get; set; }
 
         /// <summary>
         /// Принять изменения данных из предлагаемых
@@ -70,5 +70,6 @@ namespace RegionReports.Data.Entities
             this.LastChangesDate = DateTime.Now;
             
         }
+
     }
 }

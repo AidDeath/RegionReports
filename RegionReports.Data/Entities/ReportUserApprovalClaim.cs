@@ -24,6 +24,11 @@ namespace RegionReports.Data.Entities
         public ReportUser ReportUser { get; set; }
 
         /// <summary>
+        /// Дата подачи заявки
+        /// </summary>
+        public DateTime ClaimDate { get; set; } = DateTime.Now;
+
+        /// <summary>
         /// Признак обработки заявки
         /// </summary>
         public bool IsClaimProcessed { get; set; } = false;

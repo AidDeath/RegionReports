@@ -183,6 +183,23 @@ namespace RegionReports.Services
         }
 
         /// <summary>
+        /// Проверить, занят ли район.
+        /// </summary>
+        /// <param name="district"></param>
+        /// <returns>Если район занят - возвращает пользователя, которым занят. Если нет - null</returns>
+        public ReportUser? CheckIfDistrictAssigned(District district)
+        {
+            var current = _database.Districts.GetQueryable().Include(d => d.ReportUser).FirstOrDefault(d =>d.Id == district.Id);
+
+            if (current?.ReportUser is not null)
+            {
+                return current.ReportUser;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Пометить заявку обработанной, принять изменения из неё, утвердить пользователя
         /// </summary>
         /// <param name="claim"></param>
@@ -242,15 +259,40 @@ namespace RegionReports.Services
             if (unprocessedOnly) return _database.ReportUserApprovalClaims.GetQueryable()
                     .Where(c => !c.IsClaimProcessed).Include(c => c.ReportUser)
                     .Include(c => c.ReportUserSuggestedChanges).ThenInclude(c => c.RelatedDistrict)
-                    .OrderByDescending(c => c.ReportUser.WindowsUserName)
+                    .OrderByDescending(c => c.ClaimDate)
                     .AsEnumerable();
 
             return _database.ReportUserApprovalClaims.GetQueryable()
                     .Include(c => c.ReportUser)
                     .Include(c => c.ReportUserSuggestedChanges).ThenInclude(c => c.RelatedDistrict)
                     .OrderBy(c => c.IsClaimProcessed)
-                    .ThenBy(c => c.ReportUser.WindowsUserName)
+                    .ThenByDescending(c => c.ClaimDate)
                     .AsEnumerable();
+        }
+
+        public ReportUser UpdateUserData(ReportUser actualUser, ReportUser tempData)
+        {
+
+            actualUser.FullName = tempData.FullName;
+            actualUser.Email = tempData.Email;
+            actualUser.RelatedDistrict = tempData.RelatedDistrict;
+
+            //На случай, если пользователя утвердили, не рассматривая его заявку - присваиваем статус заявке - обработано
+            if (actualUser.IsApproved == false && tempData.IsApproved == true)
+            {
+                var claim = _database.ReportUserApprovalClaims.GetLastClaimForUser(actualUser.Id);
+                if (claim != null)
+                {
+                    claim.IsClaimProcessed = true;
+                    _database.ReportUserApprovalClaims.Update(claim);
+                }
+
+            }
+            actualUser.IsApproved = tempData.IsApproved;
+
+            _database.ReportUsers.Update(actualUser);
+
+            return actualUser;
         }
 
         public void DeleteUserRecord(ReportUser user)

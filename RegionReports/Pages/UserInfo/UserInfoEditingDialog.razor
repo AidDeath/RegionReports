@@ -1,0 +1,115 @@
+﻿@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject UserService UserService
+
+
+<div class="row justify-content-center">
+        <RadzenTemplateForm TItem="ReportUser" Data=@tempUserData Submit="@((ReportUser tempUserData) => { SubmitChanges(tempUserData); })">
+            <RadzenFieldset Text=@tempUserData.WindowsUserName>
+                <div class="row row-cols-2">
+                    <RadzenLabel class=col Component="FullName" Text="Полное имя" />
+                    <RadzenTextBox class=col Name="FullName" @bind-Value=@tempUserData.FullName/>
+                </div>
+                <p><RadzenRequiredValidator Component="FullName" Text="Необходимо ввести имя пользователя" /></p>
+
+                <div class="row row-cols-2">
+                    <RadzenLabel class=col Component="Email" Text="Адрес электронной почты" />
+                    <RadzenTextBox class=col Name="Email" @bind-Value=@tempUserData.Email/>
+                </div>
+                <p>
+                    <RadzenRequiredValidator Component="Email" Text="Нужно ввести адрес почты"/>
+                    <RadzenEmailValidator Component="Email" Text="Адрес почты ввден некорректно!" />
+                </p>
+
+                <div class="row row-cols-2">
+                    <RadzenLabel class=col Component="Region" Text="Обслуживаемый регион"/>
+                    <div class=col>
+                        <h3><RadzenLabel class=text-primary Text=@relatedDistrictName/></h3>
+                        <RadzenButton class=col Text="Изменить район" ButtonStyle="ButtonStyle.Secondary" Click=@SelectDistrict/>
+                    </div>
+                </div>
+                <div class="row row-cols-2 my-3">
+                    <RadzenLabel class=col Component="IsApprovedCheckBox" Text="Пользователь утвержден" />
+                    <RadzenCheckBox class=col Name="IsApprovedCheckBox" @bind-Value=@tempUserData.IsApproved/>
+                </div>
+
+                <div>
+                    <div class="row row-cols-2" style="margin-top: 16px;">
+                        <RadzenButton class="col " ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Icon="save" Text="Сохранить" />
+                        <RadzenButton class="col" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Danger" Icon="cancel" Text="Отменить" />
+                    </div>
+                </div>
+            </RadzenFieldset>
+
+        </RadzenTemplateForm>
+
+</div>
+
+
+
+@code {
+
+    private string relatedDistrictName => tempUserData?.RelatedDistrict?.DistrictName ?? "Не выбран";
+
+    [Parameter]
+    public ReportUser editingUser { get; set; } = null!;
+
+    private ReportUser tempUserData = new();
+
+    protected override void OnInitialized()
+    {
+        tempUserData = new()
+        {
+            FullName = editingUser.FullName,
+            Email = editingUser.Email,
+            RelatedDistrict = editingUser.RelatedDistrict,
+            IsApproved = editingUser.IsApproved
+        };
+    }
+
+    private async Task SubmitChanges(ReportUser editedUserData)
+    {
+
+        try
+        {
+            var currentDistrictUser = UserService.CheckIfDistrictAssigned(editedUserData.RelatedDistrict);
+            if (currentDistrictUser is not null)
+            {
+                var result = await DialogService.OpenAsync("Конфликт назначения района", ds =>
+                    @<div>
+                        <p class="mb-4">Район занят пользователем <b>@currentDistrictUser.WindowsUserName</b>, заменить?</p>
+                        <div class="row">
+                            <div class="col">
+                                <RadzenButton Text="Да" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
+                                <RadzenButton Text="Нет" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" Class="mr-1" Style="width: 80px;" />
+                            </div>
+                        </div>
+                </div>
+                );
+                if (result == false || result is  null) return;
+            }
+
+            editingUser = UserService.UpdateUserData(editingUser, editedUserData);
+            //NotificationService.Notify(NotificationSeverity.Success, "Сохранено успешно");
+            DialogService.Close();
+
+
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка сохранения", ex.GetBaseException().Message, 5000);
+        }
+
+
+    }
+
+    //Вызов диалога для выбора обслуживаемых районов
+    private void SelectDistrict()
+    {
+        DialogService.Open<RegionListDialog>("Обслуживаемый район", new Dictionary<string, object>(){
+            {"CurrentUser", tempUserData }
+        });
+
+    }
+
+}

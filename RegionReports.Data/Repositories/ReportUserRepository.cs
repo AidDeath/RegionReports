@@ -18,5 +18,11 @@ namespace RegionReports.Data.Repositories
             return user;
         }
 
+        public override void Update(ReportUser entity)
+        {
+            entity.LastChangesDate = DateTime.Now;
+            base.Update(entity);
+        }
+
     }
 }
