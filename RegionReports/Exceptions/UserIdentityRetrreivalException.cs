@@ -6,7 +6,7 @@
 
         public UserIdentityRetrreivalException()
         {
-            Message = "Ошибка определения пользователя бзаузером";
+            Message = "Ошибка определения пользователя браузером";
         }
     }
 }

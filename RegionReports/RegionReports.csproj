@@ -19,8 +19,4 @@
     <ProjectReference Include="..\RegionReports.Data\RegionReports.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
 </Project>
