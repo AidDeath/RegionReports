@@ -1,36 +1,51 @@
 ﻿@page "/createreportrequest"
+@using RegionReports.Enums
+
+
 <PageTitle>Новый запрос данных</PageTitle>
 
 <RadzenSteps Change="OnStepChange">
     <Steps>
         <RadzenStepsItem Text="Выбор вида запроса">
-
+            <RadzenDropDown TValue="KeyValuePair<int, string>" Placeholder="Вид отчета" Data="@DropDownText" TextProperty="Value" 
+            SelectedItemChanged="@DropDownChanged"/>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Данные запроса">
-            <RadzenCard >
-             <div class="row">
-                    <h3>Текст запроса информации</h3>
-                    <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
-                        <RadzenHtmlEditorUndo Title="Отменить"/>
-                        <RadzenHtmlEditorRedo Title="Повторить"/>
-                        <RadzenHtmlEditorFontName Title="Шрифт"/>
-                        <RadzenHtmlEditorFontSize Title="Размер шрифта"/>
-                        <RadzenHtmlEditorSeparator/>
-                        <RadzenHtmlEditorAlignLeft Title="По левому краю"/>
-                        <RadzenHtmlEditorAlignCenter Title="По центру"/>
-                        <RadzenHtmlEditorAlignRight Title="По правому краю"/>
-                        <RadzenHtmlEditorSeparator/>
-                        <RadzenHtmlEditorBold Title="Жирный"/>
-                        <RadzenHtmlEditorItalic Title="Курсив"/>
-                        <RadzenHtmlEditorUnderline Title="Подчеркнутый"/>
-                        <RadzenHtmlEditorStrikeThrough Title="Зачеркнутый"/>
-                        <RadzenHtmlEditorSeparator />
-                        <RadzenHtmlEditorColor Title="Цвет шрифта"/>
-                        <RadzenHtmlEditorBackground Title="Заливка"/>
-                        <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
-                    </RadzenHtmlEditor>
-                </div>
-            </RadzenCard>
+            @switch (reportRequestType)
+            {
+                case ReportRequestType.SurveyReport:
+                    break;
+                case ReportRequestType.TextOnlyReport:
+                    <RadzenCard >
+                     <div class="row">
+                            <h3>Текст запроса информации</h3>
+                            <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                                <RadzenHtmlEditorUndo Title="Отменить"/>
+                                <RadzenHtmlEditorRedo Title="Повторить"/>
+                                <RadzenHtmlEditorFontName Title="Шрифт"/>
+                                <RadzenHtmlEditorFontSize Title="Размер шрифта"/>
+                                <RadzenHtmlEditorSeparator/>
+                                <RadzenHtmlEditorAlignLeft Title="По левому краю"/>
+                                <RadzenHtmlEditorAlignCenter Title="По центру"/>
+                                <RadzenHtmlEditorAlignRight Title="По правому краю"/>
+                                <RadzenHtmlEditorSeparator/>
+                                <RadzenHtmlEditorBold Title="Жирный"/>
+                                <RadzenHtmlEditorItalic Title="Курсив"/>
+                                <RadzenHtmlEditorUnderline Title="Подчеркнутый"/>
+                                <RadzenHtmlEditorStrikeThrough Title="Зачеркнутый"/>
+                                <RadzenHtmlEditorSeparator />
+                                <RadzenHtmlEditorColor Title="Цвет шрифта"/>
+                                <RadzenHtmlEditorBackground Title="Заливка"/>
+                                <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
+                            </RadzenHtmlEditor>
+                        </div>
+                    </RadzenCard>
+                    break;
+                case ReportRequestType.TextWithFileReport:
+                    break;
+                default:
+                    break;
+            }
         </RadzenStepsItem>
         <RadzenStepsItem Text="Назначение исполнителей">
 
@@ -39,8 +54,23 @@
 </RadzenSteps>
 
 @code {
-    
+
     private string value { get; set; } = "Просьба предоставить следующую информацию:";
+
+    private ReportRequestType reportRequestType { get; set; }
+
+    private Dictionary<int, string> DropDownText = new Dictionary<int, string>
+    {
+        {0, "Запрос текстовой информмации"},
+        {1, "Запрос информации с файлом-шаблоном"},
+        {2, "Опрос"}
+    };
+
+    private void DropDownChanged(object selectedEntry)
+    {
+        var SelectedIntex = ((KeyValuePair<int, string>)selectedEntry).Key;
+        reportRequestType = (ReportRequestType)SelectedIntex;
+    }
 
     void OnChange(string html)
     {
