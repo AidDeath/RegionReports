@@ -1,6 +1,5 @@
-﻿@page "/test"
-@inject UserService UserService
-
+﻿@page "/createreportrequest"
+<PageTitle>Новый запрос данных</PageTitle>
 
 <RadzenSteps Change="OnStepChange">
     <Steps>
@@ -39,12 +38,9 @@
     </Steps>
 </RadzenSteps>
 
-
-    <RadzenButton Click="Click"/>
-
-
 @code {
-    private string value { get; set; } = "Текст какой то";
+    
+    private string value { get; set; } = "Просьба предоставить следующую информацию:";
 
     void OnChange(string html)
     {
@@ -69,5 +65,4 @@
     {
         var a = $"Step with index {index} was selected.";
     }
-
 }

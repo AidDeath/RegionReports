@@ -12,6 +12,13 @@ namespace RegionReports.Data
         public DbSet<ReportUserApprovalClaim> ReportUserApprovalClaims { get; set; }
         public DbSet<ReportUserSuggestedChanges> ReportUserSuggestedChanges { get; set; }
 
+        #region Survey Reports
+        public DbSet<ReportRequestSurvey> ReportRequestsSurvey { get; set; }
+        public DbSet<ReportRequestSurveyOption> ReportRequestSurveyOptions { get; set; }
+        public DbSet<ReportSurvey> ReportsSurvey { get; set; }
+        public DbSet<ReportSurveyOption> ReportSurveySelectedOptions { get; set; }
+        #endregion
+
 
         private readonly IConfiguration _configuration;
         public RegionReportsContext(IConfiguration Configuration)
@@ -60,6 +67,29 @@ namespace RegionReports.Data
                 .WithMany()
                 .HasForeignKey(changes => changes.RelatedDistrictId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            #region Survey Reports
+
+            modelBuilder.Entity<ReportRequestSurvey>()
+                .HasMany(repReq => repReq.Options)
+                .WithOne(opt => opt.ReportRequestSurvey)
+                .HasForeignKey(opt => opt.ReportRequestSurveyId);
+
+            modelBuilder.Entity<ReportSurvey>()
+                .HasMany(rep => rep.SelectedOptions)
+                .WithOne(opt => opt.ReportSurvey)
+                .HasForeignKey(opt => opt.ReportSurveyId);
+
+            modelBuilder.Entity<ReportSurvey>()
+                .HasOne(rep => rep.ReportUser)
+                .WithMany()
+                .HasForeignKey(rep => rep.ReportUserId);
+
+            modelBuilder.Entity<ReportSurveyOption>()
+                .HasOne(opt => opt.ReportRequestSurveyOption)
+                .WithMany()
+                .HasForeignKey(opt => opt.ReportRequestSurveyOptionId);
+            #endregion
 
 
 
