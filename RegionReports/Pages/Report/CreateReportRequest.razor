@@ -1,25 +1,69 @@
 ﻿@page "/createreportrequest"
 @using RegionReports.Enums
+@inject ReportRequestService ReportRequestService
 
 
 <PageTitle>Новый запрос данных</PageTitle>
 
-<RadzenSteps Change="OnStepChange">
+<RadzenSteps Change="OnStepChange" NextText="Далее" PreviousText="Назад" >
     <Steps>
         <RadzenStepsItem Text="Выбор вида запроса">
             <RadzenDropDown TValue="KeyValuePair<int, string>" Placeholder="Вид отчета" Data="@DropDownText" TextProperty="Value" 
-            SelectedItemChanged="@DropDownChanged"/>
+            SelectedItemChanged="@DropDownChanged" />
         </RadzenStepsItem>
         <RadzenStepsItem Text="Данные запроса">
             @switch (reportRequestType)
             {
+                //Выбран тип отчета - опрос
                 case ReportRequestType.SurveyReport:
+                    @if (SurveyRequest is not null)
+                    {
+                        <RadzenCard >
+                            <h3>Введите вопрос для создания опроса</h3>
+                            <RadzenCard Style="width: 500px" >
+                                @foreach (var opt in SurveyRequest.Options)
+                                {
+                                    <div class="row mb-1">
+                                        <div class="col-2"><RadzenIcon Icon="task_alt"></RadzenIcon> </div>
+                                        <div class="col-8">@opt.OptionName</div>
+                                        <div class="col-2"><RadzenButton Icon="delete_forever" Click="@(() => SurveyRequest.Options.Remove(opt))"/></div>
+                                    </div>
+                                }
+                                @if (isAddOptionButtonVisible)
+                                {
+                                    <div class="row">
+                                        <div class="col-2"><RadzenIcon Icon="add"></RadzenIcon> </div>
+                                        <RadzenButton class="col-10" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Добавить вариант" Click=@(() => isAddOptionButtonVisible = false)/>  
+                                    </div>
+                                }
+                                else
+                                {
+                                    <RadzenTemplateForm TItem ="ReportRequestSurveyOption" Data="@inputtingOption"  Submit="AddSurveyOption">
+                                            <RadzenTextBox Placeholder="Текст варианта ответа" Name="TextBox" @bind-Value=@inputtingOption.OptionName/>
+                                            <RadzenButton ButtonType="ButtonType.Submit" Icon="check"/>
+                                            <RadzenButton Icon="cancel" ButtonStyle="ButtonStyle.Warning" Click=@(() => isAddOptionButtonVisible = true)/>
+
+                                        <div class="row">
+                                            <RadzenRequiredValidator Text="Нужно ввести вариант ответа" Component="TextBox"/> 
+                                        </div>
+                                            
+
+                                    </RadzenTemplateForm>
+
+                                }
+
+
+                            </RadzenCard>
+                            <RadzenButton Text="Сохранить" Click="@( () => AddRequestSurvey())"/>
+                        </RadzenCard>
+                    }
                     break;
+                //Выбран тип отчета - Простой текстовый
                 case ReportRequestType.TextOnlyReport:
                     <RadzenCard >
                      <div class="row">
                             <h3>Текст запроса информации</h3>
-                            <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                            <RadzenHtmlEditor @bind-Value=@ReportRequestText style="height: 500px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
                                 <RadzenHtmlEditorUndo Title="Отменить"/>
                                 <RadzenHtmlEditorRedo Title="Повторить"/>
                                 <RadzenHtmlEditorFontName Title="Шрифт"/>
@@ -41,6 +85,7 @@
                         </div>
                     </RadzenCard>
                     break;
+                //Выбран тип отчета - Запрос с файлом шаблона
                 case ReportRequestType.TextWithFileReport:
                     break;
                 default:
@@ -55,11 +100,11 @@
 
 @code {
 
-    private string value { get; set; } = "Просьба предоставить следующую информацию:";
+    private string ReportRequestText { get; set; } = "Просьба предоставить следующую информацию:";
 
     private ReportRequestType reportRequestType { get; set; }
 
-    private Dictionary<int, string> DropDownText = new Dictionary<int, string>
+    private static Dictionary<int, string> DropDownText = new Dictionary<int, string>
     {
         {0, "Запрос текстовой информмации"},
         {1, "Запрос информации с файлом-шаблоном"},
@@ -70,7 +115,39 @@
     {
         var SelectedIntex = ((KeyValuePair<int, string>)selectedEntry).Key;
         reportRequestType = (ReportRequestType)SelectedIntex;
+
+        if (reportRequestType == ReportRequestType.SurveyReport)
+            SurveyRequest = new(){ Options = new()};
     }
+
+    #region Survey
+    private bool isAddOptionButtonVisible { get; set; } = true;
+    private ReportRequestSurvey? SurveyRequest { get; set; }
+    private ReportRequestSurveyOption inputtingOption { get; set; } = new();
+
+    private void StartAddingSurveyItem(MouseEventArgs args)
+    {
+
+    }
+
+    /// <summary>
+    /// Добавить новую опцию в запрос отчета-опроса
+    /// </summary>
+    /// <param name="newOption"></param>
+    private void AddSurveyOption(ReportRequestSurveyOption newOption)
+    {
+        SurveyRequest?.Options.Add(new ReportRequestSurveyOption(){OptionName = newOption.OptionName});
+        inputtingOption.OptionName = string.Empty;
+        isAddOptionButtonVisible = true;
+    }
+
+    private void AddRequestSurvey()
+    {
+        ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
+    }
+    #endregion
+
+
 
     void OnChange(string html)
     {
@@ -88,11 +165,12 @@
     }
 
     void Click(){
-        var a = value;
+        var a = ReportRequestText;
     }
 
     void OnStepChange(int index)
     {
         var a = $"Step with index {index} was selected.";
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using RegionReports.Data.Interfaces;
+﻿using RegionReports.Data.Entities;
+using RegionReports.Data.Interfaces;
 using RegionReports.Enums;
 
 namespace RegionReports.Services
@@ -23,6 +24,11 @@ namespace RegionReports.Services
                 case ReportRequestType.SurveyReport:
                     break;
             }
+        }
+
+        public void CreateReportRequestSurvey(ReportRequestSurvey reportRequest)
+        {
+            _database.ReportRequestsSurvey.Create(reportRequest);
         }
     }
 }

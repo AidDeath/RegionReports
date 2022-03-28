@@ -18,5 +18,6 @@ namespace RegionReports.Data.Interfaces
         
         public IReportUserApprovalClaimRepository ReportUserApprovalClaims { get; }
 
+        public IRepository<ReportRequestSurvey> ReportRequestsSurvey { get; }
     }
 }
