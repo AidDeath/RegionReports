@@ -22,15 +22,25 @@
                 </p>
 
                 <div class="row row-cols-2">
-                    <RadzenLabel class=col Component="Region" Text="Обслуживаемый регион"/>
+                    <div class=col>
+                        <RadzenLabel Component="Region" Text="Обслуживаемый регион"/>
+                    </div>
+                    
                     <div class=col>
                         <h3><RadzenLabel class=text-primary Text=@relatedDistrictName/></h3>
                         <RadzenButton class=col Text="Изменить район" ButtonStyle="ButtonStyle.Secondary" Click=@SelectDistrict/>
                     </div>
                 </div>
                 <div class="row row-cols-2 my-3">
-                    <RadzenLabel class=col Component="IsApprovedCheckBox" Text="Пользователь утвержден" />
-                    <RadzenCheckBox class=col Name="IsApprovedCheckBox" @bind-Value=@tempUserData.IsApproved/>
+                    <div class=col>
+                        <RadzenLabel class=col Component="IsApprovedCheckBox" Text="Пользователь утвержден" />
+                    </div>
+                    
+                    <div class=col>
+                        <RadzenSwitch  Name="IsApprovedCheckBox"@bind-Value=@tempUserData.IsApproved/>
+                        @*<RadzenCheckBox class=col Name="IsApprovedCheckBox" @bind-Value=@tempUserData.IsApproved/>*@
+                    </div>
+                    
                 </div>
 
                 <div>
