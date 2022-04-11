@@ -19,42 +19,62 @@
                     @if (SurveyRequest is not null)
                     {
                         <RadzenCard >
-                            <h3>Введите вопрос для создания опроса</h3>
-                            <RadzenCard Style="width: 500px" >
-                                @foreach (var opt in SurveyRequest.Options)
-                                {
-                                    <div class="row mb-1">
-                                        <div class="col-2"><RadzenIcon Icon="task_alt"></RadzenIcon> </div>
-                                        <div class="col-8">@opt.OptionName</div>
-                                        <div class="col-2"><RadzenButton Icon="delete_forever" Click="@(() => SurveyRequest.Options.Remove(opt))"/></div>
-                                    </div>
-                                }
-                                @if (isAddOptionButtonVisible)
-                                {
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6">
+                                //Шапка опроса
+                                <RadzenCard >
                                     <div class="row">
-                                        <div class="col-2"><RadzenIcon Icon="add"></RadzenIcon> </div>
-                                        <RadzenButton class="col-10" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Добавить вариант" Click=@(() => isAddOptionButtonVisible = false)/>  
-                                    </div>
-                                }
-                                else
-                                {
-                                    <RadzenTemplateForm TItem ="ReportRequestSurveyOption" Data="@inputtingOption"  Submit="AddSurveyOption">
-                                            <RadzenTextBox Placeholder="Текст варианта ответа" Name="TextBox" @bind-Value=@inputtingOption.OptionName/>
-                                            <RadzenButton ButtonType="ButtonType.Submit" Icon="check"/>
-                                            <RadzenButton Icon="cancel" ButtonStyle="ButtonStyle.Warning" Click=@(() => isAddOptionButtonVisible = true)/>
-
-                                        <div class="row">
-                                            <RadzenRequiredValidator Text="Нужно ввести вариант ответа" Component="TextBox"/> 
+                                        <div>
+                                            <h4 class="mb-3">Текст запроса: </h4>
+                                            <RadzenTextArea class="w-100" @bind-Value=@SurveyRequest.Question Rows="7" MaxLength="500"/>
                                         </div>
-                                            
+                                        <div class=row>
+                                            <div class=col><h5>Выбор нескольких вариантов</h5></div>
+                                            <div class=col><RadzenSwitch class=align-top @bind-Value=@SurveyRequest.MultipleChoises/></div>
+                                        </div>                                  
+                                    </div>
+                                
+                                </RadzenCard>
+                                </div>
 
-                                    </RadzenTemplateForm>
+                                <div class="col-md-6 col-lg-6">
+                                //Опции опроса
+                                <RadzenCard>
+                                    <div class="p-1">
+                                        <h4 class="mb-3">Варианты ответа</h4>
+                                        @foreach (var opt in SurveyRequest.Options)
+                                        {
+                                            <div class="row mb-1">
+                                                <div class="col-2"><RadzenIcon Icon="task_alt"></RadzenIcon> </div>
+                                                <div class="col-8">@opt.OptionName</div>
+                                                <div class="col-2"><RadzenButton Icon="delete_forever" Click="@(() => SurveyRequest.Options.Remove(opt))"/></div>
+                                            </div>
+                                        }
+                                        @if (isAddOptionButtonVisible)
+                                        {
+                                            <div class="row">
+                                                <div class="col-2"><RadzenIcon Icon="add"></RadzenIcon> </div>
+                                                <RadzenButton class="col-10" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="Добавить вариант" Click=@(() => isAddOptionButtonVisible = false)/>  
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <RadzenTemplateForm TItem ="ReportRequestSurveyOption" Data="@inputtingOption"  Submit="AddSurveyOption">
+                                                    <RadzenTextBox Placeholder="Текст варианта ответа" Name="TextBox" @bind-Value=@inputtingOption.OptionName/>
+                                                    <RadzenButton ButtonType="ButtonType.Submit" Icon="check"/>
+                                                    <RadzenButton Icon="cancel" ButtonStyle="ButtonStyle.Warning" Click=@(() => isAddOptionButtonVisible = true)/>
 
-                                }
+                                                <div class="row">
+                                                    <RadzenRequiredValidator Text="Нужно ввести вариант ответа" Component="TextBox"/> 
+                                                </div>
+                                            </RadzenTemplateForm>
 
-
-                            </RadzenCard>
-                            <RadzenButton Text="Сохранить" Click="@( () => AddRequestSurvey())"/>
+                                        }
+                                    </div>
+                                </RadzenCard>
+                                </div>
+                            </div>
+                            @*<RadzenButton Text="Сохранить" Click="@( () => AddRequestSurvey())"/>*@
                         </RadzenCard>
                     }
                     break;

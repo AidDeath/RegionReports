@@ -13,6 +13,8 @@ namespace RegionReports.Data.Entities
     {
         public int Id { get; set; }
 
+        public string Question { get; set; } = "";
+
         /// <summary>
         /// Возможность выбора нескольких пунктов
         /// </summary>

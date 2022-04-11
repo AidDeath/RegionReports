@@ -24,28 +24,28 @@
             @Body
         </article>
     </main>
-
 </div>
 
+<div class="fixed-bottom">
     <footer>
     <RadzenFooter style="height: 61px"> 
-      <ChildContent>
+        <ChildContent>
         <div style="display: flex; float: none; position: relative; text-align: left" class="row">
-          <div class="col-6">
+            <div class="col-6">
             <RadzenLabel style="vertical-align: middle" Text="Система сбора отчетности"/>
             <RadzenLabel>
                 <LoginDisplay/>
             </RadzenLabel>
-          </div>
-          <div class="col-6" style="text-align: right">
+            </div>
+            <div class="col-6" style="text-align: right">
             <RadzenButton Icon="info" IsBusy="false" Size="ButtonSize.Medium" Text="О программе" Click="@ShowAbout">
             </RadzenButton>
-          </div>
+            </div>
         </div>
-      </ChildContent>
+        </ChildContent>
     </RadzenFooter>
     </footer>
-
+</div>
 
 @code{
     protected async Task ShowAbout(MouseEventArgs args)
