@@ -31,6 +31,7 @@ builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<DistrictService>();
 builder.Services.AddTransient<ReportRequestService>();
+builder.Services.AddTransient<FileService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,6 +51,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 

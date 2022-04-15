@@ -216,28 +216,6 @@ namespace RegionReports.Services
             return claim;
         }
 
-        //TODO
-        //- Метод для тестирования разного рода штук. Удалить потом.
-        public void TestMethod()
-        {
-            var user = GetCurrentUserWithClaims();
-
-            var newClaim = new ReportUserApprovalClaim
-            {
-                ReportUser = user,
-                ReportUserSuggestedChanges = new ReportUserSuggestedChanges
-                {
-                    FullName = "fsdfsadf",
-                    RelatedDistrict = _database.Districts.Get(3),
-                }
-            };
-
-            newClaim.ReportUser.IsApproved = false;
-
-            _database.ReportUserApprovalClaims.Create(newClaim);
-
-        }
-
         /// <summary>
         /// Получить полный список пользователей с районами
         /// </summary>

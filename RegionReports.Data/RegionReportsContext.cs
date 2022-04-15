@@ -19,6 +19,13 @@ namespace RegionReports.Data
         public DbSet<ReportSurveyOption> ReportSurveySelectedOptions { get; set; }
         #endregion
 
+        #region Text Reports
+        public DbSet<ReportRequestText> ReportRequestsText { get; set; }
+        public DbSet<ReportRequestFile> ReportRequestFiles { get; set; }
+
+
+        #endregion
+
 
         private readonly IConfiguration _configuration;
         public RegionReportsContext(IConfiguration Configuration)
@@ -91,6 +98,15 @@ namespace RegionReports.Data
                 .HasForeignKey(opt => opt.ReportRequestSurveyOptionId);
             #endregion
 
+
+            #region Text Reports
+            //modelBuilder.Entity<ReportRequestFile>().Property(f => f.RelatedReportText).IsRequired();
+
+            modelBuilder.Entity<ReportRequestText>()
+                .HasMany(rep => rep.Files)
+                .WithOne(file => file.RelatedReportText)
+                .HasForeignKey(a => a.ReportRequestTextId);
+            #endregion
 
 
 

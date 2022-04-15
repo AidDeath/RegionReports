@@ -1,73 +1,36 @@
 ﻿@page "/test"
-@inject UserService UserService
+@inject FileService FileService
+@inject NotificationService NotificationService
 
+    <InputFile OnChange="@StartAsync"/>
 
-<RadzenSteps Change="OnStepChange">
-    <Steps>
-        <RadzenStepsItem Text="Выбор вида запроса">
-
-        </RadzenStepsItem>
-        <RadzenStepsItem Text="Данные запроса">
-            <RadzenCard >
-             <div class="row">
-                    <h3>Текст запроса информации</h3>
-                    <RadzenHtmlEditor @bind-Value=@value style="height: 500px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
-                        <RadzenHtmlEditorUndo Title="Отменить"/>
-                        <RadzenHtmlEditorRedo Title="Повторить"/>
-                        <RadzenHtmlEditorFontName Title="Шрифт"/>
-                        <RadzenHtmlEditorFontSize Title="Размер шрифта"/>
-                        <RadzenHtmlEditorSeparator/>
-                        <RadzenHtmlEditorAlignLeft Title="По левому краю"/>
-                        <RadzenHtmlEditorAlignCenter Title="По центру"/>
-                        <RadzenHtmlEditorAlignRight Title="По правому краю"/>
-                        <RadzenHtmlEditorSeparator/>
-                        <RadzenHtmlEditorBold Title="Жирный"/>
-                        <RadzenHtmlEditorItalic Title="Курсив"/>
-                        <RadzenHtmlEditorUnderline Title="Подчеркнутый"/>
-                        <RadzenHtmlEditorStrikeThrough Title="Зачеркнутый"/>
-                        <RadzenHtmlEditorSeparator />
-                        <RadzenHtmlEditorColor Title="Цвет шрифта"/>
-                        <RadzenHtmlEditorBackground Title="Заливка"/>
-                        <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
-                    </RadzenHtmlEditor>
-                </div>
-            </RadzenCard>
-        </RadzenStepsItem>
-        <RadzenStepsItem Text="Назначение исполнителей">
-
-        </RadzenStepsItem>
-    </Steps>
-</RadzenSteps>
-
-
-    <RadzenButton Click="Click"/>
+    <RadzenUpload ChooseText="Выбрать файл" Url="upload/single" Multiple="false" Progress="@OnProgress" Change="@OnChange" />
+    <RadzenProgressBar Value="@progress"/>
 
 
 @code {
-    private string value { get; set; } = "Текст какой то";
+    private int progress;
 
-    void OnChange(string html)
+    private async Task StartAsync(InputFileChangeEventArgs args){
+        await FileService.UploadFileAsync(args.File);
+    }
+
+    private void Start(InputFileChangeEventArgs args){
+        FileService.UploadFile(args.File);
+    }
+
+    private void OnProgress(UploadProgressArgs args)
     {
-        var a = html;
+        progress = args.Progress;
     }
 
-    void OnExecute(HtmlEditorExecuteEventArgs args)
+    private void OnChange(UploadChangeEventArgs args)
     {
-        var a = args.CommandName;
+        var file = args.Files.FirstOrDefault();
+        if (file is null) return;
+
+
     }
 
-    void OnPaste(HtmlEditorPasteEventArgs args)
-    {
-        var a = args.Html;
-    }
-
-    void Click(){
-        var a = value;
-    }
-
-    void OnStepChange(int index)
-    {
-        var a = $"Step with index {index} was selected.";
-    }
 
 }
