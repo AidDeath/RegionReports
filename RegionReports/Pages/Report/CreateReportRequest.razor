@@ -108,12 +108,15 @@
                             </RadzenHtmlEditor>
                          </div>
 
-                         <div class="col-sm-6 col-md-5 col-lg-4">
-                             @if (@TextRequest.Files is not null)
-                                @foreach(var file in @TextRequest.Files)
-                                {
-                                    <h4>@file.FileOriginalName</h4>
-                                }
+                             <div class="col-sm-6 col-md-5 col-lg-4">
+                                 <img src="/images/file-excel.svg"/>
+                                 <img src="/images/file-word.svg"/>
+                                 <img src="/images/file-pdf-box.svg"/>
+                                 @if (@TextRequest.Files is not null)
+                                    @foreach(var file in @TextRequest.Files)
+                                    {
+                                        <h4>@file.FileOriginalName</h4>
+                                    }
 
                                 <RadzenUpload @ref="@upload" Url="upload/multiple" ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress"
                                 Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
