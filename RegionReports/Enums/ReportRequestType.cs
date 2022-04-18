@@ -1,5 +1,8 @@
 ﻿namespace RegionReports.Enums
 {
+    /// <summary>
+    /// Тип запроса информации
+    /// </summary>
     public enum ReportRequestType
     {
         /// <summary>

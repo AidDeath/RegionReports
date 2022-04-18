@@ -82,50 +82,50 @@
                 //Выбран тип отчета - Простой текстовый
                 case ReportRequestType.TextOnlyReport:
                     <RadzenCard >
-                     <div class="row">
-                         <div class="col-sm-6 col-md-7 col-lg-8">
-                            <RadzenLabel Text="Заголовок" Component="ReportRequestTitle"/>
-                            <RadzenTextBox Name="ReportRequestTitle" @bind-Value="@TextRequest.RequestTitle"/>
-                             <h3>Текст запроса информации</h3>
-                            <RadzenHtmlEditor @bind-Value="@TextRequest.RequestText" style="height: 400px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
-                                <RadzenHtmlEditorUndo Title="Отменить"/>
-                                <RadzenHtmlEditorRedo Title="Повторить"/>
-                                <RadzenHtmlEditorFontName Title="Шрифт"/>
-                                <RadzenHtmlEditorFontSize Title="Размер шрифта"/>
-                                <RadzenHtmlEditorSeparator/>
-                                <RadzenHtmlEditorAlignLeft Title="По левому краю"/>
-                                <RadzenHtmlEditorAlignCenter Title="По центру"/>
-                                <RadzenHtmlEditorAlignRight Title="По правому краю"/>
-                                <RadzenHtmlEditorSeparator/>
-                                <RadzenHtmlEditorBold Title="Жирный"/>
-                                <RadzenHtmlEditorItalic Title="Курсив"/>
-                                <RadzenHtmlEditorUnderline Title="Подчеркнутый"/>
-                                <RadzenHtmlEditorStrikeThrough Title="Зачеркнутый"/>
-                                <RadzenHtmlEditorSeparator />
-                                <RadzenHtmlEditorColor Title="Цвет шрифта"/>
-                                <RadzenHtmlEditorBackground Title="Заливка"/>
-                                <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
-                            </RadzenHtmlEditor>
-                         </div>
+                         <div class="row">
+                             <div class="col-sm-6 col-md-7 col-lg-8">
+                                <RadzenLabel Text="Заголовок" Component="ReportRequestTitle"/>
+                                <RadzenTextBox Name="ReportRequestTitle" @bind-Value="@TextRequest.RequestTitle"/>
+                                 <h3>Текст запроса информации</h3>
+                                <RadzenHtmlEditor @bind-Value="@TextRequest.RequestText" style="height: 400px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                                    <RadzenHtmlEditorUndo Title="Отменить"/>
+                                    <RadzenHtmlEditorRedo Title="Повторить"/>
+                                    <RadzenHtmlEditorFontName Title="Шрифт"/>
+                                    <RadzenHtmlEditorFontSize Title="Размер шрифта"/>
+                                    <RadzenHtmlEditorSeparator/>
+                                    <RadzenHtmlEditorAlignLeft Title="По левому краю"/>
+                                    <RadzenHtmlEditorAlignCenter Title="По центру"/>
+                                    <RadzenHtmlEditorAlignRight Title="По правому краю"/>
+                                    <RadzenHtmlEditorSeparator/>
+                                    <RadzenHtmlEditorBold Title="Жирный"/>
+                                    <RadzenHtmlEditorItalic Title="Курсив"/>
+                                    <RadzenHtmlEditorUnderline Title="Подчеркнутый"/>
+                                    <RadzenHtmlEditorStrikeThrough Title="Зачеркнутый"/>
+                                    <RadzenHtmlEditorSeparator />
+                                    <RadzenHtmlEditorColor Title="Цвет шрифта"/>
+                                    <RadzenHtmlEditorBackground Title="Заливка"/>
+                                    <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
+                                </RadzenHtmlEditor>
+                             </div>
 
-                             <div class="col-sm-6 col-md-5 col-lg-4">
-                                 <img src="/images/file-excel.svg"/>
-                                 <img src="/images/file-word.svg"/>
-                                 <img src="/images/file-pdf-box.svg"/>
-                                 @if (@TextRequest.Files is not null)
-                                    @foreach(var file in @TextRequest.Files)
-                                    {
-                                        <h4>@file.FileOriginalName</h4>
-                                    }
+                                 <div class="col-sm-6 col-md-5 col-lg-4">
+                                     <FileIcon FileType="UploadedFileType.Excel"/>
+                                     <FileIcon FileType="UploadedFileType.Word"/>
+                                     <FileIcon FileType="UploadedFileType.Pdf"/>
+                                     @if (@TextRequest.Files is not null)
+                                        @foreach(var file in @TextRequest.Files)
+                                        {
+                                            <h4>@file.FileOriginalName</h4>
+                                        }
 
-                                <RadzenUpload @ref="@upload" Url="upload/multiple" ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress"
-                                Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
+                                    <RadzenUpload @ref="@upload" Url="upload/multiple" ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
+                                    Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
                          
-                                <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
-                            </div>
+                                    <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
+                                </div>
 
                             
-                        </div>
+                            </div>
                     </RadzenCard>
                     break;
                 //Выбран тип отчета - Запрос с файлом шаблона

@@ -1,0 +1,31 @@
+﻿@using RegionReports.Enums
+<img src="@path"/>
+
+
+@code {
+    private string path;
+
+    protected override void OnInitialized()
+    {
+        path = DefineIconPath();
+    }
+
+    private string DefineIconPath(){
+        switch  (FileType){
+            case UploadedFileType.Word:
+                return @"/images/file-word.svg";    
+            case UploadedFileType.Excel:
+                return @"/images/file-excel.svg";
+            case UploadedFileType.Pdf:
+                return @"/images/file-pdf-box.svg";
+            default:
+                return "";
+
+        }
+    }
+
+    [Parameter]
+    public UploadedFileType FileType { get; set; }
+
+
+}
