@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
 
 namespace RegionReports.Services
@@ -10,6 +11,7 @@ namespace RegionReports.Services
         private readonly IDbAccessor _database;
         private IJSObjectReference _imageStreamScript;
         private IJSRuntime _jsRuntime;
+        private string FileStoragePath = "FileStorage";
 
         public FileService(IDbAccessor database, IJSRuntime jsRuntime)
         {
@@ -40,6 +42,40 @@ namespace RegionReports.Services
         {
             await using FileStream fs = new("uploaded.tst", FileMode.Create);
             await file.OpenReadStream().CopyToAsync(fs);
+        }
+
+        //public async Task UploadFilesAsync(IFormFile[] files)
+        //{
+        //    List<ReportRequestFile> FlieList = new();
+
+        //    foreach (IFormFile file in files)
+        //    {
+        //        var trustedFileName = Path.GetRandomFileName();
+
+        //        await using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
+        //            await file.OpenReadStream().CopyToAsync(fs);
+
+        //        FlieList.Add(new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName });
+        //    }
+
+        //}
+
+        public async Task<List<ReportRequestFile>> UploadFilesAsync(IFormFile[] files)
+        {
+            List<ReportRequestFile> FlieList = new();
+
+            foreach (IFormFile file in files)
+            {
+                var trustedFileName = Path.GetRandomFileName();
+
+                await using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
+                await file.OpenReadStream().CopyToAsync(fs);
+
+                FlieList.Add(new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName });
+            }
+
+            return FlieList;
+
         }
     }
 }

@@ -28,12 +28,14 @@ namespace RegionReports.Controllers
         }
 
         [HttpPost("upload/multiple")]
-        public IActionResult Multiple(IFormFile[] files)
+        public async Task<IActionResult> Multiple(IFormFile[] files)
         {
             try
             {
+                var uploadedFiles = await _fileService.UploadFilesAsync(files);
                 // Put your code here
-                return StatusCode(200);
+                //return StatusCode(200);
+                return Ok(uploadedFiles);
             }
             catch (Exception ex)
             {

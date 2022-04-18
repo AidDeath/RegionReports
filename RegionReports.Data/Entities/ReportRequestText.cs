@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace RegionReports.Data.Entities
@@ -24,6 +24,25 @@ namespace RegionReports.Data.Entities
         /// Перечень файлов прикрепленных к запросу
         /// </summary>
         public List<ReportRequestFile>? Files { get; set; }
+
+    }
+
+    /// <summary>
+    /// Файл к запросу текстового отчета
+    /// </summary>
+    public class ReportRequestFile
+    {
+        public int Id { get; set; }
+
+        [JsonPropertyName("fileUniqueName")]
+        public string FileUniqueName { get; set; } = "";
+
+        [JsonPropertyName("FileOriginalName")]
+        public string FileOriginalName { get; set; } = "";
+
+        public int ReportRequestTextId { get; set; }
+
+        public ReportRequestText RelatedReportText { get; set; }
 
     }
 }

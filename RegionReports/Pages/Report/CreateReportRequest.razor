@@ -1,5 +1,6 @@
 ﻿@page "/createreportrequest"
 @using RegionReports.Enums
+@using System.Text.Json
 @inject ReportRequestService ReportRequestService
 
 
@@ -9,7 +10,7 @@
     <Steps>
         <RadzenStepsItem Text="Выбор вида запроса">
             <RadzenDropDown TValue="KeyValuePair<int, string>" Placeholder="Вид отчета" Data="@DropDownText" TextProperty="Value" 
-            SelectedItemChanged="@DropDownChanged" />
+            SelectedItemChanged="@DropDownChanged"/>
         </RadzenStepsItem>
         <RadzenStepsItem Text="Данные запроса">
             @switch (reportRequestType)
@@ -82,10 +83,11 @@
                 case ReportRequestType.TextOnlyReport:
                     <RadzenCard >
                      <div class="row">
+                         <div class="col-sm-6 col-md-7 col-lg-8">
                             <RadzenLabel Text="Заголовок" Component="ReportRequestTitle"/>
-                            <RadzenTextBox Name="ReportRequestTitle"/>
-                            <h3>Текст запроса информации</h3>
-                            <RadzenHtmlEditor @bind-Value=@ReportRequestText style="height: 500px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                            <RadzenTextBox Name="ReportRequestTitle" @bind-Value="@TextRequest.RequestTitle"/>
+                             <h3>Текст запроса информации</h3>
+                            <RadzenHtmlEditor @bind-Value="@TextRequest.RequestText" style="height: 400px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
                                 <RadzenHtmlEditorUndo Title="Отменить"/>
                                 <RadzenHtmlEditorRedo Title="Повторить"/>
                                 <RadzenHtmlEditorFontName Title="Шрифт"/>
@@ -104,6 +106,22 @@
                                 <RadzenHtmlEditorBackground Title="Заливка"/>
                                 <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
                             </RadzenHtmlEditor>
+                         </div>
+
+                         <div class="col-sm-6 col-md-5 col-lg-4">
+                             @if (@TextRequest.Files is not null)
+                                @foreach(var file in @TextRequest.Files)
+                                {
+                                    <h4>@file.FileOriginalName</h4>
+                                }
+
+                                <RadzenUpload @ref="@upload" Url="upload/multiple" ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress"
+                                Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
+                         
+                                <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
+                            </div>
+
+                            
                         </div>
                     </RadzenCard>
                     break;
@@ -140,17 +158,17 @@
 
         if (reportRequestType == ReportRequestType.SurveyReport)
             SurveyRequest = new(){ Options = new()};
+
+        if (reportRequestType == ReportRequestType.TextOnlyReport)
+            TextRequest = new() { Files = new() };
+
     }
 
     #region Survey
     private bool isAddOptionButtonVisible { get; set; } = true;
-    private ReportRequestSurvey? SurveyRequest { get; set; }
+    private ReportRequestSurvey SurveyRequest { get; set; }  = new() { Options = new() };
     private ReportRequestSurveyOption inputtingOption { get; set; } = new();
 
-    private void StartAddingSurveyItem(MouseEventArgs args)
-    {
-
-    }
 
     /// <summary>
     /// Добавить новую опцию в запрос отчета-опроса
@@ -163,13 +181,43 @@
         isAddOptionButtonVisible = true;
     }
 
-
     private void AddRequestSurvey()
     {
         ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
     }
     #endregion
 
+
+    #region Text
+    private ReportRequestText TextRequest { get; set; } = new() { Files = new() };
+    private RadzenUpload upload = new();
+    private double uploadProgress;
+    private bool progressVisible;
+
+    private void OnProgress(UploadProgressArgs args)
+    {
+        if (args.Progress != 100) {
+            progressVisible = true;
+            uploadProgress = args.Progress;
+        }
+
+    }
+
+    private void OnUploadComplete(UploadCompleteEventArgs args)
+    {
+        JsonDocument jsonDocument = args.JsonResponse;
+
+        var uploadedFiles = jsonDocument.RootElement.Deserialize<List<ReportRequestFile>> ();
+
+        if (uploadedFiles is not null)
+            TextRequest.Files.AddRange(uploadedFiles);
+
+        upload.ClearFiles();
+        progressVisible = false;
+    }
+
+
+    #endregion
 
 
     void OnChange(string html)
