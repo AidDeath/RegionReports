@@ -5,8 +5,9 @@
     /// </summary>
     public enum UploadedFileType
     {
-        Word,
-        Excel,
-        Pdf
+        Word = 1,
+        Excel = 2,
+        Pdf = 3,
+        Other = 0
     }
 }

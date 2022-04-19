@@ -37,9 +37,13 @@ namespace RegionReports.Data.Entities
         [JsonPropertyName("fileUniqueName")]
         public string FileUniqueName { get; set; } = "";
 
-        [JsonPropertyName("FileOriginalName")]
+        [JsonPropertyName("fileOriginalName")]
         public string FileOriginalName { get; set; } = "";
 
+        [JsonPropertyName("fileType")]
+        public int FileType { get; set; }
+
+        [JsonPropertyName("reportRequestTextId")]
         public int ReportRequestTextId { get; set; }
 
         public ReportRequestText RelatedReportText { get; set; }

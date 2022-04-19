@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
+using RegionReports.Enums;
 
 namespace RegionReports.Services
 {
@@ -71,11 +72,30 @@ namespace RegionReports.Services
                 await using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
                 await file.OpenReadStream().CopyToAsync(fs);
 
-                FlieList.Add(new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName });
+                var uploadedFile = new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
+
+                var fileExtension = Path.GetExtension(file.FileName);
+
+                if (fileExtension.Contains("xls")) uploadedFile.FileType = (int)UploadedFileType.Excel;
+                if (fileExtension.Contains("doc")) uploadedFile.FileType = (int)UploadedFileType.Word;
+                if (fileExtension.Contains("pdf")) uploadedFile.FileType = (int)UploadedFileType.Pdf;
+                
+                if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
+
+
+                FlieList.Add(uploadedFile);
+
             }
 
             return FlieList;
 
+        }
+
+        public void DeleteFileFromFileSystem(ReportRequestFile file)
+        {
+            var path = Path.Combine(FileStoragePath, file.FileUniqueName);
+
+            if (File.Exists(path)) File.Delete(path);
         }
     }
 }

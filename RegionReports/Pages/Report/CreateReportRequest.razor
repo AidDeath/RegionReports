@@ -2,6 +2,8 @@
 @using RegionReports.Enums
 @using System.Text.Json
 @inject ReportRequestService ReportRequestService
+@inject FileService FileService
+@inject NotificationService NotificationService
 
 
 <PageTitle>Новый запрос данных</PageTitle>
@@ -109,16 +111,18 @@
                              </div>
 
                                  <div class="col-sm-6 col-md-5 col-lg-4">
-                                     <FileIcon FileType="UploadedFileType.Excel"/>
-                                     <FileIcon FileType="UploadedFileType.Word"/>
-                                     <FileIcon FileType="UploadedFileType.Pdf"/>
+                                     <h4>Прикрепленные файлы</h4>
                                      @if (@TextRequest.Files is not null)
                                         @foreach(var file in @TextRequest.Files)
                                         {
-                                            <h4>@file.FileOriginalName</h4>
+                                            <p>
+                                                <RadzenButton class="m-1" Icon="delete" Click="@(() => RemoveFile(file))"/>
+                                                <FileIcon FileType="@((UploadedFileType)file.FileType)"/>
+                                               @file.FileOriginalName
+                                            </p>
                                         }
 
-                                    <RadzenUpload @ref="@upload" Url="upload/multiple" ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
+                                    <RadzenUpload @ref="@upload" Url="upload/multiple"  ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
                                     Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
                          
                                     <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
@@ -142,8 +146,6 @@
 </RadzenSteps>
 
 @code {
-
-    private string ReportRequestText { get; set; } = "Просьба предоставить следующую информацию:";
 
     private ReportRequestType reportRequestType { get; set; }
 
@@ -212,12 +214,27 @@
 
         var uploadedFiles = jsonDocument.RootElement.Deserialize<List<ReportRequestFile>> ();
 
-        if (uploadedFiles is not null)
+        if (uploadedFiles is not null && TextRequest.Files is not null)
             TextRequest.Files.AddRange(uploadedFiles);
 
         upload.ClearFiles();
         progressVisible = false;
+
+        NotificationService.Notify(NotificationSeverity.Success, "Файлы загружены");
     }
+
+    /// <summary>
+    /// Удалить файл из списка и с сервера
+    /// </summary>
+    /// <param name="file"></param>
+    private void RemoveFile(ReportRequestFile file)
+    {
+        if (TextRequest.Files is not null) TextRequest.Files.Remove(file);
+
+        FileService.DeleteFileFromFileSystem(file);
+
+        NotificationService.Notify(NotificationSeverity.Info, "Файл удален");
+    } 
 
 
     #endregion
@@ -239,7 +256,7 @@
     }
 
     void Click(){
-        var a = ReportRequestText;
+        
     }
 
     void OnStepChange(int index)

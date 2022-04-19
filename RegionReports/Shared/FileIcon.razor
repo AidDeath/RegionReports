@@ -3,7 +3,7 @@
 
 
 @code {
-    private string path;
+    private string path {get; set;}= string.Empty;
 
     protected override void OnInitialized()
     {
@@ -19,7 +19,7 @@
             case UploadedFileType.Pdf:
                 return @"/images/file-pdf-box.svg";
             default:
-                return "";
+                return "/images/file-question.svg";
 
         }
     }
