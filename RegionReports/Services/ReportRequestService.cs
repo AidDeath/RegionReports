@@ -19,8 +19,6 @@ namespace RegionReports.Services
             {
                 case ReportRequestType.TextOnlyReport:
                     break;
-                case ReportRequestType.TextWithFileReport:
-                    break;
                 case ReportRequestType.SurveyReport:
                     break;
             }

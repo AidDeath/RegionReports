@@ -14,6 +14,8 @@
         <RadzenStepsItem Text="Выбор вида запроса">
             <RadzenDropDown TValue="KeyValuePair<int, string>" Placeholder="Вид отчета" Data="@DropDownText" TextProperty="Value" 
             SelectedItemChanged="@DropDownChanged"/>
+
+            <RadzenButton />
         </RadzenStepsItem>
         <RadzenStepsItem Text="Данные запроса">
             @switch (reportRequestType)
@@ -82,7 +84,7 @@
                         </RadzenCard>
                     }
                     break;
-                //Выбран тип отчета - Простой текстовый
+                //Выбран тип отчета - Простой текстовый запрос с возможностью прикрепить файл
                 case ReportRequestType.TextOnlyReport:
                     <RadzenCard >
                          <div class="row">
@@ -125,17 +127,11 @@
 
                                     <RadzenUpload @ref="@upload" Url="upload/multiple"  ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
                                     Accept="@SettingsService.GetUploadableMimeTypes()" Error="@OnUploadError"/>
-@*                                    Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
-*@                         
+                                    @*Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>*@                         
                                     <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
                                 </div>
-
-                            
                             </div>
                     </RadzenCard>
-                    break;
-                //Выбран тип отчета - Запрос с файлом шаблона
-                case ReportRequestType.TextWithFileReport:
                     break;
                 default:
                     break;
@@ -154,26 +150,34 @@
     private static Dictionary<int, string> DropDownText = new Dictionary<int, string>
     {
         {(int)ReportRequestType.TextOnlyReport, "Запрос текстовой информмации"},
-        {(int)ReportRequestType.TextWithFileReport, "Запрос информации с файлом-шаблоном"},
         {(int)ReportRequestType.SurveyReport, "Опрос"}
     };
 
     private void DropDownChanged(object selectedEntry)
     {
-        var SelectedIntex = ((KeyValuePair<int, string>)selectedEntry).Key;
-        reportRequestType = (ReportRequestType)SelectedIntex;
+        var SelectedIndex = ((KeyValuePair<int, string>)selectedEntry).Key;
+        reportRequestType = (ReportRequestType)SelectedIndex;
 
         if (reportRequestType == ReportRequestType.SurveyReport)
+        {
             SurveyRequest = new(){ Options = new()};
+            TextRequest = null;
+        }
+
 
         if (reportRequestType == ReportRequestType.TextOnlyReport)
+        {
             TextRequest = new() { Files = new() };
+            SurveyRequest = null;
+        }
+
+
 
     }
 
     #region Survey
     private bool isAddOptionButtonVisible { get; set; } = true;
-    private ReportRequestSurvey SurveyRequest { get; set; }  = new() { Options = new() };
+    private ReportRequestSurvey? SurveyRequest { get; set; }
     private ReportRequestSurveyOption inputtingOption { get; set; } = new();
 
 
@@ -187,16 +191,11 @@
         inputtingOption.OptionName = string.Empty;
         isAddOptionButtonVisible = true;
     }
-
-    private void AddRequestSurvey()
-    {
-        ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
-    }
     #endregion
 
 
     #region Text
-    private ReportRequestText TextRequest { get; set; } = new() { Files = new() };
+    private ReportRequestText? TextRequest { get; set; }
     private RadzenUpload upload = new();
     private double uploadProgress;
     private bool progressVisible;
@@ -216,7 +215,7 @@
 
         var uploadedFiles = jsonDocument.RootElement.Deserialize<List<ReportRequestFile>> ();
 
-        if (uploadedFiles is not null && TextRequest.Files is not null)
+        if (uploadedFiles is not null && TextRequest?.Files is not null)
             TextRequest.Files.AddRange(uploadedFiles);
 
         upload.ClearFiles();
@@ -239,7 +238,7 @@
     /// <param name="file"></param>
     private void RemoveFile(ReportRequestFile file)
     {
-        if (TextRequest.Files is not null) TextRequest.Files.Remove(file);
+        if (TextRequest?.Files is not null) TextRequest.Files.Remove(file);
 
         FileService.DeleteFileFromFileSystem(file);
 
