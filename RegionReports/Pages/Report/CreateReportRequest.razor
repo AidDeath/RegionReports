@@ -4,6 +4,7 @@
 @inject ReportRequestService ReportRequestService
 @inject FileService FileService
 @inject NotificationService NotificationService
+@inject SettingsService SettingsService
 
 
 <PageTitle>Новый запрос данных</PageTitle>
@@ -123,8 +124,9 @@
                                         }
 
                                     <RadzenUpload @ref="@upload" Url="upload/multiple"  ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
-                                    Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
-                         
+                                    Accept="@SettingsService.GetUploadableMimeTypes()" Error="@OnUploadError"/>
+@*                                    Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>
+*@                         
                                     <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
                                 </div>
 
@@ -151,9 +153,9 @@
 
     private static Dictionary<int, string> DropDownText = new Dictionary<int, string>
     {
-        {0, "Запрос текстовой информмации"},
-        {1, "Запрос информации с файлом-шаблоном"},
-        {2, "Опрос"}
+        {(int)ReportRequestType.TextOnlyReport, "Запрос текстовой информмации"},
+        {(int)ReportRequestType.TextWithFileReport, "Запрос информации с файлом-шаблоном"},
+        {(int)ReportRequestType.SurveyReport, "Опрос"}
     };
 
     private void DropDownChanged(object selectedEntry)
@@ -221,6 +223,14 @@
         progressVisible = false;
 
         NotificationService.Notify(NotificationSeverity.Success, "Файлы загружены");
+    }
+
+
+    private void OnUploadError(UploadErrorEventArgs args){
+        NotificationService.Notify(NotificationSeverity.Error, "Ошибка при загрузке", args.Message);
+
+        upload.ClearFiles();
+        progressVisible = false;
     }
 
     /// <summary>

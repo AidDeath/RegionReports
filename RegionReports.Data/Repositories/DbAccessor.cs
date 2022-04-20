@@ -26,5 +26,8 @@ namespace RegionReports.Data.Repositories
         private IRepository<ReportRequestText> _reportRequestsText { get; set; }
         public IRepository<ReportRequestText> ReportRequestsText => _reportRequestsText ??= new Repository<ReportRequestText>(_context);
 
+        private IRepository<UploadableFileType> _uploadableFileTypes { get; set; }
+        public IRepository<UploadableFileType> UploadableFileTypes => _uploadableFileTypes ??= new Repository<UploadableFileType>(_context);
+
     }
 }

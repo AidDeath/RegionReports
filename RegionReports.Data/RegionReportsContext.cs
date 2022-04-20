@@ -23,8 +23,9 @@ namespace RegionReports.Data
         public DbSet<ReportRequestText> ReportRequestsText { get; set; }
         public DbSet<ReportRequestFile> ReportRequestFiles { get; set; }
 
-
         #endregion
+
+        public DbSet<UploadableFileType> AlowedUploadFileTypes { get; set; }
 
 
         private readonly IConfiguration _configuration;
@@ -100,13 +101,21 @@ namespace RegionReports.Data
 
 
             #region Text Reports
-            //modelBuilder.Entity<ReportRequestFile>().Property(f => f.RelatedReportText).IsRequired();
+            modelBuilder.Entity<ReportRequestFile>().Property(f => f.ReportRequestTextId).IsRequired();
 
             modelBuilder.Entity<ReportRequestText>()
                 .HasMany(rep => rep.Files)
                 .WithOne(file => file.RelatedReportText)
                 .HasForeignKey(a => a.ReportRequestTextId);
             #endregion
+
+            modelBuilder.Entity<UploadableFileType>().HasData(
+                new UploadableFileType() {Id = 1, AlowedMimeType = @"application/msword" },
+                new UploadableFileType() {Id = 2,  AlowedMimeType = @"application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                new UploadableFileType() {Id = 3, AlowedMimeType = @"application/vnd.ms-excel"},
+                new UploadableFileType() {Id = 4, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                new UploadableFileType() {Id = 5, AlowedMimeType = @"application/pdf" }
+                );
 
 
 

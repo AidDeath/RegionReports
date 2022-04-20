@@ -1,36 +1,16 @@
 ﻿@page "/test"
 @inject FileService FileService
 @inject NotificationService NotificationService
+@inject SettingsService SettingsService
 
-    <InputFile OnChange="@StartAsync"/>
-
-    <RadzenUpload ChooseText="Выбрать файл" Url="upload/single" Multiple="false" Progress="@OnProgress" Change="@OnChange" />
-    <RadzenProgressBar Value="@progress"/>
-
+    <h1>@fromParams</h1>
 
 @code {
-    private int progress;
+    private string fromParams { get; set; } = string.Empty;
 
-    private async Task StartAsync(InputFileChangeEventArgs args){
-        await FileService.UploadFileAsync(args.File);
-    }
-
-    private void Start(InputFileChangeEventArgs args){
-        FileService.UploadFile(args.File);
-    }
-
-    private void OnProgress(UploadProgressArgs args)
+    protected override void OnInitialized()
     {
-        progress = args.Progress;
+        fromParams = SettingsService.GetUploadableMimeTypes();
     }
-
-    private void OnChange(UploadChangeEventArgs args)
-    {
-        var file = args.Files.FirstOrDefault();
-        if (file is null) return;
-
-
-    }
-
 
 }

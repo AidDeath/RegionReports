@@ -28,10 +28,15 @@ builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
+
+
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<DistrictService>();
 builder.Services.AddTransient<ReportRequestService>();
 builder.Services.AddTransient<FileService>();
+
+builder.Services.AddTransient<SettingsService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

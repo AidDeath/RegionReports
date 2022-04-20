@@ -7,9 +7,11 @@ namespace RegionReports.Controllers
     {
 
         private FileService _fileService;
-        public UploadController(FileService fileService)
+        private readonly long _maxFileSize;
+        public UploadController(FileService fileService, SettingsService settingsService)
         {
             _fileService = fileService;
+            _maxFileSize = settingsService.GetMaxUploadFileSize();
         }
 
         [HttpPost("upload/single")]
@@ -17,9 +19,9 @@ namespace RegionReports.Controllers
         {
             try
             {
-                if (file is null) return BadRequest();
-                await _fileService.UploadFileAsync(file);
-                return Ok();
+                if (file.Length > _maxFileSize) throw new Exception("Превышено ограничение на размер файла");
+                var uploadedFile = await _fileService.UploadFileAsync(file);
+                return Ok(uploadedFile);
             }
             catch (Exception ex)
             {
@@ -27,13 +29,16 @@ namespace RegionReports.Controllers
             }
         }
 
+
+
         [HttpPost("upload/multiple")]
         public async Task<IActionResult> Multiple(IFormFile[] files)
         {
             try
             {
+                if (files.Max(f => f.Length) > _maxFileSize) throw new Exception("Превышено ограничение на размер файла");
+
                 var uploadedFiles = await _fileService.UploadFilesAsync(files);
-                // Put your code here
                 //return StatusCode(200);
                 return Ok(uploadedFiles);
             }
@@ -48,7 +53,6 @@ namespace RegionReports.Controllers
         {
             try
             {
-                // Put your code here
                 return StatusCode(200);
             }
             catch (Exception ex)

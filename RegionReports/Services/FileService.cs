@@ -12,12 +12,13 @@ namespace RegionReports.Services
         private readonly IDbAccessor _database;
         private IJSObjectReference _imageStreamScript;
         private IJSRuntime _jsRuntime;
-        private string FileStoragePath = "FileStorage";
+        private readonly string FileStoragePath;
 
-        public FileService(IDbAccessor database, IJSRuntime jsRuntime)
+        public FileService(IDbAccessor database, IJSRuntime jsRuntime, SettingsService settingsService)
         {
             _jsRuntime = jsRuntime;
             _database = database;
+            FileStoragePath = settingsService.GetFileStoragePath();
 
             Task.Run(() => LoadScripts());
         }
@@ -39,31 +40,69 @@ namespace RegionReports.Services
             await file.OpenReadStream().CopyToAsync(fs);
         }
 
-        public async Task UploadFileAsync(IFormFile file)
+        public async Task<ReportRequestFile> UploadFileAsync(IFormFile file)
         {
-            await using FileStream fs = new("uploaded.tst", FileMode.Create);
-            await file.OpenReadStream().CopyToAsync(fs);
+            var trustedFileName = Path.GetRandomFileName();
+
+            using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
+                await file.OpenReadStream().CopyToAsync(fs);
+
+            var uploadedFile = new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
+
+            var fileExtension = Path.GetExtension(file.FileName);
+
+            if (fileExtension.Contains("xls")) uploadedFile.FileType = (int)UploadedFileType.Excel;
+            if (fileExtension.Contains("doc")) uploadedFile.FileType = (int)UploadedFileType.Word;
+            if (fileExtension.Contains("pdf")) uploadedFile.FileType = (int)UploadedFileType.Pdf;
+
+            if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
+
+            return uploadedFile;
         }
 
-        //public async Task UploadFilesAsync(IFormFile[] files)
-        //{
-        //    List<ReportRequestFile> FlieList = new();
+        /// <summary>
+        /// Синхронная загрузка нескольких файлов
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        public List<ReportRequestFile> UploadFiles(IFormFile[] files)
+        {
+            List<ReportRequestFile> fileList = new();
 
-        //    foreach (IFormFile file in files)
-        //    {
-        //        var trustedFileName = Path.GetRandomFileName();
+            foreach (IFormFile file in files)
+            {
+                var trustedFileName = Path.GetRandomFileName();
 
-        //        await using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
-        //            await file.OpenReadStream().CopyToAsync(fs);
+                using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
+                    file.OpenReadStream().CopyToAsync(fs);
 
-        //        FlieList.Add(new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName });
-        //    }
+                var uploadedFile = new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
 
-        //}
+                var fileExtension = Path.GetExtension(file.FileName);
 
+                if (fileExtension.Contains("xls")) uploadedFile.FileType = (int)UploadedFileType.Excel;
+                if (fileExtension.Contains("doc")) uploadedFile.FileType = (int)UploadedFileType.Word;
+                if (fileExtension.Contains("pdf")) uploadedFile.FileType = (int)UploadedFileType.Pdf;
+
+                if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
+
+
+                fileList.Add(uploadedFile);
+
+            }
+
+            return fileList;
+
+        }
+
+        /// <summary>
+        /// Асинхронная загрузка нескольких файлов
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
         public async Task<List<ReportRequestFile>> UploadFilesAsync(IFormFile[] files)
         {
-            List<ReportRequestFile> FlieList = new();
+            List<ReportRequestFile> fileList = new();
 
             foreach (IFormFile file in files)
             {
@@ -83,11 +122,11 @@ namespace RegionReports.Services
                 if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
 
 
-                FlieList.Add(uploadedFile);
+                fileList.Add(uploadedFile);
 
             }
 
-            return FlieList;
+            return fileList;
 
         }
 

@@ -21,5 +21,7 @@ namespace RegionReports.Data.Interfaces
         public IRepository<ReportRequestSurvey> ReportRequestsSurvey { get; }
 
         public IRepository<ReportRequestText> ReportRequestsText { get; }
+
+        public IRepository<UploadableFileType> UploadableFileTypes { get; }
     }
 }
