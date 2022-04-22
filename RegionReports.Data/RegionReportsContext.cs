@@ -107,6 +107,11 @@ namespace RegionReports.Data
                 .HasMany(rep => rep.Files)
                 .WithOne(file => file.RelatedReportText)
                 .HasForeignKey(a => a.ReportRequestTextId);
+
+            modelBuilder.Entity<ReportRequestText>()
+                .HasOne(rep => rep.ReportSchedule)
+                .WithOne()
+                .HasForeignKey<ReportRequestText>(rep => rep.ReportScheduleId);
             #endregion
 
             modelBuilder.Entity<UploadableFileType>().HasData(

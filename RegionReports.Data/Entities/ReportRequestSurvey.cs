@@ -24,6 +24,23 @@ namespace RegionReports.Data.Entities
         /// Список вариантов ответа в опросе
         /// </summary>
         public List<ReportRequestSurveyOption> Options { get; set; } = new List<ReportRequestSurveyOption>();
+
+        /// <summary>
+        /// Назначено ли расписание для запроса
+        /// </summary>
+        public bool IsSchedulledRequest { get; set; } = false;
+
+        
+        /// <summary>
+        /// Срок сдачи отчета. Заполняется в случае отсутствия расписания
+        /// </summary>
+        public DateTime? NonScheduledDeadline { get; set; }
+
+        /// <summary>
+        /// Идентификатор расписания, если задано
+        /// </summary>
+        public int? ReportScheduleId { get; set; }
+        public ReportSchedule? ReportSchedule { get; set; }
     }
 
     /// <summary>
@@ -44,5 +61,7 @@ namespace RegionReports.Data.Entities
         /// Ссылка на запрос, к которому относится этот пункт 
         /// </summary>
         public ReportRequestSurvey? ReportRequestSurvey { get; set; }
+
+
     }
 }

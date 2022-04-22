@@ -25,6 +25,23 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public List<ReportRequestFile>? Files { get; set; }
 
+        /// <summary>
+        /// Назначено ли расписание для запроса
+        /// </summary>
+        public bool IsSchedulledRequest { get; set; } = false;
+
+
+        /// <summary>
+        /// Срок сдачи отчета. Заполняется в случае отсутствия расписания
+        /// </summary>
+        public DateTime? NonScheduledDeadline { get; set; }
+
+        /// <summary>
+        /// Идентификатор расписания, если задано
+        /// </summary>
+        public int? ReportScheduleId { get; set; }
+        public ReportSchedule? ReportSchedule { get; set; }
+
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220421092634_Added schedules for report requests")]
+    partial class Addedschedulesforreportrequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,6 +298,9 @@ namespace RegionReports.Data.Migrations
                     b.Property<int?>("ReportScheduleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ReportSheduleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReportScheduleId");
@@ -339,7 +344,7 @@ namespace RegionReports.Data.Migrations
                     b.Property<DateTime?>("NonScheduledDeadline")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ReportScheduleId")
+                    b.Property<int?>("ReportSheduleId")
                         .HasColumnType("int");
 
                     b.Property<string>("RequestText")
@@ -352,9 +357,9 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReportScheduleId")
+                    b.HasIndex("ReportSheduleId")
                         .IsUnique()
-                        .HasFilter("[ReportScheduleId] IS NOT NULL");
+                        .HasFilter("[ReportSheduleId] IS NOT NULL");
 
                     b.ToTable("ReportRequestsText");
                 });
@@ -367,10 +372,10 @@ namespace RegionReports.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<short?>("DayOfMonth")
+                    b.Property<short>("DayOfMonth")
                         .HasColumnType("smallint");
 
-                    b.Property<short?>("DayOfWeek")
+                    b.Property<short>("DayOfWeek")
                         .HasColumnType("smallint");
 
                     b.Property<int>("ScheduleType")
@@ -624,7 +629,7 @@ namespace RegionReports.Data.Migrations
                 {
                     b.HasOne("RegionReports.Data.Entities.ReportSchedule", "ReportSchedule")
                         .WithOne()
-                        .HasForeignKey("RegionReports.Data.Entities.ReportRequestText", "ReportScheduleId");
+                        .HasForeignKey("RegionReports.Data.Entities.ReportRequestText", "ReportSheduleId");
 
                     b.Navigation("ReportSchedule");
                 });
