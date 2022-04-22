@@ -3,14 +3,29 @@
 @inject NotificationService NotificationService
 @inject SettingsService SettingsService
 
-    <h1>@fromParams</h1>
+
+
+
+         <RadzenCard>
+        <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" TValue="short?" @bind-Value="@a" Change="@Changed">
+            <Items>
+                <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
+                <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
+                <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
+                <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
+                <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
+                <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
+                <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
+            </Items>
+        </RadzenRadioButtonList>
+            </RadzenCard>
 
 @code {
-    private string fromParams { get; set; } = string.Empty;
+    private short? a { get; set; } = 1;
 
-    protected override void OnInitialized()
+    private void Changed(short? val)
     {
-        fromParams = SettingsService.GetUploadableMimeTypes();
+        var a = val;
     }
 
 }

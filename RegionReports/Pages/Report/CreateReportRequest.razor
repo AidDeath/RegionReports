@@ -137,7 +137,7 @@
                     break;
             }
         </RadzenStepsItem>
-        <RadzenStepsItem Text="Назначение исполнителей">
+        <RadzenStepsItem Text="Исполнители и расписание">
             <div class="row align-content-center">
                 <div class="col-md-6 col-lg-6 align-items-center">
                     <RadzenFieldset Text="Назначение отчёта пользователям">
@@ -148,33 +148,61 @@
                 <div class="col-md-6 col-lg-6 align-items-center">
                     <RadzenFieldset Text="Периодичность сбора отчета">
                         
-                        <RadzenSelectBar TValue="bool" @bind-Value="@isSchedulledRequest">
+                        <RadzenSelectBar TValue="bool" @bind-Value="@isScheduledRequest">
                             <Items>
                                 <RadzenSelectBarItem Text="Однократный запрос" Value="false" />
                                 <RadzenSelectBarItem Text="Запрос по расписанию" Value="true" />
                             </Items>
                         </RadzenSelectBar>
 
-                        <RadzenCard Visible="@(!isSchedulledRequest)">
+                        @*Для однократного запроса*@
+                        <RadzenCard Visible="@(!isScheduledRequest)">
                             <RadzenLabel Component="NonScheduledCalendar" Text="Дата" />
-                            <RadzenDatePicker Name="NonScheduledCalendar" class="m-2"  TValue="DateTime" Inline="true" @bind-Value="@nonScheduledDeadline" />
+                            <RadzenDatePicker Name="NonScheduledCalendar" DateRender="@DateRenderNotBeforeToday" class="m-2"  TValue="DateTime" Inline="true" @bind-Value="@nonScheduledDeadline" />
                         
                             <RadzenLabel Component="NonSchedulledDeadline" Text="Время"/>
-                            <RadzenDatePicker Name="NonSchedulledDeadline" AllowInput="false" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" TValue="DateTime?" Change=@((args) => OnNonScheduledTimeChanged(args))/>
+                            <RadzenDatePicker Name="NonSchedulledDeadline" AllowInput="false" ShowTime="true" TimeOnly="true" DateFormat="HH:mm" TValue="DateTime" @bind-Value="@nonScheduledDeadline"/>
                         </RadzenCard>
 
-                        
-                        <RadzenCard Visible=@isSchedulledRequest>
+                        @*Для запроса с расписанием*@
+                        <RadzenCard Visible=@isScheduledRequest>
                             <RadzenAccordion class="m-2"  Expand="@((args) => SheduleTypeSelected(args))">
                                 <Items>
                                     <RadzenAccordionItem Text="Ежемесячнно" Icon="calendar_view_month">
-                                        <RadzenDatePicker class="w-100" TValue="TimeSpan" ShowTime="true" TimeOnly="true" DateFormat="HH:mm"/>
+                                        <p>
+                                        <RadzenLabel Component="DayOfMonthNumericBox" Text="День месяца"/>
+                                        <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" Value="@reportSchedule.DayOfMonth" />
+                                        </p>
+                                        <p>
+                                       <RadzenLabel Component="SchedulledTime" Text="Время"/>
+                                        <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
+                                                DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+                                        </p>
                                     </RadzenAccordionItem>
                                     <RadzenAccordionItem Text="Еженедельно" Icon="calendar_view_week">
-                                        Details for Employees
+                                        <RadzenLabel Component="DayOfWeekRadioButtons" Text="День недели"/>
+                                        <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" 
+                                                    TValue="short?" @bind-Value="@reportSchedule.DayOfWeek">
+                                            <Items>
+                                                <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
+                                                <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
+                                                <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
+                                                <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
+                                                <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
+                                                <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
+                                                <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
+                                            </Items>
+                                        </RadzenRadioButtonList>
+
+                                       <RadzenLabel Component="SchedulledTime" Text="Время"/>
+                                        <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
+                                                DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
                                     </RadzenAccordionItem>
                                     <RadzenAccordionItem Text="Ежедневно" Icon="calendar_view_day">
-                                        Details for Customers
+
+                                        <RadzenLabel Component="SchedulledTime" Text="Время"/>
+                                        <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
+                                                DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
                                     </RadzenAccordionItem>
                                 </Items>
                             </RadzenAccordion>
@@ -292,57 +320,96 @@
 
 
     #region Scheduller
+    // Данные в этих переменных хранятся временно, TODO: переписать в объект при сохранении запроса
+    private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
 
-    private ReportSchedule? reportSchedule;
+    private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
+    private ReportSchedule reportSchedule = new ReportSchedule() {
+            DayOfMonth = 1,
+            DayOfWeek = 1,
+            Time = new TimeSpan(12, 30, 0)
+    };
 
-    private DateTime nonScheduledDeadline
+    void DateRenderNotBeforeToday(DateRenderEventArgs args)
     {
-        get
-        {
-            switch (reportRequestType){
-                case ReportRequestType.SurveyReport:
-                    if (SurveyRequest is null) throw new NullReferenceException();
-                    if (SurveyRequest.NonScheduledDeadline is null) SurveyRequest.NonScheduledDeadline = DateTime.Now.AddDays(1);
-                    return SurveyRequest.NonScheduledDeadline ?? DateTime.Now.AddDays(1).Date;
-                case ReportRequestType.TextOnlyReport:
-                    if (TextRequest is null) throw new NullReferenceException();
-                    if (TextRequest.NonScheduledDeadline is null) TextRequest.NonScheduledDeadline = DateTime.Now.AddDays(1);
-                    return TextRequest?.NonScheduledDeadline ?? DateTime.Now.AddDays(1).Date; 
-                default: throw new Exception("Не выбран тип отчета");
-            }
-        }
-
-        set
-        {
-            switch (reportRequestType){
-                case ReportRequestType.SurveyReport:
-                    if (SurveyRequest is null) throw new NullReferenceException();
-                    SurveyRequest.NonScheduledDeadline = value;
-                    break;
-
-                case ReportRequestType.TextOnlyReport:
-                    if (TextRequest is null) throw new NullReferenceException();
-                    TextRequest.NonScheduledDeadline  = value;
-                    break;
-
-                default: throw new Exception("Не выбран тип отчета");
-            }
-
-            StateHasChanged();
-        }
+        args.Disabled = args.Disabled || args.Date < DateTime.Today;
     }
 
 
-    private void OnNonScheduledTimeChanged(DateTime? dateTime)
-    {
-        if (dateTime is not null)
-        {
-            var current = nonScheduledDeadline.Date;
-            nonScheduledDeadline = current.AddHours(dateTime.Value.Hour).AddMinutes(dateTime.Value.Minute);
-        }
-    }
 
-    private bool isSchedulledRequest {
+
+    //private DateTime nonScheduledDeadline
+    //{
+    //    get
+    //    {
+    //        switch (reportRequestType){
+    //            case ReportRequestType.SurveyReport:
+    //                if (SurveyRequest is null) throw new NullReferenceException();
+    //                if (SurveyRequest.NonScheduledDeadline is null) SurveyRequest.NonScheduledDeadline = DateTime.Now.AddDays(1);
+    //                return SurveyRequest.NonScheduledDeadline ?? DateTime.Now.AddDays(1).Date;
+    //            case ReportRequestType.TextOnlyReport:
+    //                if (TextRequest is null) throw new NullReferenceException();
+    //                if (TextRequest.NonScheduledDeadline is null) TextRequest.NonScheduledDeadline = DateTime.Now.AddDays(1);
+    //                return TextRequest?.NonScheduledDeadline ?? DateTime.Now.AddDays(1).Date; 
+    //            default: throw new Exception("Не выбран тип отчета");
+    //        }
+    //    }
+
+    //    set
+    //    {
+    //        switch (reportRequestType){
+    //            case ReportRequestType.SurveyReport:
+    //                if (SurveyRequest is null) throw new NullReferenceException();
+    //                SurveyRequest.NonScheduledDeadline = value;
+    //                break;
+
+    //            case ReportRequestType.TextOnlyReport:
+    //                if (TextRequest is null) throw new NullReferenceException();
+    //                TextRequest.NonScheduledDeadline  = value;
+    //                break;
+
+    //            default: throw new Exception("Не выбран тип отчета");
+    //        }
+
+    //        StateHasChanged();
+    //    }
+    //}
+
+
+    //private void OnNonScheduledTimeChanged(DateTime? dateTime)
+    //{
+    //    if (dateTime is not null)
+    //    {
+    //        var current = nonScheduledDeadline.Date;
+    //        nonScheduledDeadline = current.AddHours(dateTime.Value.Hour).AddMinutes(dateTime.Value.Minute);
+    //    }
+    //}
+
+    //private void OnScheduledTimeChanged(DateTime? dateTime)
+    //{
+    //    if (dateTime is not null)
+    //    {
+    //        var current = nonScheduledDeadline.Date;
+    //        current = current.AddHours(dateTime.Value.Hour).AddMinutes(dateTime.Value.Minute);
+    //        switch (reportRequestType){
+    //            case ReportRequestType.SurveyReport:
+    //                if (SurveyRequest?.ReportSchedule is null ) throw new NullReferenceException();
+    //                SurveyRequest.ReportSchedule.Time = new TimeSpan(current.Hour, current.Second, 0);
+    //                break;
+
+    //            case ReportRequestType.TextOnlyReport:
+    //                if (TextRequest?.ReportSchedule is null ) throw new NullReferenceException();
+    //                TextRequest.ReportSchedule.Time = new TimeSpan(current.Hour, current.Second, 0);
+    //                break;
+
+    //            default: throw new Exception("Не выбран тип отчета");
+    //        }
+
+    //    }
+    //}
+
+
+    private bool isScheduledRequest {
         get {
             switch (reportRequestType){
                 case ReportRequestType.SurveyReport:
@@ -358,13 +425,11 @@
                 case ReportRequestType.SurveyReport:
                     if (SurveyRequest is null) throw new NullReferenceException();
                     SurveyRequest.IsSchedulledRequest = value;
-                    reportSchedule = SurveyRequest.ReportSchedule = (value) ?  new() : null;
                     break;
 
                 case ReportRequestType.TextOnlyReport:
                     if (TextRequest is null) throw new NullReferenceException();
                     TextRequest.IsSchedulledRequest = value;
-                    reportSchedule = TextRequest.ReportSchedule = (value) ?  new() : null;
                     break;
 
                 default: throw new Exception("Не выбран тип отчета");
@@ -375,11 +440,10 @@
 
     private void SheduleTypeSelected(int selectedIndex)
     {
-        if (reportSchedule is not null)
-            reportSchedule.ScheduleType = selectedIndex + 1;
+        reportSchedule.ScheduleType = selectedIndex + 1;
     }
 
-#endregion
+    #endregion
 
 
     void OnChange(string html)
@@ -404,19 +468,6 @@
     void OnStepChange(int index)
     {
         //При переходе на вкладку с расписанием и назначениями - проставляем дату выполнения в завтрашнюю
-        if (index == 2)
-        {
-            switch (reportRequestType){
-                case ReportRequestType.SurveyReport:
-                    if (SurveyRequest is null) throw new NullReferenceException();
-                    SurveyRequest.NonScheduledDeadline = nonScheduledDeadline;
-                    break;
-                case ReportRequestType.TextOnlyReport:
-                    if (TextRequest is null) throw new NullReferenceException();
-                    TextRequest.NonScheduledDeadline = nonScheduledDeadline;
-                    break;
-            }
-        }
-
+        var a = nonScheduledDeadline;
     }
 }
