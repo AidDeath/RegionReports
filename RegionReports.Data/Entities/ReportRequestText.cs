@@ -49,6 +49,7 @@ namespace RegionReports.Data.Entities
     /// </summary>
     public class ReportRequestFile
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [JsonPropertyName("fileUniqueName")]

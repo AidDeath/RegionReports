@@ -1,4 +1,5 @@
-﻿using RegionReports.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
 
 namespace RegionReports.Services
@@ -24,5 +25,11 @@ namespace RegionReports.Services
         {
             return _database.Districts.GetQueryable().AsEnumerable();
         }
+
+        public async Task<IEnumerable<District>> GetDistrictsWithUsersAsync()
+        {
+            return await _database.Districts.GetQueryable().Where(d => d.ReportUserId != null).Include(d => d.ReportUser).ToListAsync();
+        }
+
     }
 }

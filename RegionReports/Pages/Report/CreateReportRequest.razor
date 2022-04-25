@@ -5,6 +5,7 @@
 @inject FileService FileService
 @inject NotificationService NotificationService
 @inject SettingsService SettingsService
+@inject DistrictService DistrictService;
 
 
 <PageTitle>Новый запрос данных</PageTitle>
@@ -28,16 +29,14 @@
                             <div class="row">
                                 <div class="col-md-6 col-lg-6">
                                 @*Шапка опроса*@
+                                 <RadzenLabel Text="Заголовок" Component="SurveyRequestTitle"/>
+                                <RadzenTextBox class="m-2" Name="SurveyRequestTitle" @bind-Value="@SurveyRequest.RequestTitle"/>
                                 <RadzenCard >
                                     <div class="row">
                                         <div>
                                             <h4 class="mb-3">Текст запроса: </h4>
                                             <RadzenTextArea class="w-100" @bind-Value=@SurveyRequest.Question Rows="7" MaxLength="500"/>
-                                        </div>
-                                        <div class=row>
-                                            <div class=col><h5>Выбор нескольких вариантов</h5></div>
-                                            <div class=col><RadzenSwitch class=align-top @bind-Value=@SurveyRequest.MultipleChoises/></div>
-                                        </div>                                  
+                                        </div>                            
                                     </div>
                                 
                                 </RadzenCard>
@@ -45,6 +44,10 @@
 
                                 <div class="col-md-6 col-lg-6">
                                 @*Опции опроса*@
+                                    <div class="row m-2">
+                                            <div class=col><h5>Выбор нескольких вариантов</h5></div>
+                                            <div class=col><RadzenSwitch class=align-top @bind-Value=@SurveyRequest.MultipleChoises/></div>
+                                    </div>                                  
                                 <RadzenCard>
                                     <div class="p-1">
                                         <h4 class="mb-3">Варианты ответа</h4>
@@ -141,9 +144,26 @@
             <div class="row align-content-center">
                 <div class="col-md-6 col-lg-6 align-items-center">
                     <RadzenFieldset Text="Назначение отчёта пользователям">
+                        <RadzenDataGrid @ref="districtsDataGrid" AllowRowSelectOnRowClick="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="6"
+                                        AllowSorting="true" Data="@districts" TItem="District" ColumnWidth="200px"
+                                        SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedDistricts>
+                                <Columns>
+                                    <RadzenDataGridColumn TItem="District" Width="40px" Sortable="false" Filterable="false">
+                                        <HeaderTemplate>
+                                            <RadzenCheckBox TriState="true" TValue="bool" Value="@(districts.Any(i => selectedDistricts != null && selectedDistricts.Contains(i)))"
+                                                            Change="@(args => selectedDistricts = args ? districts.ToList() : null)" />
+                                        </HeaderTemplate>
+                                        <Template Context="data">
+                                            <RadzenCheckBox TriState="false" Value="@(selectedDistricts != null && selectedDistricts.Contains(data))" 
+                                                TValue="bool" Change=@(args => { districtsDataGrid.SelectRow(data); }) />
+                                        </Template>
+                                    </RadzenDataGridColumn>
 
+                                    <RadzenDataGridColumn TItem="District" Property="DistrictName" Title="Район"  SortOrder="SortOrder.Ascending"/>
+                                    <RadzenDataGridColumn TItem="District" Property="ReportUser.FullName" Title="Представитель" />
+                                </Columns>
+                            </RadzenDataGrid>
                     </RadzenFieldset>
-
                 </div>
                 <div class="col-md-6 col-lg-6 align-items-center">
                     <RadzenFieldset Text="Периодичность сбора отчета">
@@ -211,6 +231,44 @@
                     </RadzenFieldset>
                 </div>
             </div>
+        </RadzenStepsItem>
+
+        <RadzenStepsItem Text="Готово">
+                <p class="lead">Проверьте, всё ли верно</p>
+                <div class=h4>
+                        <p> Тип отчета : @DropDownText[(int)reportRequestType]</p>
+
+                        <p>Заголовок: 
+                            @switch (reportRequestType) {
+                                case ReportRequestType.SurveyReport:
+                                            @if (SurveyRequest.RequestTitle != string.Empty )
+                                            {
+                                                @SurveyRequest.RequestTitle
+                                            }
+                                            else
+                                            {
+                                                 <div class="alert alert-danger">Не указан заголовок запроса отчета</div>
+                                            }
+                                    break;
+                                case ReportRequestType.TextOnlyReport:
+                                    @TextRequest.RequestTitle
+                                    break;
+                            }
+                        </p>
+
+                        <p>Исполнители: 
+                            @if (selectedDistricts != null && selectedDistricts.Count > 0)
+                            {
+                                @selectedDistricts.Select(d => d.DistrictName).Aggregate((a, b) => a + ", " + b);
+                            }
+                            else {
+                                <div class="alert alert-danger" role="alert">
+                                    Не выбраны! Выберите исполнителей!
+                                </div>
+                            }
+                        </p>
+
+                </div>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
@@ -335,80 +393,6 @@
         args.Disabled = args.Disabled || args.Date < DateTime.Today;
     }
 
-
-
-
-    //private DateTime nonScheduledDeadline
-    //{
-    //    get
-    //    {
-    //        switch (reportRequestType){
-    //            case ReportRequestType.SurveyReport:
-    //                if (SurveyRequest is null) throw new NullReferenceException();
-    //                if (SurveyRequest.NonScheduledDeadline is null) SurveyRequest.NonScheduledDeadline = DateTime.Now.AddDays(1);
-    //                return SurveyRequest.NonScheduledDeadline ?? DateTime.Now.AddDays(1).Date;
-    //            case ReportRequestType.TextOnlyReport:
-    //                if (TextRequest is null) throw new NullReferenceException();
-    //                if (TextRequest.NonScheduledDeadline is null) TextRequest.NonScheduledDeadline = DateTime.Now.AddDays(1);
-    //                return TextRequest?.NonScheduledDeadline ?? DateTime.Now.AddDays(1).Date; 
-    //            default: throw new Exception("Не выбран тип отчета");
-    //        }
-    //    }
-
-    //    set
-    //    {
-    //        switch (reportRequestType){
-    //            case ReportRequestType.SurveyReport:
-    //                if (SurveyRequest is null) throw new NullReferenceException();
-    //                SurveyRequest.NonScheduledDeadline = value;
-    //                break;
-
-    //            case ReportRequestType.TextOnlyReport:
-    //                if (TextRequest is null) throw new NullReferenceException();
-    //                TextRequest.NonScheduledDeadline  = value;
-    //                break;
-
-    //            default: throw new Exception("Не выбран тип отчета");
-    //        }
-
-    //        StateHasChanged();
-    //    }
-    //}
-
-
-    //private void OnNonScheduledTimeChanged(DateTime? dateTime)
-    //{
-    //    if (dateTime is not null)
-    //    {
-    //        var current = nonScheduledDeadline.Date;
-    //        nonScheduledDeadline = current.AddHours(dateTime.Value.Hour).AddMinutes(dateTime.Value.Minute);
-    //    }
-    //}
-
-    //private void OnScheduledTimeChanged(DateTime? dateTime)
-    //{
-    //    if (dateTime is not null)
-    //    {
-    //        var current = nonScheduledDeadline.Date;
-    //        current = current.AddHours(dateTime.Value.Hour).AddMinutes(dateTime.Value.Minute);
-    //        switch (reportRequestType){
-    //            case ReportRequestType.SurveyReport:
-    //                if (SurveyRequest?.ReportSchedule is null ) throw new NullReferenceException();
-    //                SurveyRequest.ReportSchedule.Time = new TimeSpan(current.Hour, current.Second, 0);
-    //                break;
-
-    //            case ReportRequestType.TextOnlyReport:
-    //                if (TextRequest?.ReportSchedule is null ) throw new NullReferenceException();
-    //                TextRequest.ReportSchedule.Time = new TimeSpan(current.Hour, current.Second, 0);
-    //                break;
-
-    //            default: throw new Exception("Не выбран тип отчета");
-    //        }
-
-    //    }
-    //}
-
-
     private bool isScheduledRequest {
         get {
             switch (reportRequestType){
@@ -445,6 +429,26 @@
 
     #endregion
 
+    #region District or user selection
+
+    RadzenDataGrid<District> districtsDataGrid;
+
+    IEnumerable<District> districts;
+    IList<District> selectedDistricts;
+
+
+
+
+
+
+
+    #endregion
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        districts = await DistrictService.GetDistrictsWithUsersAsync();
+    }
 
     void OnChange(string html)
     {

@@ -13,6 +13,11 @@ namespace RegionReports.Data.Entities
     {
         public int Id { get; set; }
 
+        /// <summary>
+        /// Заголовок опроса
+        /// </summary>
+        public string RequestTitle { get; set; } = "";
+
         public string Question { get; set; } = "";
 
         /// <summary>
