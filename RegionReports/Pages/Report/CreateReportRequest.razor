@@ -191,7 +191,7 @@
                                     <RadzenAccordionItem Text="Ежемесячнно" Icon="calendar_view_month">
                                         <p>
                                         <RadzenLabel Component="DayOfMonthNumericBox" Text="День месяца"/>
-                                        <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" Value="@reportSchedule.DayOfMonth" />
+                                        <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" @bind-Value="@reportSchedule.DayOfMonth" />
                                         </p>
                                         <p>
                                        <RadzenLabel Component="SchedulledTime" Text="Время"/>
@@ -203,14 +203,14 @@
                                         <RadzenLabel Component="DayOfWeekRadioButtons" Text="День недели"/>
                                         <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" 
                                                     TValue="short?" @bind-Value="@reportSchedule.DayOfWeek">
-                                            <Items>
-                                                <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
-                                                <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
-                                                <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
-                                                <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
-                                                <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
-                                                <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
-                                                <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
+                                                    <Items>
+                                                        <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
+                                                        <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
+                                                        <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
+                                                        <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
+                                                        <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
+                                                        <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
+                                                        <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
                                             </Items>
                                         </RadzenRadioButtonList>
 
@@ -232,43 +232,37 @@
                 </div>
             </div>
         </RadzenStepsItem>
-
         <RadzenStepsItem Text="Готово">
                 <p class="lead">Проверьте, всё ли верно</p>
-                <div class=h4>
-                        <p> Тип отчета : @DropDownText[(int)reportRequestType]</p>
 
-                        <p>Заголовок: 
-                            @switch (reportRequestType) {
-                                case ReportRequestType.SurveyReport:
-                                            @if (SurveyRequest.RequestTitle != string.Empty )
-                                            {
-                                                @SurveyRequest.RequestTitle
-                                            }
-                                            else
-                                            {
-                                                 <div class="alert alert-danger">Не указан заголовок запроса отчета</div>
-                                            }
-                                    break;
-                                case ReportRequestType.TextOnlyReport:
-                                    @TextRequest.RequestTitle
-                                    break;
-                            }
-                        </p>
+                 <p class="@alertCssClass(isRequestTypeOk)" >
+                   Тип отчета:  <b class="text-muted">@requestTypeCheckResult</b></p>
+                
+                <p class="@alertCssClass(isRequestTitleOk)" >
+                Заголовок запроса:  <b class="text-muted">@requestTitleCheckResult</b></p>
+                   
+                <p class="@alertCssClass(isRequestTextOk)" >
+                Текст запроса:  <b class="text-muted">@requestTextCheckResult</b></p>
 
-                        <p>Исполнители: 
-                            @if (selectedDistricts != null && selectedDistricts.Count > 0)
-                            {
-                                @selectedDistricts.Select(d => d.DistrictName).Aggregate((a, b) => a + ", " + b);
-                            }
-                            else {
-                                <div class="alert alert-danger" role="alert">
-                                    Не выбраны! Выберите исполнителей!
-                                </div>
-                            }
-                        </p>
+                @if (reportRequestType == ReportRequestType.SurveyReport)
+                {
+                        <p class="@alertCssClass(isSurveyOptionsOk)" >
+                        Варианты ответа:  <b class="text-muted">@surveyOptionsCheckResult</b></p>
+                }
 
-                </div>
+                <p class="@alertCssClass(isDistrictAssignmentOk)" >
+                Исполнители:  <b class="text-muted">@districtAssignmentCheckResult</b></p>
+
+                @if (isScheduledRequest){
+                <p class="@alertCssClass(isReportScheduleTypeOk)" >
+                Расписание:  <b class="text-muted">@scheduleTypeCheckResult()</b></p>
+                }
+                else
+                {
+                <p class="alert alert-success">
+                Срок отчета:  <b class="text-muted">@nonScheduledCheckResult</b></p>
+                }
+
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
@@ -388,6 +382,7 @@
             Time = new TimeSpan(12, 30, 0)
     };
 
+    //Ограничение для календаря, чтобы не рендерило прошлые даты
     void DateRenderNotBeforeToday(DateRenderEventArgs args)
     {
         args.Disabled = args.Disabled || args.Date < DateTime.Today;
@@ -431,18 +426,98 @@
 
     #region District or user selection
 
-    RadzenDataGrid<District> districtsDataGrid;
+    RadzenDataGrid<District>? districtsDataGrid;
 
-    IEnumerable<District> districts;
-    IList<District> selectedDistricts;
-
-
-
-
-
+    IEnumerable<District>? districts;
+    IList<District>? selectedDistricts;
 
 
     #endregion
+
+
+    #region FinalCheck
+    private string alertCssClass(bool state) =>   (state) ? "alert alert-success" : "alert alert-danger";
+
+    //Тип отчета
+    private bool isRequestTypeOk => (int)reportRequestType != 0;
+    private string requestTypeCheckResult => (isRequestTypeOk) ?  DropDownText[(int)reportRequestType] : "Не выбран тип отчета!";
+
+    //Заголовок отчета
+    private bool isRequestTitleOk =>  getRequestTitle() != string.Empty;
+    private string requestTitleCheckResult => (isRequestTitleOk) ? getRequestTitle() : "Не указан заголовок отчета!"; 
+    private string getRequestTitle()  {
+        switch (reportRequestType)
+        {
+            case ReportRequestType.SurveyReport:
+                return SurveyRequest?.RequestTitle ?? string.Empty;
+
+            case ReportRequestType.TextOnlyReport:
+                return TextRequest?.RequestTitle ?? string.Empty;
+        }
+        return string.Empty;
+    }
+
+    //Текст запроса (опроса)
+    private bool isRequestTextOk => getRequestText() != string.Empty;
+    private string requestTextCheckResult => (isRequestTextOk) ? "Текст запроса введен" : "Не заполнен текст запроса!"; 
+    private string getRequestText()
+    {
+        switch (reportRequestType)
+        {
+            case ReportRequestType.SurveyReport:
+                return SurveyRequest?.Question ?? string.Empty;
+
+            case ReportRequestType.TextOnlyReport:
+                return TextRequest?.RequestText ?? string.Empty;
+        }
+        return string.Empty;
+    }
+
+    //Варианты ответов для опроса
+    private bool isSurveyOptionsOk => (SurveyRequest?.Options?.Count ?? 0) > 1;
+    private string surveyOptionsCheckResult => (isSurveyOptionsOk) ? "Варианты ответов для опроса добавлены" : "Необходимо хотя бы два варианта ответа для опроса";
+
+    //Назначение исполнителей
+    private bool isDistrictAssignmentOk => (selectedDistricts?.Count ?? 0) > 0;
+    private string districtAssignmentCheckResult => (isDistrictAssignmentOk) ? $"{selectedDistricts?.Select(d => d.DistrictName).Aggregate((a, b) => a + ", " + b)}" : "Не указано ни одного исполнителя!";
+
+    //Периодичность - без расписания
+    private string nonScheduledCheckResult => $"Без расписания, срок до {nonScheduledDeadline.Date:D} в {nonScheduledDeadline:t}";
+
+
+    //Периодичность - с расписанием
+    private bool isReportScheduleTypeOk => new[] { 1, 2, 3 }.Contains(reportSchedule.ScheduleType);
+    //private bool isReportScheduleTypeOk => (new[] { 1, 2, 3 }.Contains(reportSchedule.ScheduleType) && ());
+
+
+    private string scheduleTypeCheckResult()
+    {
+        if (!isReportScheduleTypeOk) return "Выбран тип с расписанием, но расписание не указано";
+        switch (reportSchedule.ScheduleType)
+        {
+            case 1:
+                return $"Ежемесячно, не позднее {reportSchedule.DayOfMonth} числа, до {scheduledTime:t}";
+            case 2:
+                return $"Еженедельно, {daysDictionary[reportSchedule.DayOfWeek ?? 0]}, до {scheduledTime:t}";
+            case 3:
+                return $"Ежедневно до {scheduledTime:t}";
+        }
+        return string.Empty;
+    }
+
+    private Dictionary<short, string> daysDictionary = new() {
+        { 1, "Понедельник" },
+        { 2, "Вторник" }, 
+        { 3, "Среда" }, 
+        { 4, "Четверг" }, 
+        { 5, "Пятница" }, 
+        { 6, "Суббота" }, 
+        { 7, "Воскресенье" }, 
+    };
+
+
+
+#endregion
 
 
     protected override async Task OnInitializedAsync()
@@ -471,7 +546,6 @@
 
     void OnStepChange(int index)
     {
-        //При переходе на вкладку с расписанием и назначениями - проставляем дату выполнения в завтрашнюю
         var a = nonScheduledDeadline;
     }
 }
