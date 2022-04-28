@@ -114,6 +114,11 @@ namespace RegionReports.Data
                 .HasForeignKey<ReportRequestText>(rep => rep.ReportScheduleId);
             #endregion
 
+            modelBuilder.Entity<ReportSchedule>()
+                .Property(sch => sch.IsScheduleActive)
+                .HasDefaultValue(true)
+                .IsRequired();
+
             modelBuilder.Entity<UploadableFileType>().HasData(
                 new UploadableFileType() {Id = 1, AlowedMimeType = @"application/msword" },
                 new UploadableFileType() {Id = 2,  AlowedMimeType = @"application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
@@ -121,9 +126,6 @@ namespace RegionReports.Data
                 new UploadableFileType() {Id = 4, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
                 new UploadableFileType() {Id = 5, AlowedMimeType = @"application/pdf" }
                 );
-
-
-
 
             modelBuilder.Entity<Region>().HasData(
                  new Region { Id= 1, RegionName = "Брестская область"},

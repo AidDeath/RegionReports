@@ -19,5 +19,7 @@ namespace RegionReports.Data.Entities
         public short? DayOfWeek { get; set;  }
 
         public short? DayOfMonth { get; set; }
+
+        public bool? IsScheduleActive { get; set; } = true;
     }
 }

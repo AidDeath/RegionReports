@@ -6,6 +6,7 @@
 @inject NotificationService NotificationService
 @inject SettingsService SettingsService
 @inject DistrictService DistrictService;
+@inject DialogService DialogService
 
 
 <PageTitle>Новый запрос данных</PageTitle>
@@ -191,7 +192,7 @@
                                     <RadzenAccordionItem Text="Ежемесячнно" Icon="calendar_view_month">
                                         <p>
                                         <RadzenLabel Component="DayOfMonthNumericBox" Text="День месяца"/>
-                                        <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" @bind-Value="@reportSchedule.DayOfMonth" />
+                                        <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" @bind-Value="@requestSchedule.DayOfMonth" />
                                         </p>
                                         <p>
                                        <RadzenLabel Component="SchedulledTime" Text="Время"/>
@@ -202,7 +203,7 @@
                                     <RadzenAccordionItem Text="Еженедельно" Icon="calendar_view_week">
                                         <RadzenLabel Component="DayOfWeekRadioButtons" Text="День недели"/>
                                         <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" 
-                                                    TValue="short?" @bind-Value="@reportSchedule.DayOfWeek">
+                                                    TValue="short?" @bind-Value="@requestSchedule.DayOfWeek">
                                                     <Items>
                                                         <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
                                                         <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
@@ -262,6 +263,8 @@
                 <p class="alert alert-success">
                 Срок отчета:  <b class="text-muted">@nonScheduledCheckResult</b></p>
                 }
+
+                <RadzenButton Text="Сохранить запрос" Disabled ="@isFinalCheckFailed()" Click="@(args => CommitReportRequest(args))" />
 
         </RadzenStepsItem>
     </Steps>
@@ -376,7 +379,7 @@
     private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
 
     private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
-    private ReportSchedule reportSchedule = new ReportSchedule() {
+    private ReportSchedule requestSchedule = new ReportSchedule() {
             DayOfMonth = 1,
             DayOfWeek = 1,
             Time = new TimeSpan(12, 30, 0)
@@ -419,7 +422,7 @@
 
     private void SheduleTypeSelected(int selectedIndex)
     {
-        reportSchedule.ScheduleType = selectedIndex + 1;
+        requestSchedule.ScheduleType = selectedIndex + 1;
     }
 
     #endregion
@@ -486,19 +489,19 @@
 
 
     //Периодичность - с расписанием
-    private bool isReportScheduleTypeOk => new[] { 1, 2, 3 }.Contains(reportSchedule.ScheduleType);
+    private bool isReportScheduleTypeOk => new[] { 1, 2, 3 }.Contains(requestSchedule.ScheduleType);
     //private bool isReportScheduleTypeOk => (new[] { 1, 2, 3 }.Contains(reportSchedule.ScheduleType) && ());
 
 
     private string scheduleTypeCheckResult()
     {
         if (!isReportScheduleTypeOk) return "Выбран тип с расписанием, но расписание не указано";
-        switch (reportSchedule.ScheduleType)
+        switch (requestSchedule.ScheduleType)
         {
             case 1:
-                return $"Ежемесячно, не позднее {reportSchedule.DayOfMonth} числа, до {scheduledTime:t}";
+                return $"Ежемесячно, не позднее {requestSchedule.DayOfMonth} числа, до {scheduledTime:t}";
             case 2:
-                return $"Еженедельно, {daysDictionary[reportSchedule.DayOfWeek ?? 0]}, до {scheduledTime:t}";
+                return $"Еженедельно, {daysDictionary[requestSchedule.DayOfWeek ?? 0]}, до {scheduledTime:t}";
             case 3:
                 return $"Ежедневно до {scheduledTime:t}";
         }
@@ -515,10 +518,59 @@
         { 7, "Воскресенье" }, 
     };
 
+    private bool isFinalCheckFailed()
+    {
+        var final = isRequestTypeOk && isDistrictAssignmentOk && isRequestTitleOk && isRequestTextOk;
+
+        if (reportRequestType == ReportRequestType.SurveyReport) 
+            final = final && isSurveyOptionsOk;
+
+        if (isScheduledRequest) final = final && isReportScheduleTypeOk;
+
+        return !final;
 
 
-#endregion
+    }
 
+    #endregion
+
+
+
+    private void CommitReportRequest(MouseEventArgs args)
+    {
+        requestSchedule.Time = new TimeSpan(scheduledTime.Hour, scheduledTime.Minute, 0);
+
+        switch (reportRequestType){
+            case ReportRequestType.SurveyReport:
+                if (SurveyRequest is null) throw new NullReferenceException();
+
+                if (SurveyRequest.IsSchedulledRequest) SurveyRequest.ReportSchedule = requestSchedule;
+                else SurveyRequest.NonScheduledDeadline = nonScheduledDeadline;
+
+                ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
+                break;
+
+            case ReportRequestType.TextOnlyReport:
+                if (TextRequest is null) throw new NullReferenceException();
+
+                if (TextRequest.IsSchedulledRequest) TextRequest.ReportSchedule = requestSchedule;
+                else TextRequest.NonScheduledDeadline = nonScheduledDeadline;
+
+                ReportRequestService.CreateReportRequestText(TextRequest);
+                break;
+
+        }
+
+        // Вывести сообщение и перенаправить на список заданий
+           DialogService.Open("Запрос назначен", ds =>
+                    @<div>
+                            <div class="row">
+                                <div class="col">
+                                    <RadzenButton Text="Ok" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
+                                </div>
+                            </div>
+                        </div>);
+    }
 
     protected override async Task OnInitializedAsync()
     {

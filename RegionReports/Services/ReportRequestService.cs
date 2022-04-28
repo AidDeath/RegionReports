@@ -28,5 +28,10 @@ namespace RegionReports.Services
         {
             _database.ReportRequestsSurvey.Create(reportRequest);
         }
+
+        public void CreateReportRequestText(ReportRequestText reportRequest)
+        {
+            _database.ReportRequestsText.Create(reportRequest);
+        }
     }
 }
