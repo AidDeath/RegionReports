@@ -36,7 +36,7 @@
                                     <div class="row">
                                         <div>
                                             <h4 class="mb-3">Текст запроса: </h4>
-                                            <RadzenTextArea class="w-100" @bind-Value=@SurveyRequest.Question Rows="7" MaxLength="500"/>
+                                            <RadzenTextArea class="w-100" @bind-Value=@SurveyRequest.RequestText Rows="7" MaxLength="500"/>
                                         </div>                            
                                     </div>
                                 
@@ -468,7 +468,7 @@
         switch (reportRequestType)
         {
             case ReportRequestType.SurveyReport:
-                return SurveyRequest?.Question ?? string.Empty;
+                return SurveyRequest?.RequestText ?? string.Empty;
 
             case ReportRequestType.TextOnlyReport:
                 return TextRequest?.RequestText ?? string.Empty;

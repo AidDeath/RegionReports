@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using RegionReports.Data.Interfaces;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Запрос текстового отчета
     /// </summary>
-    public class ReportRequestText
+    public class ReportRequestText : IReportRequest
     {
         public int Id { get; set; }
 
-        /// <summary>
-        /// Заголовок запроса текстового отчета
-        /// </summary>
         public string RequestTitle { get; set; } = "";
 
         public string RequestText { get; set; } = "";
@@ -36,9 +30,6 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public DateTime? NonScheduledDeadline { get; set; }
 
-        /// <summary>
-        /// Идентификатор расписания, если задано
-        /// </summary>
         public int? ReportScheduleId { get; set; }
         public ReportSchedule? ReportSchedule { get; set; }
 

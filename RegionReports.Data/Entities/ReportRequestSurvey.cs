@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RegionReports.Data.Interfaces;
 
 namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Запрос на предоставление информации в виде опроса
     /// </summary>
-    public class ReportRequestSurvey
+    public class ReportRequestSurvey : IReportRequest
     {
         public int Id { get; set; }
 
-        /// <summary>
-        /// Заголовок опроса
-        /// </summary>
         public string RequestTitle { get; set; } = "";
 
-        public string Question { get; set; } = "";
+        public string RequestText { get; set; } = "";
 
         /// <summary>
         /// Возможность выбора нескольких пунктов
@@ -30,20 +23,10 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public List<ReportRequestSurveyOption> Options { get; set; } = new List<ReportRequestSurveyOption>();
 
-        /// <summary>
-        /// Назначено ли расписание для запроса
-        /// </summary>
         public bool IsSchedulledRequest { get; set; } = false;
 
-        
-        /// <summary>
-        /// Срок сдачи отчета. Заполняется в случае отсутствия расписания
-        /// </summary>
         public DateTime? NonScheduledDeadline { get; set; }
 
-        /// <summary>
-        /// Идентификатор расписания, если задано
-        /// </summary>
         public int? ReportScheduleId { get; set; }
         public ReportSchedule? ReportSchedule { get; set; }
     }
