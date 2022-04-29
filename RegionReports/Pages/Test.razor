@@ -1,31 +1,47 @@
 ﻿@page "/test"
-@inject FileService FileService
+@inject ReportRequestService ReportRequestService
 @inject NotificationService NotificationService
 @inject SettingsService SettingsService
 
+<RadzenDataGrid TItem="ReportRequestBase" AllowPaging="true" Data="@list">
+    <Columns>
+        <RadzenDataGridColumn TItem="ReportRequestBase" Title="Тип запроса">
+            <Template Context="data">
+                @if (data is ReportRequestText)
+                {
+                    <p>Текст</p>
+                }
+                else
+                {
+                    <p>Опрос</p>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ReportRequestBase" Property="RequestTitle" Title="Заголовок"  />
+        <RadzenDataGridColumn TItem="ReportRequestBase" Property="IsSchedulledRequest" Title="Периодичность сбора" >
+            <Template Context="data">
+                @if (data.IsSchedulledRequest)
+                {
+                    @ReportRequestService.WhenToCollect(data)
+                }
+                else
+                {
+                    @data.NonScheduledDeadline                  
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ReportRequestBase" Property="DateCreated" Title="Создан"  />
 
-
-
-         <RadzenCard>
-        <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" TValue="short?" @bind-Value="@a" Change="@Changed">
-            <Items>
-                <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
-                <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
-                <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
-                <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
-                <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
-                <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
-                <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
-            </Items>
-        </RadzenRadioButtonList>
-            </RadzenCard>
+    </Columns>
+</RadzenDataGrid>
 
 @code {
-    private short? a { get; set; } = 1;
 
-    private void Changed(short? val)
+    IEnumerable<ReportRequestBase> list;
+
+    protected override void OnInitialized()
     {
-        var a = val;
+        list = ReportRequestService.GetAllRequests();
     }
 
 }

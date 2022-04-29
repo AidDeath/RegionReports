@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220428113348_request fields changes")]
+    partial class requestfieldschanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,41 +240,6 @@ namespace RegionReports.Data.Migrations
                             Id = 6,
                             RegionName = "Минская область"
                         });
-                });
-
-            modelBuilder.Entity("RegionReports.Data.Entities.ReportAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("DateAssigned")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ReportRequestSurveyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReportRequestTextId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReportUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportRequestSurveyId");
-
-                    b.HasIndex("ReportRequestTextId");
-
-                    b.HasIndex("ReportUserId")
-                        .IsUnique();
-
-                    b.ToTable("ReportAssignment");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestFile", b =>
@@ -637,33 +604,6 @@ namespace RegionReports.Data.Migrations
                     b.Navigation("ReportUser");
                 });
 
-            modelBuilder.Entity("RegionReports.Data.Entities.ReportAssignment", b =>
-                {
-                    b.HasOne("RegionReports.Data.Entities.ReportRequestSurvey", "ReportRequestSurvey")
-                        .WithMany("ReportAssignments")
-                        .HasForeignKey("ReportRequestSurveyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RegionReports.Data.Entities.ReportRequestText", "ReportRequestText")
-                        .WithMany("ReportAssignments")
-                        .HasForeignKey("ReportRequestTextId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RegionReports.Data.Entities.ReportUser", "ReportUser")
-                        .WithOne()
-                        .HasForeignKey("RegionReports.Data.Entities.ReportAssignment", "ReportUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReportRequestSurvey");
-
-                    b.Navigation("ReportRequestText");
-
-                    b.Navigation("ReportUser");
-                });
-
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestFile", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.ReportRequestText", "RelatedReportText")
@@ -771,15 +711,11 @@ namespace RegionReports.Data.Migrations
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestSurvey", b =>
                 {
                     b.Navigation("Options");
-
-                    b.Navigation("ReportAssignments");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestText", b =>
                 {
                     b.Navigation("Files");
-
-                    b.Navigation("ReportAssignments");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>

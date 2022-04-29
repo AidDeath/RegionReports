@@ -29,5 +29,10 @@ namespace RegionReports.Data.Interfaces
         public int? ReportScheduleId { get; set; }
         public ReportSchedule? ReportSchedule { get; set; }
 
+        /// <summary>
+        /// Дата и время создания запроса
+        /// </summary>
+        public DateTime DateCreated { get; set; }
+
     }
 }

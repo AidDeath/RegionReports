@@ -97,6 +97,11 @@ namespace RegionReports.Data
                 .HasOne(opt => opt.ReportRequestSurveyOption)
                 .WithMany()
                 .HasForeignKey(opt => opt.ReportRequestSurveyOptionId);
+
+            modelBuilder.Entity<ReportRequestSurvey>()
+                .HasMany(rep => rep.ReportAssignments)
+                .WithOne(assign => assign.ReportRequestSurvey)
+                .HasForeignKey(assign => assign.ReportRequestSurveyId);
             #endregion
 
 
@@ -106,18 +111,31 @@ namespace RegionReports.Data
             modelBuilder.Entity<ReportRequestText>()
                 .HasMany(rep => rep.Files)
                 .WithOne(file => file.RelatedReportText)
-                .HasForeignKey(a => a.ReportRequestTextId);
+                .HasForeignKey(file => file.ReportRequestTextId);
 
             modelBuilder.Entity<ReportRequestText>()
                 .HasOne(rep => rep.ReportSchedule)
                 .WithOne()
                 .HasForeignKey<ReportRequestText>(rep => rep.ReportScheduleId);
+
+            modelBuilder.Entity<ReportRequestText>()
+                .HasMany(rep => rep.ReportAssignments)
+                .WithOne(assign => assign.ReportRequestText)
+                .HasForeignKey(assign => assign.ReportRequestTextId);
             #endregion
 
             modelBuilder.Entity<ReportSchedule>()
                 .Property(sch => sch.IsScheduleActive)
                 .HasDefaultValue(true)
                 .IsRequired();
+
+            modelBuilder.Entity<ReportAssignment>()
+                .HasOne(assign => assign.ReportUser)
+                .WithOne()
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportUserId);
+
+
+
 
             modelBuilder.Entity<UploadableFileType>().HasData(
                 new UploadableFileType() {Id = 1, AlowedMimeType = @"application/msword" },

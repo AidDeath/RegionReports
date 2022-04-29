@@ -5,30 +5,20 @@ namespace RegionReports.Data.Entities
     /// <summary>
     /// Запрос на предоставление информации в виде опроса
     /// </summary>
-    public class ReportRequestSurvey : IReportRequest
+    public class ReportRequestSurvey : ReportRequestBase, IReportRequest
     {
         public int Id { get; set; }
-
-        public string RequestTitle { get; set; } = "";
-
-        public string RequestText { get; set; } = "";
 
         /// <summary>
         /// Возможность выбора нескольких пунктов
         /// </summary>
         public bool MultipleChoises { get; set; } = false;
-        public DateTime DateCreated { get; set; } = DateTime.Now;
+        
         /// <summary>
         /// Список вариантов ответа в опросе
         /// </summary>
         public List<ReportRequestSurveyOption> Options { get; set; } = new List<ReportRequestSurveyOption>();
 
-        public bool IsSchedulledRequest { get; set; } = false;
-
-        public DateTime? NonScheduledDeadline { get; set; }
-
-        public int? ReportScheduleId { get; set; }
-        public ReportSchedule? ReportSchedule { get; set; }
     }
 
     /// <summary>

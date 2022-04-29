@@ -16,10 +16,11 @@ namespace RegionReports.Data.Entities
         public int ScheduleType { get; set; }
 
         public TimeSpan Time { get; set; } = new TimeSpan();
-        public short? DayOfWeek { get; set;  }
+        public short? DayOfWeek { get; set; }
 
         public short? DayOfMonth { get; set; }
 
         public bool? IsScheduleActive { get; set; } = true;
+
     }
 }

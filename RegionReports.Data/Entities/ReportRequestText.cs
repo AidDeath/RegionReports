@@ -6,32 +6,18 @@ namespace RegionReports.Data.Entities
     /// <summary>
     /// Запрос текстового отчета
     /// </summary>
-    public class ReportRequestText : IReportRequest
+    public class ReportRequestText : ReportRequestBase, IReportRequest
     {
         public int Id { get; set; }
 
-        public string RequestTitle { get; set; } = "";
 
-        public string RequestText { get; set; } = "";
 
         /// <summary>
         /// Перечень файлов прикрепленных к запросу
         /// </summary>
         public List<ReportRequestFile>? Files { get; set; }
 
-        /// <summary>
-        /// Назначено ли расписание для запроса
-        /// </summary>
-        public bool IsSchedulledRequest { get; set; } = false;
 
-
-        /// <summary>
-        /// Срок сдачи отчета. Заполняется в случае отсутствия расписания
-        /// </summary>
-        public DateTime? NonScheduledDeadline { get; set; }
-
-        public int? ReportScheduleId { get; set; }
-        public ReportSchedule? ReportSchedule { get; set; }
 
     }
 
