@@ -1,0 +1,52 @@
+﻿@page "/usersreports"
+@inject TooltipService TooltipService
+@inject AssignmentService AssignmentService
+@inject UserService UserService
+
+<h3>Отчеты, назначенные мне</h3>
+
+        <RadzenCheckBox TValue=bool Name="ShowUnansweredOnlyCheckBox" @bind-Value="@ShowUnansweredOnly" Change="@RefreshRequestsList"></RadzenCheckBox>
+        <RadzenLabel Component ="ShowUnansweredOnlyCheckBox" Text="Только невыполненные задания"/>
+                
+            <RadzenDataGrid AllowColumnResize="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" 
+            PagerPosition="PagerPosition.Bottom" ShowPagingSummary="true" Data="@assignments" TItem="ReportAssignment" ColumnWidth="300px" EmptyText="Нет запросов для отображения">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ReportAssignment" Property="DateAssigned" Title="Отчет назначен" Width="140px">
+                        <Template Context="data">
+                            <p class="mb-1">@data.DateAssigned</p>
+                            @if (data.IsCompleted)
+                            {
+                                 <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Ответ отправлен" />
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ReportUser" Property="FullName" Filterable="false" Title="ФИО" Frozen="true" Width="200px" />
+                    <RadzenDataGridColumn TItem="ReportUser" Property="Email" Title="Почта" Frozen="true" Width="140px" />
+                    <RadzenDataGridColumn TItem="ReportUser" Property="RelatedDistrict.DistrictName" Title="Район" Frozen="true" Width="140px" />
+                    <RadzenDataGridColumn TItem="ReportUser" Title="Действия" Width="90px">
+                        <Template Context="data">
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Изменить"))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"/>
+
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+
+@code {
+    private bool ShowUnansweredOnly { get; set; } = true;
+
+    List<ReportAssignment>? assignments { get; set; }
+
+    private void RefreshRequestsList()
+    {
+
+    }
+
+    protected override void OnInitialized()
+    {
+        assignments = AssignmentService.GetForUser(UserService.GetCurrentUserModel());
+    }
+
+
+}

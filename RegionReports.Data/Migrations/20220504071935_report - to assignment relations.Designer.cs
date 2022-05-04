@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220504071935_report - to assignment relations")]
+    partial class reporttoassignmentrelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,7 +281,7 @@ namespace RegionReports.Data.Migrations
                     b.HasIndex("ReportUserId")
                         .IsUnique();
 
-                    b.ToTable("ReportAssignments");
+                    b.ToTable("ReportAssignment");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestFile", b =>

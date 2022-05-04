@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Предоставленная информация на запрос в виде опроса
@@ -29,6 +23,13 @@ namespace RegionReports.Data.Entities
         /// Отмеченные пользователем пункты опроса
         /// </summary>
         public List<ReportSurveyOption> SelectedOptions { get; set; } = new List<ReportSurveyOption>();
+
+        public int ReportAssignmentId { get; set; }
+        /// <summary>
+        /// Ссылка на назначение, по которому сделан этот отчет
+        /// </summary>
+        public ReportAssignment ReportAssignment { get; set; }
+
     }
 
     public class ReportSurveyOption

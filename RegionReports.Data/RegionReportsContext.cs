@@ -27,6 +27,8 @@ namespace RegionReports.Data
 
         public DbSet<UploadableFileType> AlowedUploadFileTypes { get; set; }
 
+        public DbSet<ReportAssignment> ReportAssignments { get; set; }
+
 
         private readonly IConfiguration _configuration;
         public RegionReportsContext(IConfiguration Configuration)
@@ -133,6 +135,12 @@ namespace RegionReports.Data
                 .HasOne(assign => assign.ReportUser)
                 .WithOne()
                 .HasForeignKey<ReportAssignment>(assign => assign.ReportUserId);
+
+
+            modelBuilder.Entity<ReportAssignment>()
+                .HasOne(assign => assign.ReportSurvey)
+                .WithOne(rep => rep.ReportAssignment)
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId);
 
 
 

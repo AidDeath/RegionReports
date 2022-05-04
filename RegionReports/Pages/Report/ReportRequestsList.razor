@@ -1,0 +1,48 @@
+﻿@page "/reportrequestslist"
+@inject ReportRequestService ReportRequestService
+@inject NotificationService NotificationService
+@inject SettingsService SettingsService
+
+
+<h3>ReportRequestsList</h3>
+
+<RadzenDataGrid TItem="ReportRequestBase" AllowPaging="true" Data="@list">
+    <Columns>
+        <RadzenDataGridColumn TItem="ReportRequestBase" Title="Тип запроса">
+            <Template Context="data">
+                @if (data is ReportRequestText)
+                {
+                    <p>Текст</p>
+                }
+                else
+                {
+                    <p>Опрос</p>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ReportRequestBase" Property="RequestTitle" Title="Заголовок"  />
+        <RadzenDataGridColumn TItem="ReportRequestBase" Property="IsSchedulledRequest" Title="Периодичность сбора" >
+            <Template Context="data">
+                @if (data.IsSchedulledRequest)
+                {
+                    @ReportRequestService.WhenToCollect(data)
+                }
+                else
+                {
+                    @data.NonScheduledDeadline                  
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ReportRequestBase" Property="DateCreated" Title="Создан"  />
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+        IEnumerable<ReportRequestBase> list;
+
+    protected override void OnInitialized()
+    {
+        list = ReportRequestService.GetAllRequests();
+    }
+}

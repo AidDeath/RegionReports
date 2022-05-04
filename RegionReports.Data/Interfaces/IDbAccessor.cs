@@ -23,5 +23,10 @@ namespace RegionReports.Data.Interfaces
         public IRepository<ReportRequestText> ReportRequestsText { get; }
 
         public IRepository<UploadableFileType> UploadableFileTypes { get; }
+
+        /// <summary>
+        /// Назначения отчетов
+        /// </summary>
+        public IRepository<ReportAssignment> ReportAssignments { get; }
     }
 }

@@ -7,6 +7,7 @@
 @inject SettingsService SettingsService
 @inject DistrictService DistrictService;
 @inject DialogService DialogService
+@inject AssignmentService  AssignmentService
 
 
 <PageTitle>Новый запрос данных</PageTitle>
@@ -540,6 +541,8 @@
     {
         requestSchedule.Time = new TimeSpan(scheduledTime.Hour, scheduledTime.Minute, 0);
 
+
+
         switch (reportRequestType){
             case ReportRequestType.SurveyReport:
                 if (SurveyRequest is null) throw new NullReferenceException();
@@ -547,6 +550,7 @@
                 if (SurveyRequest.IsSchedulledRequest) SurveyRequest.ReportSchedule = requestSchedule;
                 else SurveyRequest.NonScheduledDeadline = nonScheduledDeadline;
 
+                AssignmentService.AddAssignmentsRange(SurveyRequest, selectedDistricts.Select(distr => distr.ReportUser));
                 ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
                 break;
 
@@ -555,7 +559,8 @@
 
                 if (TextRequest.IsSchedulledRequest) TextRequest.ReportSchedule = requestSchedule;
                 else TextRequest.NonScheduledDeadline = nonScheduledDeadline;
-
+                
+                AssignmentService.AddAssignmentsRange(TextRequest, selectedDistricts.Select(distr => distr.ReportUser));
                 ReportRequestService.CreateReportRequestText(TextRequest);
                 break;
 

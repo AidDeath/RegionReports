@@ -29,5 +29,8 @@ namespace RegionReports.Data.Repositories
         private IRepository<UploadableFileType> _uploadableFileTypes { get; set; }
         public IRepository<UploadableFileType> UploadableFileTypes => _uploadableFileTypes ??= new Repository<UploadableFileType>(_context);
 
+        private IRepository<ReportAssignment> _reportAssignments { get; set; }
+        public IRepository<ReportAssignment> ReportAssignments => _reportAssignments ??= new Repository<ReportAssignment>(_context); 
+
     }
 }
