@@ -140,10 +140,9 @@ namespace RegionReports.Data
             #region Report Assignments
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportUser)
-                .WithOne()
-                .HasForeignKey<ReportAssignment>(assign => assign.ReportUserId);
+                .WithMany();
 
-
+            
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportSurvey)
                 .WithOne(rep => rep.ReportAssignment)

@@ -50,6 +50,12 @@ namespace RegionReports.Services
         public string WhenToCollect(ReportRequestBase request)
         {
             if (request.IsSchedulledRequest && request.ReportSchedule is null) throw new NullReferenceException();
+
+            if (!request.IsSchedulledRequest && request.NonScheduledDeadline is not null)
+            {
+                return $"Без расписания, срок до {  (DateTime)request.NonScheduledDeadline:D} в {  (DateTime)request.NonScheduledDeadline:t}";
+            }
+
             switch (request.ReportSchedule?.ScheduleType)
             {
                 case 1:

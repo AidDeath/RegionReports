@@ -17,6 +17,11 @@ namespace RegionReports.Services
 
         }
 
+        /// <summary>
+        /// Вписать новые назначения в запрос отчета
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="usersToAssign"></param>
         public void AddAssignmentsRange(ReportRequestBase request, IEnumerable<ReportUser>? usersToAssign)
         {
                 foreach(var user in usersToAssign)
@@ -30,18 +35,28 @@ namespace RegionReports.Services
                 }
         }
 
+        /// <summary>
+        /// Получить назначения для пользователя
+        /// </summary>
+        /// <param name="user">Пользователь</param>
+        /// <param name="uncompetedOnly">Только невыполненные отчеты</param>
+        /// <returns></returns>
         public List<ReportAssignment> GetForUser(ReportUser user, bool uncompetedOnly = false)
         {
             var query = _database.ReportAssignments.GetQueryable()
                 .Include(ass => ass.ReportUser)
-                .Include(ass => ass.ReportRequestSurvey)
-                .Include(ass => ass.ReportRequestText)
-                .Include(ass => ass.ReportSurvey);
+                .Include(ass => ass.ReportRequestSurvey).ThenInclude(repSurvey => repSurvey.ReportSchedule)
+                .Include(ass => ass.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
+                .Include(ass => ass.ReportRequestText.Files)
+                .Include(ass => ass.ReportSurvey)
+                .Include(ass => ass.ReportText)
+                .OrderByDescending(rep => rep.DateAssigned);
 
 
             return (uncompetedOnly)
                 ? query.Where(ass => ass.ReportUser == user && !ass.IsCompleted).ToList()
                 : query.Where(ass => ass.ReportUser == user).ToList();
         }
+
     }
 }

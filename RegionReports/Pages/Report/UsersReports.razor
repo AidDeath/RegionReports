@@ -44,10 +44,9 @@
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ReportAssignment" Property="RelatedDistrict.DistrictName" Title="Район" Frozen="true" Width="140px" />
-                    <RadzenDataGridColumn TItem="ReportUser" Title="Действия" Width="90px">
+                    <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                         <Template Context="data">
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Изменить"))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" />
                             <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"/>
                         </Template>
                     </RadzenDataGridColumn>

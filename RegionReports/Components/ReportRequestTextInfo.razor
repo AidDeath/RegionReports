@@ -1,0 +1,70 @@
+﻿@inject ReportRequestService ReportRequestService
+@using Microsoft.AspNetCore.Components
+@using RegionReports.Enums
+@inject FileService FileService
+@inject NotificationService NotificationService
+
+
+<RadzenPanel AllowCollapse=true >
+    <HeaderTemplate>
+        <h4 class="m-0 d-flex align-items-center">
+            <RadzenIcon Icon="description" Class="mr-1" /><b>Запрос текстового отчета</b>
+        </h4>
+    </HeaderTemplate>
+    <ChildContent>
+        <div class="row">
+        <div class="col-md-6 col-lg-6">
+            <h2>@reportRequestText.RequestTitle</h2>
+            <p>@formattedText</p>
+        </div>
+
+        <div class="col-md-6 col-lg-6">
+
+                @if (@reportRequestText.Files is not null && @reportRequestText.Files.Count > 0)
+                {
+                <RadzenCard > 
+                    <p>Файлы к запросу</p>
+                   @foreach(var file in @reportRequestText.Files)
+                    {
+                        <p>
+                            <RadzenButton class="m-1" Icon="download" Click="@(() => DownloadFile(file))"/>
+                            <FileIcon FileType="@((UploadedFileType)file.FileType)"/>
+                            @file.FileOriginalName
+                        </p>
+                    }
+                    </RadzenCard>
+                }
+
+            <p>Срок предоставления: @ReportRequestService.WhenToCollect(reportRequestText)</p>
+        </div>
+    </div>
+    </ChildContent>
+    <SummaryTemplate>
+        <RadzenCard class="mt-3">
+            <b>@reportRequestText.RequestTitle</b>
+        </RadzenCard>
+    </SummaryTemplate>
+</RadzenPanel>
+
+
+
+@code {
+    [Parameter]
+    public ReportRequestText reportRequestText { get; set; }
+
+    private MarkupString formattedText => (MarkupString)reportRequestText.RequestText;
+
+    private void DownloadFile(ReportRequestFile file)
+    {
+        try
+        {
+            FileService.DownloadFileFromServer(file);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка скачивания", ex.GetBaseException().Message);
+        }
+
+    }
+
+}

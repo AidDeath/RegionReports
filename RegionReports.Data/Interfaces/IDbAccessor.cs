@@ -1,10 +1,5 @@
 ﻿using RegionReports.Data.Entities;
 using RegionReports.Data.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RegionReports.Data.Interfaces
 {

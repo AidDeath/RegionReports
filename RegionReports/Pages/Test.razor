@@ -1,47 +1,18 @@
 ﻿@page "/test"
 @inject ReportRequestService ReportRequestService
 @inject NotificationService NotificationService
-@inject SettingsService SettingsService
+@inject AssignmentService  AssignmentService
+@inject UserService UserService
 
-<RadzenDataGrid TItem="ReportRequestBase" AllowPaging="true" Data="@list">
-    <Columns>
-        <RadzenDataGridColumn TItem="ReportRequestBase" Title="Тип запроса">
-            <Template Context="data">
-                @if (data is ReportRequestText)
-                {
-                    <p>Текст</p>
-                }
-                else
-                {
-                    <p>Опрос</p>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ReportRequestBase" Property="RequestTitle" Title="Заголовок"  />
-        <RadzenDataGridColumn TItem="ReportRequestBase" Property="IsSchedulledRequest" Title="Периодичность сбора" >
-            <Template Context="data">
-                @if (data.IsSchedulledRequest)
-                {
-                    @ReportRequestService.WhenToCollect(data)
-                }
-                else
-                {
-                    @data.NonScheduledDeadline                  
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ReportRequestBase" Property="DateCreated" Title="Создан"  />
-
-    </Columns>
-</RadzenDataGrid>
+<ReportRequestTextInfo reportRequestText=@rep/>
 
 @code {
-
-    IEnumerable<ReportRequestBase> list;
+    ReportRequestText rep;
 
     protected override void OnInitialized()
     {
-        list = ReportRequestService.GetAllRequests();
+        var a = AssignmentService.GetForUser(UserService.GetCurrentUserModel(), true);
+        rep =  a.FirstOrDefault(a => a.ReportRequestText is not null).ReportRequestText;
     }
 
 }

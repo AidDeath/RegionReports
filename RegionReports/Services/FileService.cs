@@ -11,6 +11,7 @@ namespace RegionReports.Services
     {
         private readonly IDbAccessor _database;
         private IJSObjectReference _imageStreamScript;
+        private IJSObjectReference _fileDownloadScript;
         private IJSRuntime _jsRuntime;
         private readonly string FileStoragePath;
 
@@ -26,6 +27,7 @@ namespace RegionReports.Services
         private async Task LoadScripts()
         {
             _imageStreamScript = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/SetImgFromStream.js");
+            _fileDownloadScript = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", @"/js/FileStreamDownload.js");
         }
 
 
@@ -135,6 +137,23 @@ namespace RegionReports.Services
             var path = Path.Combine(FileStoragePath, file.FileUniqueName);
 
             if (File.Exists(path)) File.Delete(path);
+        }
+
+        public async Task DownloadFileFromServer(ReportRequestFile requestFile)
+        {
+            var filePathWithUniqueName = Path.Combine(FileStoragePath, requestFile.FileUniqueName);
+
+            if (File.Exists(filePathWithUniqueName))
+            {
+                var fileStream = new FileStream(filePathWithUniqueName, FileMode.Open);
+                if (fileStream != null)
+                {
+                    using var streamRef = new DotNetStreamReference(fileStream);
+                    //await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+                    await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream",  requestFile.FileOriginalName, streamRef);
+                }
+            }
+
         }
     }
 }
