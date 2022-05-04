@@ -22,6 +22,7 @@ namespace RegionReports.Data
         #region Text Reports
         public DbSet<ReportRequestText> ReportRequestsText { get; set; }
         public DbSet<ReportRequestFile> ReportRequestFiles { get; set; }
+        public DbSet<ReportText> ReportsText { get; set; }
 
         #endregion
 
@@ -124,6 +125,11 @@ namespace RegionReports.Data
                 .HasMany(rep => rep.ReportAssignments)
                 .WithOne(assign => assign.ReportRequestText)
                 .HasForeignKey(assign => assign.ReportRequestTextId);
+
+            modelBuilder.Entity<ReportText>()
+                .HasOne(rep => rep.ReportUser)
+                .WithMany()
+                .HasForeignKey(rep => rep.ReportUserId);
             #endregion
 
             modelBuilder.Entity<ReportSchedule>()
@@ -131,6 +137,7 @@ namespace RegionReports.Data
                 .HasDefaultValue(true)
                 .IsRequired();
 
+            #region Report Assignments
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportUser)
                 .WithOne()
@@ -141,6 +148,12 @@ namespace RegionReports.Data
                 .HasOne(assign => assign.ReportSurvey)
                 .WithOne(rep => rep.ReportAssignment)
                 .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId);
+            
+            modelBuilder.Entity<ReportAssignment>()
+                .HasOne(assign => assign.ReportText)
+                .WithOne(rep => rep.ReportAssignment)
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportTextId);
+            #endregion
 
 
 

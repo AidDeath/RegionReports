@@ -10,14 +10,10 @@ namespace RegionReports.Data.Entities
     {
         public int Id { get; set; }
 
-
-
         /// <summary>
         /// Перечень файлов прикрепленных к запросу
         /// </summary>
         public List<ReportRequestFile>? Files { get; set; }
-
-
 
     }
 

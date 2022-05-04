@@ -20,14 +20,35 @@
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ReportUser" Property="FullName" Filterable="false" Title="ФИО" Frozen="true" Width="200px" />
-                    <RadzenDataGridColumn TItem="ReportUser" Property="Email" Title="Почта" Frozen="true" Width="140px" />
-                    <RadzenDataGridColumn TItem="ReportUser" Property="RelatedDistrict.DistrictName" Title="Район" Frozen="true" Width="140px" />
+                    <RadzenDataGridColumn TItem="ReportAssignment"  Filterable="false" Title="Тип запроса" Frozen="true" Width="200px" >
+                        <Template Context="assignment">
+                            @if (assignment.ReportRequestText is not null)
+                            {
+                               <p>Текстовая информация</p>
+                            }
+                            @if (assignment.ReportRequestSurvey is not null)
+                            {
+                                 <p>Опрос</p>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ReportAssignment" Title="Заголовок" Frozen="true"  >
+                        <Template Context="assignment">
+                            @if (assignment.ReportRequestText is not null)
+                            {
+                               <p>@assignment.ReportRequestText.RequestTitle</p>
+                            }
+                            @if (assignment.ReportRequestSurvey is not null)
+                            {
+                                <p>@assignment.ReportRequestSurvey.RequestTitle</p>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ReportAssignment" Property="RelatedDistrict.DistrictName" Title="Район" Frozen="true" Width="140px" />
                     <RadzenDataGridColumn TItem="ReportUser" Title="Действия" Width="90px">
                         <Template Context="data">
                             <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Изменить"))" />
                             <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"/>
-
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -40,12 +61,12 @@
 
     private void RefreshRequestsList()
     {
-
+        assignments = AssignmentService.GetForUser(UserService.GetCurrentUserModel(), ShowUnansweredOnly);
     }
 
     protected override void OnInitialized()
     {
-        assignments = AssignmentService.GetForUser(UserService.GetCurrentUserModel());
+        RefreshRequestsList();
     }
 
 

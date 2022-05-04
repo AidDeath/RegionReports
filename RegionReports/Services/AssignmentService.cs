@@ -30,15 +30,18 @@ namespace RegionReports.Services
                 }
         }
 
-        public List<ReportAssignment> GetForUser(ReportUser user)
+        public List<ReportAssignment> GetForUser(ReportUser user, bool uncompetedOnly = false)
         {
-            return  _database.ReportAssignments.GetQueryable()
+            var query = _database.ReportAssignments.GetQueryable()
                 .Include(ass => ass.ReportUser)
                 .Include(ass => ass.ReportRequestSurvey)
                 .Include(ass => ass.ReportRequestText)
-                .Include(ass => ass.ReportSurvey)
-                .Where(ass => ass.ReportUser == user)
-                .ToList();
+                .Include(ass => ass.ReportSurvey);
+
+
+            return (uncompetedOnly)
+                ? query.Where(ass => ass.ReportUser == user && !ass.IsCompleted).ToList()
+                : query.Where(ass => ass.ReportUser == user).ToList();
         }
     }
 }

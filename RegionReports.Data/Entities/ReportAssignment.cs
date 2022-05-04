@@ -21,6 +21,12 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public ReportSurvey? ReportSurvey { get; set; }
 
+        public int? ReportTextId { get; set; }
+        /// <summary>
+        /// Ответ на текстовый запрос
+        /// </summary>
+        public ReportText? ReportText { get; set; }
+
 
         //TODO: Добавить ответы на текстовый запрос
 
