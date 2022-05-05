@@ -46,6 +46,7 @@ namespace RegionReports.Services
             var query = _database.ReportAssignments.GetQueryable()
                 .Include(ass => ass.ReportUser)
                 .Include(ass => ass.ReportRequestSurvey).ThenInclude(repSurvey => repSurvey.ReportSchedule)
+                .Include(ass => ass.ReportRequestSurvey.Options)
                 .Include(ass => ass.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
                 .Include(ass => ass.ReportRequestText.Files)
                 .Include(ass => ass.ReportSurvey)

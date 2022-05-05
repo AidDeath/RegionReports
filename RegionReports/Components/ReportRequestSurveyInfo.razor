@@ -1,0 +1,51 @@
+﻿@inject ReportRequestService ReportRequestService
+
+<RadzenPanel AllowCollapse=true Collapsed="@Collapsed">
+    <HeaderTemplate>
+        <h4 class="m-0 d-flex align-items-center">
+            <RadzenIcon Icon="description" Class="mr-1" /><b>Запрос информации в виде опроса</b>
+        </h4>
+    </HeaderTemplate>
+    <ChildContent>
+        <div class="row">
+        <div class="col-md-6 col-lg-6">
+            <h2>@ReportRequestSurvey.RequestTitle</h2>
+            <p>@formattedText</p>
+        </div>
+
+        <div class="col-md-6 col-lg-6">
+
+                @if (ReportRequestSurvey.Options is not null && ReportRequestSurvey.Options.Count > 0)
+                {
+                <RadzenCard > 
+                    <p>Варианты ответа:</p>
+                   @foreach(var option in ReportRequestSurvey.Options)
+                    {
+                        <p>
+                            <RadzenIcon Icon="check_circle"/>
+                            @option.OptionName
+                        </p>
+                    }
+                    </RadzenCard>
+                }
+
+            <p>Срок предоставления: @ReportRequestService.WhenToCollect(ReportRequestSurvey)</p>
+        </div>
+    </div>
+    </ChildContent>
+    <SummaryTemplate>
+        <RadzenCard class="mt-3">
+            <b>@ReportRequestSurvey.RequestTitle</b>
+        </RadzenCard>
+    </SummaryTemplate>
+</RadzenPanel>
+
+@code {
+    [Parameter]
+    public ReportRequestSurvey ReportRequestSurvey { get; set; }
+
+    [Parameter]
+    public bool Collapsed { get; set; } = false;
+
+    private MarkupString formattedText => (MarkupString)ReportRequestSurvey.RequestText;
+}

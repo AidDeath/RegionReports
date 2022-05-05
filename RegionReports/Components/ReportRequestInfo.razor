@@ -1,0 +1,17 @@
+﻿@if (ReportRequest is ReportRequestText) {
+    <ReportRequestTextInfo ReportRequestText="@((ReportRequestText)ReportRequest)"/>
+}
+
+@if (ReportRequest is ReportRequestSurvey) {
+    <ReportRequestSurveyInfo ReportRequestSurvey="@((ReportRequestSurvey)ReportRequest)" Collapsed="@Collapsed"/>
+}
+
+
+
+@code {
+    [Parameter]
+    public ReportRequestBase ReportRequest { get; set; }
+
+    [Parameter]
+    public bool Collapsed { get; set; } = false;
+}

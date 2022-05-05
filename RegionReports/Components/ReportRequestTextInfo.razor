@@ -5,7 +5,7 @@
 @inject NotificationService NotificationService
 
 
-<RadzenPanel AllowCollapse=true >
+<RadzenPanel AllowCollapse=true Collapsed="@Collapsed" >
     <HeaderTemplate>
         <h4 class="m-0 d-flex align-items-center">
             <RadzenIcon Icon="description" Class="mr-1" /><b>Запрос текстового отчета</b>
@@ -14,20 +14,20 @@
     <ChildContent>
         <div class="row">
         <div class="col-md-6 col-lg-6">
-            <h2>@reportRequestText.RequestTitle</h2>
+            <h2>@ReportRequestText.RequestTitle</h2>
             <p>@formattedText</p>
         </div>
 
         <div class="col-md-6 col-lg-6">
 
-                @if (@reportRequestText.Files is not null && @reportRequestText.Files.Count > 0)
+                @if (ReportRequestText.Files is not null && ReportRequestText.Files.Count > 0)
                 {
                 <RadzenCard > 
                     <p>Файлы к запросу</p>
-                   @foreach(var file in @reportRequestText.Files)
+                   @foreach(var file in ReportRequestText.Files)
                     {
                         <p>
-                            <RadzenButton class="m-1" Icon="download" Click="@(() => DownloadFile(file))"/>
+                            <RadzenButton class="m-1" Icon="download" Click="@(() => DownloadFileAsync(file))"/>
                             <FileIcon FileType="@((UploadedFileType)file.FileType)"/>
                             @file.FileOriginalName
                         </p>
@@ -35,13 +35,13 @@
                     </RadzenCard>
                 }
 
-            <p>Срок предоставления: @ReportRequestService.WhenToCollect(reportRequestText)</p>
+            <p>Срок предоставления: @ReportRequestService.WhenToCollect(ReportRequestText)</p>
         </div>
     </div>
     </ChildContent>
     <SummaryTemplate>
         <RadzenCard class="mt-3">
-            <b>@reportRequestText.RequestTitle</b>
+            <b>@ReportRequestText.RequestTitle</b>
         </RadzenCard>
     </SummaryTemplate>
 </RadzenPanel>
@@ -50,15 +50,18 @@
 
 @code {
     [Parameter]
-    public ReportRequestText reportRequestText { get; set; }
+    public ReportRequestText ReportRequestText { get; set; }
 
-    private MarkupString formattedText => (MarkupString)reportRequestText.RequestText;
+    [Parameter]
+    public bool Collapsed { get; set; } = false;
 
-    private void DownloadFile(ReportRequestFile file)
+    private MarkupString formattedText => (MarkupString)ReportRequestText.RequestText;
+
+    private async Task DownloadFileAsync(ReportRequestFile file)
     {
         try
         {
-            FileService.DownloadFileFromServer(file);
+            await FileService.DownloadFileFromServer(file);
         }
         catch (Exception ex)
         {
