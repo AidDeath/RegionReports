@@ -16,7 +16,7 @@ namespace RegionReports.Data
         public DbSet<ReportRequestSurvey> ReportRequestsSurvey { get; set; }
         public DbSet<ReportRequestSurveyOption> ReportRequestSurveyOptions { get; set; }
         public DbSet<ReportSurvey> ReportsSurvey { get; set; }
-        public DbSet<ReportSurveyOption> ReportSurveySelectedOptions { get; set; }
+        public DbSet<ReportSurveyOption> ReportSurveySelectableOptions { get; set; }
         #endregion
 
         #region Text Reports
@@ -87,7 +87,7 @@ namespace RegionReports.Data
                 .HasForeignKey(opt => opt.ReportRequestSurveyId);
 
             modelBuilder.Entity<ReportSurvey>()
-                .HasMany(rep => rep.SelectedOptions)
+                .HasMany(rep => rep.SelectableOptions)
                 .WithOne(opt => opt.ReportSurvey)
                 .HasForeignKey(opt => opt.ReportSurveyId);
 

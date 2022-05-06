@@ -1,0 +1,93 @@
+﻿
+
+<RadzenPanel AllowCollapse=false>
+        <HeaderTemplate>
+        <h4 class="m-0 d-flex align-items-center">
+            <RadzenIcon Icon="description" Class="mr-1" /><b>@TextProceedToFill</b>
+        </h4>
+    </HeaderTemplate>
+    <ChildContent>
+
+        @if (ReportAssignment.ReportRequestSurvey.MultipleChoises)
+        {
+            @foreach(var opt in reportSurvey.SelectableOptions)
+            {
+                <p>
+                    <RadzenCheckBox TValue="bool" @bind-Value="opt.Checked"/>
+                    @opt.ReportRequestSurveyOption.OptionName
+                </p>
+            }
+        }
+        else
+        {
+           @* Не самый лучший вариант. Первый вариант отмечается автоматом*@
+@*            <RadzenRadioButtonList TValue="int" Change="@OnCheckBoxChange" Orientation="Orientation.Vertical" >
+                <Items>
+                    @foreach ( var option in reportSurvey.SelectableOptions)
+                    {
+                        <RadzenRadioButtonListItem TValue="int" Text="@option.ReportRequestSurveyOption.OptionName" Value="@reportSurvey.SelectableOptions.IndexOf(option)"/> 
+                    }
+                 </Items>
+            </RadzenRadioButtonList>*@
+
+            @*Вариант получше, но похоже, затратный*@
+            @foreach(var opt in reportSurvey.SelectableOptions)
+            {
+                <p>
+                    <RadzenCheckBox TValue="bool" @bind-Value="opt.Checked" Change="@((value) =>OnCheckBoxChange(opt, value) )"/>
+                    @opt.ReportRequestSurveyOption.OptionName
+                </p>
+            }
+        }
+
+    </ChildContent>
+</RadzenPanel>
+
+
+<RadzenRadioButtonList TValue="ReportSurveyOption" Orientation="Orientation.Vertical" />
+
+<RadzenButton Text="Отправить ответ" Click=@(() => Test()) Disabled="@(!isAnyOptionSelected)"/>
+
+@code {
+
+    [Parameter]
+    public ReportAssignment ReportAssignment { get; set; }
+
+    private string TextProceedToFill => (ReportAssignment.ReportRequestSurvey.MultipleChoises) ? "Выберите один или несколько вариантов ответа" : "Выберите один вариант ответа";
+
+    private ReportSurvey reportSurvey = new(){SelectableOptions = new()};
+
+    protected override void OnInitialized()
+    {
+        foreach (var option in ReportAssignment.ReportRequestSurvey.Options)
+        {
+            reportSurvey.SelectableOptions.Add(new() { ReportRequestSurveyOption = option });
+        }
+
+    }
+
+    private bool isAnyOptionSelected => reportSurvey.SelectableOptions.Any(opt => opt.Checked);
+
+    //Для варианта с радио-баттонами
+    private void OnCheckBoxChange(int selectedIndex)
+    {
+        reportSurvey.SelectableOptions.ForEach(o => o.Checked = false);
+        reportSurvey.SelectableOptions[selectedIndex].Checked = true;
+    }
+        
+    private void OnCheckBoxChange(ReportSurveyOption opt, bool value)
+    {
+        if (!value) return;
+        reportSurvey.SelectableOptions.ForEach(o => o.Checked = false);
+         reportSurvey.SelectableOptions[reportSurvey.SelectableOptions.IndexOf(opt)].Checked = true;
+    }
+
+
+    private void Test()
+    {
+        var a = reportSurvey;
+    }
+
+
+
+}

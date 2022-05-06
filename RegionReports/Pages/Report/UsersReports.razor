@@ -2,6 +2,7 @@
 @inject TooltipService TooltipService
 @inject AssignmentService AssignmentService
 @inject UserService UserService
+@inject DialogService DialogService
 
 <h3>Отчеты, назначенные мне</h3>
 
@@ -47,7 +48,7 @@
                     <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                         <Template Context="data">
                             <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" />
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"/>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"  Click="(() =>ShowRequestInfo(data) )"/>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -68,5 +69,20 @@
         RefreshRequestsList();
     }
 
+    private async Task ShowRequestInfo(ReportAssignment assignment)
+    {       
+        ReportRequestBase request = null;
+
+        if (assignment.ReportRequestText is not null) request = assignment.ReportRequestText;
+        if (assignment.ReportRequestSurvey is not null) request = assignment.ReportRequestSurvey;
+
+        if (request is null) throw new NullReferenceException();
+
+        await DialogService.OpenAsync("Информация о запросе", ds =>
+            @<ReportRequestInfo ReportRequest=request/>
+            , new(){ShowClose=true, CloseDialogOnEsc=true, CloseDialogOnOverlayClick=true, Draggable=true}
+            );
+    } 
+    
 
 }

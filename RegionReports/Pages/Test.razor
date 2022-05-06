@@ -4,15 +4,15 @@
 @inject AssignmentService  AssignmentService
 @inject UserService UserService
 
-<ReportRequestInfo ReportRequest="@rep" Collapsed="true"/>
+<ReportSurveyInput ReportAssignment=@ass/>
 
 @code {
-    ReportRequestText rep;
+    ReportAssignment ass;
 
     protected override void OnInitialized()
     {
         var a = AssignmentService.GetForUser(UserService.GetCurrentUserModel(), true);
-        rep =  a.FirstOrDefault(a => a.ReportRequestText is not null).ReportRequestText;
+        ass =  a.FirstOrDefault(a => a.ReportRequestSurvey is not null);
     }
 
 }
