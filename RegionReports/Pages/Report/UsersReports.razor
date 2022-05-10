@@ -3,6 +3,7 @@
 @inject AssignmentService AssignmentService
 @inject UserService UserService
 @inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <h3>Отчеты, назначенные мне</h3>
 
@@ -47,7 +48,7 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                         <Template Context="data">
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Click="(() => RedirectToReportInput(data.Id))"/>
                             <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"  Click="(() =>ShowRequestInfo(data) )"/>
                         </Template>
                     </RadzenDataGridColumn>
@@ -79,10 +80,15 @@
         if (request is null) throw new NullReferenceException();
 
         await DialogService.OpenAsync("Информация о запросе", ds =>
-            @<ReportRequestInfo ReportRequest=request/>
-            , new(){ShowClose=true, CloseDialogOnEsc=true, CloseDialogOnOverlayClick=true, Draggable=true}
+    @<ReportRequestInfo ReportRequest=request/>
+    , new(){ShowClose=true, CloseDialogOnEsc=true, CloseDialogOnOverlayClick=true, Draggable=true}
             );
     } 
-    
+
+    private void RedirectToReportInput(int assignmentId)
+    {
+        NavigationManager.NavigateTo($"/reportinput/{assignmentId}");
+    }
+
 
 }

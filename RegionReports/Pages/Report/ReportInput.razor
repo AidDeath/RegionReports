@@ -1,5 +1,66 @@
-﻿<h3>ReportInput</h3>
+﻿@page "/reportinput/{assignmentId:int}"
+@inject AssignmentService AssignmentService
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+@if (ReportAssignment is not null)
+{
+    <ReportRequestInfo ReportRequest="@request"/>
+
+    @if (request is ReportRequestSurvey)
+    {
+        <ReportSurveyInput SubmitChanges="@SubmitChanges" ReportAssignment="@ReportAssignment"/>
+    }
+
+    @if (request is ReportRequestText)
+    {
+        <ReportTextInput SubmitChanges="@SubmitChanges" ReportAssignment="@ReportAssignment"/>
+    }
+}
+else
+{
+    <h3>Нет доступа к этому назначению</h3>
+}
+
+
+
 
 @code {
+    [Parameter]
+    public int assignmentId { get; set; }
+
+    public ReportAssignment ReportAssignment { get; set; }
+
+    private ReportRequestBase request { get; set; }
+
+    private ReportUser currentUser;
+
+    protected override void OnInitialized()
+    {
+        var currentUser = UserService.GetCurrentUserModel();
+        ReportAssignment = AssignmentService.GetById(currentUser, assignmentId);
+        if (ReportAssignment is not null)
+        {
+            request = ReportAssignment.GetReportRequest();
+        }
+    }
+
+    private void SubmitChanges(ReportBase report)
+    {
+        report.ReportUser = ReportAssignment.ReportUser;
+
+        if (report is ReportSurvey) ReportAssignment.ReportSurvey = (ReportSurvey)report;
+        if (report is ReportText) ReportAssignment.ReportText = (ReportText)report;
+
+        ReportAssignment.IsCompleted = true;
+
+        AssignmentService.UpdateAssignment(ReportAssignment);
+
+        NavigationManager.NavigateTo("/usersreports");
+
+    }
+
+
+
 
 }

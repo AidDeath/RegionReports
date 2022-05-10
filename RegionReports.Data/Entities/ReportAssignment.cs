@@ -28,12 +28,22 @@ namespace RegionReports.Data.Entities
         public ReportText? ReportText { get; set; }
 
 
-        //TODO: Добавить ответы на текстовый запрос
-
         /// <summary>
         /// Сдан ли отчет по этому назначению
         /// </summary>
         public bool IsCompleted { get; set; } = false;
+
+        public ReportRequestBase? GetReportRequest()
+        {
+            if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();
+
+            if (ReportRequestText is not null) return ReportRequestText;
+            if (ReportRequestSurvey is not null) return ReportRequestSurvey;
+
+            return null;
+            
+        }
+
 
     }
 }

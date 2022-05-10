@@ -59,5 +59,23 @@ namespace RegionReports.Services
                 : query.Where(ass => ass.ReportUser == user).ToList();
         }
 
+        public ReportAssignment? GetById(ReportUser user, int id)
+        {
+            return _database.ReportAssignments.GetQueryable()
+                .Include(ass => ass.ReportUser)
+                .Include(ass => ass.ReportRequestSurvey).ThenInclude(repSurvey => repSurvey.ReportSchedule)
+                .Include(ass => ass.ReportRequestSurvey.Options)
+                .Include(ass => ass.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
+                .Include(ass => ass.ReportRequestText.Files)
+                .Include(ass => ass.ReportSurvey)
+                .Include(ass => ass.ReportText)
+                .Where(ass => ass.ReportUser == user && ass.Id == id).FirstOrDefault();
+        }
+
+        public void UpdateAssignment(ReportAssignment assignment)
+        {
+            _database.ReportAssignments.Update(assignment);
+        }
+
     }
 }

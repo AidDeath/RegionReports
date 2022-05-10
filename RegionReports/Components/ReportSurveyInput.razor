@@ -1,6 +1,4 @@
-﻿
-
-<RadzenPanel AllowCollapse=false>
+﻿<RadzenPanel AllowCollapse=false>
         <HeaderTemplate>
         <h4 class="m-0 d-flex align-items-center">
             <RadzenIcon Icon="description" Class="mr-1" /><b>@TextProceedToFill</b>
@@ -46,7 +44,7 @@
 
 <RadzenRadioButtonList TValue="ReportSurveyOption" Orientation="Orientation.Vertical" />
 
-<RadzenButton Text="Отправить ответ" Click=@(() => Test()) Disabled="@(!isAnyOptionSelected)"/>
+<RadzenButton Text="Отправить ответ" Click=@(() => Submit()) Disabled="@(!isAnyOptionSelected)"/>
 
 @code {
 
@@ -74,18 +72,20 @@
         reportSurvey.SelectableOptions.ForEach(o => o.Checked = false);
         reportSurvey.SelectableOptions[selectedIndex].Checked = true;
     }
-        
+
     private void OnCheckBoxChange(ReportSurveyOption opt, bool value)
     {
         if (!value) return;
         reportSurvey.SelectableOptions.ForEach(o => o.Checked = false);
-         reportSurvey.SelectableOptions[reportSurvey.SelectableOptions.IndexOf(opt)].Checked = true;
+        reportSurvey.SelectableOptions[reportSurvey.SelectableOptions.IndexOf(opt)].Checked = true;
     }
+    
+    [Parameter]
+    public EventCallback<ReportBase> SubmitChanges { get; set; }
 
-
-    private void Test()
+    private void Submit()
     {
-        var a = reportSurvey;
+        SubmitChanges.InvokeAsync(reportSurvey);
     }
 
 
