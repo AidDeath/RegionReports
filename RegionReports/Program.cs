@@ -19,8 +19,8 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddDbContext<RegionReportsContext>(ServiceLifetime.Scoped);
-builder.Services.AddScoped<IDbAccessor, DbAccessor>();
+builder.Services.AddDbContext<RegionReportsContext>(ServiceLifetime.Transient);
+builder.Services.AddTransient<IDbAccessor, DbAccessor>();
 builder.Services.AddHttpContextAccessor();
 
 //Radzen services
@@ -37,6 +37,8 @@ builder.Services.AddTransient<FileService>();
 builder.Services.AddScoped<AssignmentService>();
 
 builder.Services.AddTransient<SettingsService>();
+
+builder.Services.AddHostedService<SchedulerService>();
 
 var app = builder.Build();
 
