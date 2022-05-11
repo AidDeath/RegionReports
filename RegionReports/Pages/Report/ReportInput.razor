@@ -48,6 +48,7 @@ else
     private void SubmitChanges(ReportBase report)
     {
         report.ReportUser = ReportAssignment.ReportUser;
+        report.ReportAssignment = ReportAssignment;
 
         if (report is ReportSurvey) ReportAssignment.ReportSurvey = (ReportSurvey)report;
         if (report is ReportText) ReportAssignment.ReportText = (ReportText)report;

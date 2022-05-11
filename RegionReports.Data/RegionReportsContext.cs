@@ -39,7 +39,6 @@ namespace RegionReports.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
             //optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MsSqlConnectionString"));
             optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=RegionReport;Trusted_Connection=True;");
         }
@@ -96,6 +95,12 @@ namespace RegionReports.Data
                 .WithMany()
                 .HasForeignKey(rep => rep.ReportUserId);
 
+            //TEST
+            modelBuilder.Entity<ReportSurvey>()
+                .HasOne(rep => rep.ReportAssignment)
+                .WithOne(ass => ass.ReportSurvey)
+                .HasForeignKey<ReportSurvey>(rep => rep.ReportAssignmentId);
+
             modelBuilder.Entity<ReportSurveyOption>()
                 .HasOne(opt => opt.ReportRequestSurveyOption)
                 .WithMany()
@@ -130,6 +135,12 @@ namespace RegionReports.Data
                 .HasOne(rep => rep.ReportUser)
                 .WithMany()
                 .HasForeignKey(rep => rep.ReportUserId);
+
+            //  TEST
+            modelBuilder.Entity<ReportText>()
+                .HasOne(rep => rep.ReportAssignment)
+                .WithOne(ass => ass.ReportText)
+                .HasForeignKey<ReportText>(rep => rep.ReportAssignmentId);
             #endregion
 
             modelBuilder.Entity<ReportSchedule>()
@@ -146,12 +157,16 @@ namespace RegionReports.Data
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportSurvey)
                 .WithOne(rep => rep.ReportAssignment)
-                .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId);
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId)
+                //.HasForeignKey<ReportSurvey>(rep => rep.ReportAssignmentId)
+                ;
             
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportText)
                 .WithOne(rep => rep.ReportAssignment)
-                .HasForeignKey<ReportAssignment>(assign => assign.ReportTextId);
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportTextId)
+                //.HasForeignKey<ReportText>(rep => rep.ReportAssignmentId)
+                ;
             #endregion
 
 
@@ -159,7 +174,7 @@ namespace RegionReports.Data
 
             modelBuilder.Entity<UploadableFileType>().HasData(
                 new UploadableFileType() {Id = 1, AlowedMimeType = @"application/msword" },
-                new UploadableFileType() {Id = 2,  AlowedMimeType = @"application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                new UploadableFileType() {Id = 2, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
                 new UploadableFileType() {Id = 3, AlowedMimeType = @"application/vnd.ms-excel"},
                 new UploadableFileType() {Id = 4, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
                 new UploadableFileType() {Id = 5, AlowedMimeType = @"application/pdf" }

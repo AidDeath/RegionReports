@@ -22,5 +22,6 @@ namespace RegionReports.Data.Entities
 
         public bool? IsScheduleActive { get; set; } = true;
 
+
     }
 }

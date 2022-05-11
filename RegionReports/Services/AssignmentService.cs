@@ -72,6 +72,7 @@ namespace RegionReports.Services
                 .Where(ass => ass.ReportUser == user && ass.Id == id).FirstOrDefault();
         }
 
+        //TODO: Не прописывает сданный отчет в назначении
         public void UpdateAssignment(ReportAssignment assignment)
         {
             _database.ReportAssignments.Update(assignment);
