@@ -48,8 +48,8 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                         <Template Context="data">
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Click="(() => RedirectToReportInput(data.Id))"/>
-                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))"  Click="(() =>ShowRequestInfo(data) )"/>
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Disabled="@(data.IsCompleted)" Click="(() => RedirectToReportInput(data.Id))"/>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))" Click="(() =>ShowRequestInfo(data) )"/>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
