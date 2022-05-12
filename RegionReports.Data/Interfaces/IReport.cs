@@ -23,11 +23,7 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         public DateTime DateFilled { get; set; }
 
-        public int ReportAssignmentId { get; set; }
+        public ReportAssignment? ReportAssignment { get; set; }
 
-        /// <summary>
-        /// Ссылка на назначение, по которому сделан этот отчет
-        /// </summary>
-        public ReportAssignment ReportAssignment { get; set; }
     }
 }

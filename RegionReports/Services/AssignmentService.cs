@@ -75,7 +75,10 @@ namespace RegionReports.Services
         //TODO: Не прописывает сданный отчет в назначении
         public void UpdateAssignment(ReportAssignment assignment)
         {
-            _database.ReportAssignments.Update(assignment);
+            var report = assignment.GetReportBase();
+
+            if (report is ReportText) _database.ReportsText.Create((ReportText)report);
+            if (report is ReportSurvey) _database.ReportsSurvey.Create((ReportSurvey)report);
         }
 
     }

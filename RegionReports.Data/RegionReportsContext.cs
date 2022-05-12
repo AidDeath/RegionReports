@@ -95,12 +95,6 @@ namespace RegionReports.Data
                 .WithMany()
                 .HasForeignKey(rep => rep.ReportUserId);
 
-            //TEST
-            modelBuilder.Entity<ReportSurvey>()
-                .HasOne(rep => rep.ReportAssignment)
-                .WithOne(ass => ass.ReportSurvey)
-                .HasForeignKey<ReportSurvey>(rep => rep.ReportAssignmentId);
-
             modelBuilder.Entity<ReportSurveyOption>()
                 .HasOne(opt => opt.ReportRequestSurveyOption)
                 .WithMany()
@@ -136,11 +130,6 @@ namespace RegionReports.Data
                 .WithMany()
                 .HasForeignKey(rep => rep.ReportUserId);
 
-            //  TEST
-            modelBuilder.Entity<ReportText>()
-                .HasOne(rep => rep.ReportAssignment)
-                .WithOne(ass => ass.ReportText)
-                .HasForeignKey<ReportText>(rep => rep.ReportAssignmentId);
             #endregion
 
             modelBuilder.Entity<ReportSchedule>()

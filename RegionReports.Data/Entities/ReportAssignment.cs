@@ -44,6 +44,16 @@ namespace RegionReports.Data.Entities
             
         }
 
+        public ReportBase GetReportBase()
+        {
+            if (ReportText is null && ReportSurvey is null) throw new NullReferenceException();
+
+            if (ReportText is not null) return ReportText;
+            if (ReportSurvey is not null) return ReportSurvey;
+
+            return null;
+        }
+
 
     }
 }
