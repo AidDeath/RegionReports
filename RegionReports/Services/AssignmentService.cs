@@ -2,6 +2,7 @@
 using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
 
+#nullable disable
 namespace RegionReports.Services
 {
     public class AssignmentService
@@ -72,13 +73,12 @@ namespace RegionReports.Services
                 .Where(ass => ass.ReportUser == user && ass.Id == id).FirstOrDefault();
         }
 
-        //TODO: Не прописывает сданный отчет в назначении
-        public void UpdateAssignment(ReportAssignment assignment)
+        public void SaveReportInAssignment(ReportAssignment assignment)
         {
             var report = assignment.GetReportBase();
 
-            if (report is ReportText) _database.ReportsText.Create((ReportText)report);
-            if (report is ReportSurvey) _database.ReportsSurvey.Create((ReportSurvey)report);
+            if (report is ReportText reportText) _database.ReportsText.Create(reportText);
+            if (report is ReportSurvey reportSurvey) _database.ReportsSurvey.Create(reportSurvey);
         }
 
     }

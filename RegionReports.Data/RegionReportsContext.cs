@@ -4,6 +4,7 @@ using RegionReports.Data.Entities;
 
 namespace RegionReports.Data
 {
+#nullable disable
     public class RegionReportsContext : DbContext
     {
         public DbSet<Region> Regions { get; set; }
@@ -30,6 +31,7 @@ namespace RegionReports.Data
 
         public DbSet<ReportAssignment> ReportAssignments { get; set; }
 
+        public DbSet<ReportSchedule> ReportSchedules { get; set; }
 
         private readonly IConfiguration _configuration;
         public RegionReportsContext(IConfiguration Configuration)
@@ -115,10 +117,10 @@ namespace RegionReports.Data
                 .WithOne(file => file.RelatedReportText)
                 .HasForeignKey(file => file.ReportRequestTextId);
 
-            modelBuilder.Entity<ReportRequestText>()
-                .HasOne(rep => rep.ReportSchedule)
-                .WithOne()
-                .HasForeignKey<ReportRequestText>(rep => rep.ReportScheduleId);
+            //modelBuilder.Entity<ReportRequestText>()
+            //    .HasOne(rep => rep.ReportSchedule)
+            //    .WithOne()
+            //    .HasForeignKey<ReportRequestText>(rep => rep.ReportScheduleId);
 
             modelBuilder.Entity<ReportRequestText>()
                 .HasMany(rep => rep.ReportAssignments)

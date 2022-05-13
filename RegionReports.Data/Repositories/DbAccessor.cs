@@ -39,5 +39,8 @@ namespace RegionReports.Data.Repositories
         private IRepository<ReportSurvey> _reportsSurvey { get; set; }
         public IRepository<ReportSurvey> ReportsSurvey => _reportsSurvey ??= new Repository<ReportSurvey>(_context);
 
+        private IRepository<ReportSchedule> _reportSchedules { get; set; }
+        public IRepository<ReportSchedule> ReportSchedules => _reportSchedules ??= new Repository<ReportSchedule>(_context);
+
     }
 }

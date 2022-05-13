@@ -24,8 +24,19 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         public IRepository<ReportAssignment> ReportAssignments { get; }
 
+        /// <summary>
+        /// Результаты отчета - текст
+        /// </summary>
         public IRepository<ReportText> ReportsText { get; }
+        /// <summary>
+        /// Результаты отчета - опроса
+        /// </summary>
         public IRepository<ReportSurvey> ReportsSurvey { get; }
+        
+        /// <summary>
+        /// Расписания отчетов
+        /// </summary>
+        public IRepository<ReportSchedule> ReportSchedules { get; }
 
     }
 }

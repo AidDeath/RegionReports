@@ -246,6 +246,8 @@
                                     </RadzenAccordionItem>
                                 </Items>
                             </RadzenAccordion>
+                            <RadzenLabel Component="DaysBeforeAssignNumericBox" Text="Дней до создания назначения"/>
+                            <RadzenNumeric class="w-25" Name="DaysBeforeAssignNumericBox" Min=1 Max=10 TValue="int" @bind-Value="@requestSchedule.DaysBeforeAutoAssignment"/>
                         </RadzenCard>
                         
                     </RadzenFieldset>
@@ -564,11 +566,13 @@
         switch (reportRequestType){
             case ReportRequestType.SurveyReport:
                 if (SurveyRequest is null) throw new NullReferenceException();
-
+                //Если отчет без расписания - сразу создаем назначение, иначе - его создаст ScheduleService
                 if (SurveyRequest.IsSchedulledRequest) SurveyRequest.ReportSchedule = requestSchedule;
-                else SurveyRequest.NonScheduledDeadline = nonScheduledDeadline;
+                else {
+                    SurveyRequest.NonScheduledDeadline = nonScheduledDeadline;
+                    AssignmentService.AddAssignmentsRange(SurveyRequest, selectedDistricts.Select(distr => distr.ReportUser));
+                }
 
-                AssignmentService.AddAssignmentsRange(SurveyRequest, selectedDistricts.Select(distr => distr.ReportUser));
                 ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
                 break;
 
@@ -576,9 +580,11 @@
                 if (TextRequest is null) throw new NullReferenceException();
 
                 if (TextRequest.IsSchedulledRequest) TextRequest.ReportSchedule = requestSchedule;
-                else TextRequest.NonScheduledDeadline = nonScheduledDeadline;
-                
-                AssignmentService.AddAssignmentsRange(TextRequest, selectedDistricts.Select(distr => distr.ReportUser));
+                else{
+                    TextRequest.NonScheduledDeadline = nonScheduledDeadline;
+                    AssignmentService.AddAssignmentsRange(TextRequest, selectedDistricts.Select(distr => distr.ReportUser));
+                }
+
                 ReportRequestService.CreateReportRequestText(TextRequest);
                 break;
 

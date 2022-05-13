@@ -1,6 +1,7 @@
 ﻿
 namespace RegionReports.Data.Entities
 {
+#nullable disable
     public class ReportAssignment
     {
         public int Id { get; set; }

@@ -55,7 +55,7 @@ else
 
         ReportAssignment.IsCompleted = true;
 
-        AssignmentService.UpdateAssignment(ReportAssignment);
+        AssignmentService.SaveReportInAssignment(ReportAssignment);
 
         NavigationManager.NavigateTo("/usersreports");
 

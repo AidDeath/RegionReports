@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220513085605_Renamed Schedule table")]
+    partial class RenamedScheduletable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +50,7 @@ namespace RegionReports.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ReportUserId] IS NOT NULL");
 
-                    b.ToTable("Districts", (string)null);
+                    b.ToTable("Districts");
 
                     b.HasData(
                         new
@@ -205,7 +207,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions", (string)null);
+                    b.ToTable("Regions");
 
                     b.HasData(
                         new
@@ -285,7 +287,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportUserId");
 
-                    b.ToTable("ReportAssignments", (string)null);
+                    b.ToTable("ReportAssignments");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestFile", b =>
@@ -314,7 +316,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportRequestTextId");
 
-                    b.ToTable("ReportRequestFiles", (string)null);
+                    b.ToTable("ReportRequestFiles");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestSurvey", b =>
@@ -350,11 +352,9 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReportScheduleId")
-                        .IsUnique()
-                        .HasFilter("[ReportScheduleId] IS NOT NULL");
+                    b.HasIndex("ReportScheduleId");
 
-                    b.ToTable("ReportRequestsSurvey", (string)null);
+                    b.ToTable("ReportRequestsSurvey");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestSurveyOption", b =>
@@ -376,7 +376,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportRequestSurveyId");
 
-                    b.ToTable("ReportRequestSurveyOptions", (string)null);
+                    b.ToTable("ReportRequestSurveyOptions");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestText", b =>
@@ -413,7 +413,7 @@ namespace RegionReports.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ReportScheduleId] IS NOT NULL");
 
-                    b.ToTable("ReportRequestsText", (string)null);
+                    b.ToTable("ReportRequestsText");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSchedule", b =>
@@ -447,7 +447,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportSchedules", (string)null);
+                    b.ToTable("ReportSchedules");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>
@@ -468,7 +468,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportUserId");
 
-                    b.ToTable("ReportsSurvey", (string)null);
+                    b.ToTable("ReportsSurvey");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurveyOption", b =>
@@ -494,7 +494,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportSurveyId");
 
-                    b.ToTable("ReportSurveySelectableOptions", (string)null);
+                    b.ToTable("ReportSurveySelectableOptions");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportText", b =>
@@ -519,7 +519,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportUserId");
 
-                    b.ToTable("ReportsText", (string)null);
+                    b.ToTable("ReportsText");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUser", b =>
@@ -562,7 +562,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportUsers", (string)null);
+                    b.ToTable("ReportUsers");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
@@ -586,7 +586,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportUserId");
 
-                    b.ToTable("ReportUserApprovalClaims", (string)null);
+                    b.ToTable("ReportUserApprovalClaims");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserSuggestedChanges", b =>
@@ -616,7 +616,7 @@ namespace RegionReports.Data.Migrations
                     b.HasIndex("ReportUserApprovalClaimId")
                         .IsUnique();
 
-                    b.ToTable("ReportUserSuggestedChanges", (string)null);
+                    b.ToTable("ReportUserSuggestedChanges");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.UploadableFileType", b =>
@@ -633,7 +633,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AlowedUploadFileTypes", (string)null);
+                    b.ToTable("AlowedUploadFileTypes");
 
                     b.HasData(
                         new
@@ -729,8 +729,8 @@ namespace RegionReports.Data.Migrations
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestSurvey", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.ReportSchedule", "ReportSchedule")
-                        .WithOne("ReportRequestSurvey")
-                        .HasForeignKey("RegionReports.Data.Entities.ReportRequestSurvey", "ReportScheduleId");
+                        .WithMany()
+                        .HasForeignKey("ReportScheduleId");
 
                     b.Navigation("ReportSchedule");
                 });
@@ -749,7 +749,7 @@ namespace RegionReports.Data.Migrations
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestText", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.ReportSchedule", "ReportSchedule")
-                        .WithOne("ReportRequestText")
+                        .WithOne()
                         .HasForeignKey("RegionReports.Data.Entities.ReportRequestText", "ReportScheduleId");
 
                     b.Navigation("ReportSchedule");
@@ -842,13 +842,6 @@ namespace RegionReports.Data.Migrations
                     b.Navigation("Files");
 
                     b.Navigation("ReportAssignments");
-                });
-
-            modelBuilder.Entity("RegionReports.Data.Entities.ReportSchedule", b =>
-                {
-                    b.Navigation("ReportRequestSurvey");
-
-                    b.Navigation("ReportRequestText");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>

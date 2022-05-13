@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     public class ReportSchedule
     {
@@ -21,6 +15,12 @@ namespace RegionReports.Data.Entities
         public short? DayOfMonth { get; set; }
 
         public bool? IsScheduleActive { get; set; } = true;
+
+        public int DaysBeforeAutoAssignment { get; set; } = 1;
+
+        public ReportRequestText? ReportRequestText { get; set; }
+
+        public ReportRequestSurvey? ReportRequestSurvey { get; set; }
 
 
     }
