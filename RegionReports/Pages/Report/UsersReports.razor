@@ -16,9 +16,13 @@
             <RadzenDataGridColumn TItem="ReportAssignment" Property="DateAssigned" Title="Отчет назначен" Width="140px">
                 <Template Context="data">
                     <p class="mb-1">@data.DateAssigned</p>
-                    @if (data.IsCompleted)
+                    @if (data.IsCompleted && !data.IsCancelledByOverDue)
                     {
-                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Ответ отправлен" />
+                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Ответ отправлен" />
+                    }
+                    @if (data.IsCancelledByOverDue)
+                    {
+                        <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Просрочено" />
                     }
                 </Template>
             </RadzenDataGridColumn>
@@ -48,7 +52,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                 <Template Context="data">
-                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Disabled="@(data.IsCompleted)" Click="(() => RedirectToReportInput(data.Id))"/>
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Disabled="@(data.IsCompleted || data.IsCancelledByOverDue)" Click="(() => RedirectToReportInput(data.Id))"/>
                     <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))" Click="(() =>ShowRequestInfo(data) )"/>
                 </Template>
             </RadzenDataGridColumn>

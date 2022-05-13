@@ -34,6 +34,11 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public bool IsCompleted { get; set; } = false;
 
+        /// <summary>
+        /// Назначение просрочено, в связи с выдачей следующего по расписанию, или из-за невыполнения.
+        /// </summary>
+        public bool IsCancelledByOverDue { get; set; }
+
         public ReportRequestBase? GetReportRequest()
         {
             if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();
