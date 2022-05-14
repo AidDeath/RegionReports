@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RegionReports.Data;
 using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
 using RegionReports.Enums;
@@ -8,13 +9,13 @@ namespace RegionReports.Services
     public class SchedulerService : BackgroundService
     {
 
-        private readonly IDbAccessor _database;
         private readonly ILogger<SchedulerService> _logger;
+        private readonly RegionReportsContext _dbContext;
 
-        public SchedulerService(IDbAccessor database, ILogger<SchedulerService> logger)
+        public SchedulerService(ILogger<SchedulerService> logger, RegionReportsContext dbContext)
         {
-            _database = database;
             _logger = logger;
+            _dbContext = dbContext;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,13 +29,15 @@ namespace RegionReports.Services
                     _logger.Log(LogLevel.Information, "Hello! I'm from hosted service");
                     //Console.WriteLine("Hello! I'm from hosted service");
                     //var a = CreateAssignmentsForSchedule();
+
+                    await SetOverdueOnAssignments();
                 }
                 catch (Exception ex)
                 {
                     _logger.Log(LogLevel.Error, ex.GetBaseException().Message);
                 }
 
-                await Task.Delay(15000);
+                await Task.Delay(10000);
             }
 
             // Если нужно дождаться завершения очистки, но контролировать время, то стоит предусмотреть в контракте использование CancellationToken
@@ -42,54 +45,44 @@ namespace RegionReports.Services
         }
 
 
-        private List<ReportSchedule> CreateAssignmentsForSchedule()
-        {
-            //Беру расписание, смотрю, не нужно ли создать назначение. Попутно могу посмотреть назначения, если предыдущее неисполнено - могу поставить ему
-            //какой то признак о том, что оно не выполнено, просрочено.
-            //Так же надо ставить признаки просроченности в том случае, если отчет не сдан вовремя.
+        //private List<ReportSchedule> CreateAssignmentsForSchedule()
+        //{
+        //    //Беру расписание, смотрю, не нужно ли создать назначение. Попутно могу посмотреть назначения, если предыдущее неисполнено - могу поставить ему
+        //    //какой то признак о том, что оно не выполнено, просрочено.
+        //    //Так же надо ставить признаки просроченности в том случае, если отчет не сдан вовремя.
 
-            //Походу нужно изменять логику для назначения дедлайна и переносить его из запроса в назначение
+        //    //Походу нужно изменять логику для назначения дедлайна и переносить его из запроса в назначение
 
-            return _database.ReportSchedules.GetQueryable()
-                .Include(sch => sch.ReportRequestSurvey)
-                .Include(sch => sch.ReportRequestText)
-                .Where(sch => sch.ReportRequestText.IsSchedulledRequest || sch.ReportRequestSurvey.IsSchedulledRequest )
-                .ToList();
-        }
+        //    return _database.ReportSchedules.GetQueryable()
+        //        .Include(sch => sch.ReportRequestSurvey)
+        //        .Include(sch => sch.ReportRequestText)
+        //        .Where(sch => sch.ReportRequestText.IsSchedulledRequest || sch.ReportRequestSurvey.IsSchedulledRequest )
+        //        .ToList();
+        //}
 
         /// <summary>
         /// Устанавливаем признак "просрочено" для отчетов, которые не сданы вовремя
         /// </summary>
-        private void SetOverdueOnAssignments()
+        private async Task SetOverdueOnAssignments()
         {
-            var assignments = _database.ReportAssignments.GetQueryable()
-                .Include(assignment => assignment.ReportRequestSurvey.ReportSchedule)
-                .Include(assignment => assignment.ReportRequestText.ReportSchedule)
-                .Where(assignment => !assignment.IsCompleted);
+            //var assignments = await _dbContext.ReportAssignments
+            //    .Where(assignment => !assignment.IsCompleted && assignment.ActualDeadline < DateTime.Now)
+            //    .ToListAsync();
+                
+            //foreach (var assignment in assignments)
+            //{
+            //    assignment.IsCancelledByOverDue = true;
+            //    _logger.Log(LogLevel.Information, $"Assignment {assignment.Id} cancelled by overdue");
+            //}
 
-            foreach (var assignment in assignments)
-            {
-                var request = assignment.GetReportRequest();
-                //запрос без расписания
-                if (request.IsSchedulledRequest)
-                {
-                    assignment.IsCancelledByOverDue = true;
-                }
-                //Запрос с раписанием
-                else
-                {
-                    switch ((ReportScheduleType)request.ReportSchedule.ScheduleType)
-                    {
-                        //case ReportScheduleType.Ежемесячный:
-                        //    break;
-                        //case ReportScheduleType.Еженедельный:
-                        //    break;
-                        //case ReportScheduleType.Ежедневный:
-                        //    if (request.ReportSchedule.Time)
-                        //    break;
-                    }
-                }
-            }
+
+            await _dbContext.ReportAssignments
+                .Where(assignment => !assignment.IsCompleted && assignment.ActualDeadline < DateTime.Now)
+                .ForEachAsync(ass =>ass.IsCancelledByOverDue = true);
+            _dbContext.SaveChanges();
+
+            _logger.Log(LogLevel.Information, $"Overdued assignmtnts was cancelled");
+
         }
 
 
