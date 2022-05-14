@@ -28,6 +28,10 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public ReportText? ReportText { get; set; }
 
+        /// <summary>
+        /// Крайний срок предоставления по этому назначению
+        /// </summary>
+        public DateTime ActualDeadline { get; set; }
 
         /// <summary>
         /// Сдан ли отчет по этому назначению

@@ -14,8 +14,6 @@ namespace RegionReports.Data.Entities
 
         public bool IsSchedulledRequest { get; set; } = false;
 
-        public DateTime? NonScheduledDeadline { get; set; }
-
         public int? ReportScheduleId { get; set; }
         public ReportSchedule? ReportSchedule { get; set; }
 

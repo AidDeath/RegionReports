@@ -20,16 +20,16 @@
                 <RadzenCard > 
                     <p>Варианты ответа:</p>
                    @foreach(var option in ReportRequestSurvey.Options)
-                    {
-                        <p>
-                            <RadzenIcon Icon="check_circle"/>
-                            @option.OptionName
-                        </p>
-                    }
+                   {
+                    <p>
+                        <RadzenIcon Icon="check_circle"/>
+                        @option.OptionName
+                    </p>
+                   }
                     </RadzenCard>
                 }
 
-            <p>Срок предоставления: @ReportRequestService.WhenToCollect(ReportRequestSurvey)</p>
+            @*<p>Срок предоставления: @ReportRequestService.WhenToCollect(ReportRequestSurvey)</p>*@
         </div>
     </div>
     </ChildContent>

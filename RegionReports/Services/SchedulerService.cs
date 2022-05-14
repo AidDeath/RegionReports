@@ -71,7 +71,7 @@ namespace RegionReports.Services
             {
                 var request = assignment.GetReportRequest();
                 //запрос без расписания
-                if (request.IsSchedulledRequest && DateTime.Now >= request.NonScheduledDeadline)
+                if (request.IsSchedulledRequest)
                 {
                     assignment.IsCancelledByOverDue = true;
                 }

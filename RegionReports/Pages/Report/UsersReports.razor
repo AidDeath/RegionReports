@@ -50,6 +50,11 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ReportAssignment" Title="Срок отчета">
+                <Template Context="data">
+                    @($"До {data.ActualDeadline.Date:d}, {data.ActualDeadline.TimeOfDay:t}")
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                 <Template Context="data">
                     <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Disabled="@(data.IsCompleted || data.IsCancelledByOverDue)" Click="(() => RedirectToReportInput(data.Id))"/>

@@ -19,11 +19,6 @@ namespace RegionReports.Data.Interfaces
         public bool IsSchedulledRequest { get; set; }
 
         /// <summary>
-        /// Срок сдачи отчета. Заполняется в случае отсутствия расписания
-        /// </summary>
-        public DateTime? NonScheduledDeadline { get; set; }
-
-        /// <summary>
         /// Идентификатор расписания, если задано
         /// </summary>
         public int? ReportScheduleId { get; set; }
