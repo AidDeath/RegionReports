@@ -112,16 +112,16 @@ namespace RegionReports.Services
             switch ((ReportScheduleType)schedule.ScheduleType)
             {
                 case ReportScheduleType.Ежемесячный:
-                    var dayForCurrentMonth = (DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) > schedule.DayOfMonth)
+                    var dayForCurrentMonth = (DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) < schedule.DayOfMonth)
                         ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)
                         : (int)schedule.DayOfMonth;
 
                     var nextMonth = DateTime.Now.AddMonths(1);
-                    var dayForNextMonth = (DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month) > schedule.DayOfMonth)
-                        ? DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month)
+                    var dayForNextMonth = (DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month) < schedule.DayOfMonth)
+                        ? DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month)
                         : (int)schedule.DayOfMonth;
 
-                    calculatedDeadline = (DateTime.Now.Date.Day <= dayForCurrentMonth && DateTime.Now.TimeOfDay < schedule.Time)
+                    calculatedDeadline = (DateTime.Now < new DateTime(DateTime.Now.Year, DateTime.Now.Month, dayForCurrentMonth, schedule.Time.Hours, schedule.Time.Minutes, 0))
                         ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, dayForCurrentMonth)
                         : new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, dayForNextMonth);
                     break;

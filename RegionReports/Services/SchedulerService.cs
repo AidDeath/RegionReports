@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegionReports.Data;
-using RegionReports.Data.Entities;
-using RegionReports.Data.Interfaces;
-using RegionReports.Enums;
 
 namespace RegionReports.Services
 {

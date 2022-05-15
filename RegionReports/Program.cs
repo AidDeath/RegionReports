@@ -19,7 +19,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddDbContext<RegionReportsContext>(ServiceLifetime.Singleton);
+builder.Services.AddDbContext<RegionReportsContext>(ServiceLifetime.Transient);
 builder.Services.AddSingleton<IDbAccessor, DbAccessor>();
 builder.Services.AddHttpContextAccessor();
 
