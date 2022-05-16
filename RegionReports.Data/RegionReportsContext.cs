@@ -139,6 +139,7 @@ namespace RegionReports.Data
                 .HasDefaultValue(true)
                 .IsRequired();
 
+
             #region Report Assignments
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportUser)

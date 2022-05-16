@@ -43,7 +43,7 @@ namespace RegionReports.Services
         /// </summary>
         /// <param name="request"></param>
         /// <param name="usersToAssign"></param>
-        public void AddAssignmentsRange(ReportRequestBase request, IEnumerable<ReportUser>? usersToAssign, DateTime nonScheduledDeadline)
+        public void AddAssignmentsRange(ReportRequestBase request, IEnumerable<ReportUser>? usersToAssign, DateTime nonScheduledDeadline = default(DateTime))
         {
             DateTime calculatedDeadline = (request.IsSchedulledRequest) 
                 ? GetDeadlineDate(request.ReportSchedule) 

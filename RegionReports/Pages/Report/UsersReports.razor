@@ -16,11 +16,11 @@
             <RadzenDataGridColumn TItem="ReportAssignment" Property="DateAssigned" Title="Отчет назначен" Width="140px">
                 <Template Context="data">
                     <p class="mb-1">@data.DateAssigned</p>
-                    @if (data.IsCompleted && !data.IsCancelledByOverDue)
+                    @if (data.IsCompleted)
                     {
                         <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Ответ отправлен" />
                     }
-                    @if (data.IsCancelledByOverDue)
+                    @if (!data.IsCompleted && data.IsCancelledByOverDue)
                     {
                         <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Просрочено" />
                     }

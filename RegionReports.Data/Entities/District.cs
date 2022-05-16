@@ -30,5 +30,7 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public ReportUser? ReportUser { get; set; }
 
+        public List<ReportSchedule> Schedules { get; set; }  
+
     }
 }
