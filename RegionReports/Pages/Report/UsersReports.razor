@@ -5,6 +5,7 @@
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
 
+<PageTitle>Мои отчеты</PageTitle>
 <h3>Отчеты, назначенные мне</h3>
 
 <RadzenCheckBox TValue=bool Name="ShowUnansweredOnlyCheckBox" @bind-Value="@ShowUnansweredOnly" Change="@RefreshRequestsList"></RadzenCheckBox>

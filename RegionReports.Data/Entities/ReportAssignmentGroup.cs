@@ -34,6 +34,16 @@
 
         }
 
+        public string GetRequestTypeName()
+        {
+            if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();
+
+            if (ReportRequestText is not null) return "Текстовый запрос";
+            if (ReportRequestSurvey is not null) return "Запрос отчета";
+
+            return string.Empty;
+        }
+
 
     }
 }

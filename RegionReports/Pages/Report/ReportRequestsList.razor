@@ -1,5 +1,5 @@
 ﻿@page "/reportrequestslist"
-@inject ReportRequestService ReportRequestService
+@inject AssignmentService AssignmentService
 @inject NotificationService NotificationService
 @inject SettingsService SettingsService
 
@@ -7,50 +7,71 @@
     Что здесь должно быть:
     Эт страница, типа управления назначенными отчетами.
     Показываю датагрид с запросами отчетов. В нем будут: 
-        - По расписанию отчет или нет, можно выключить расписание, тогда оно автоматически создаваться не будет.
         - Дата назначения
-        - Количество назначений ????
+        - Заготовок отчета
+        - Срок отчета, истёк или нет.
+        - Скольким пользователям назначен и солько из них выполнили назначение.
+        - По расписанию отчет или нет, можно выключить расписание, тогда оно автоматически создаваться не будет.
+
+        - Детали выбранного отчета
+        - Изменение расписания и назначения пользователей
+
+        -- Вывод агрегирующего отчета
+
 
 *@
-<h3>ReportRequestsList</h3>
+<PageTitle>Сбор отчетов</PageTitle>
+<h3>Прогресс сбора отчетов</h3>
 
-<RadzenDataGrid TItem="ReportRequestBase" AllowPaging="true" Data="@list">
+<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list">
     <Columns>
-        <RadzenDataGridColumn TItem="ReportRequestBase" Title="Тип запроса">
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="DateAssigned" Title="Назначен"/>
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
             <Template Context="data">
-                @if (data is ReportRequestText)
-                {
-                    <p>Текст</p>
-                }
-                else
-                {
-                    <p>Опрос</p>
-                }
+                @data.GetRequestTypeName()
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ReportRequestBase" Property="RequestTitle" Title="Заголовок"  />
-        <RadzenDataGridColumn TItem="ReportRequestBase" Property="IsSchedulledRequest" Title="Периодичность сбора" >
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Заголовок">
             <Template Context="data">
-                @if (data.IsSchedulledRequest)
-                {
-                    @ReportRequestService.WhenToCollect(data)
-                }
-                else
-                {
-                    @*@data.NonScheduledDeadline  *@                
-                }
+                @data.GetReportRequest().RequestTitle
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ReportRequestBase" Property="DateCreated" Title="Создан"  />
 
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Расписание" >
+            <Template Context="data">
+                @{
+                    if (data.GetReportRequest().IsSchedulledRequest)
+                    {
+                        var scheduleText = data.GetReportRequest().WhenToCollect();
+                        <RadzenButton Text="@scheduleText"/>
+                    }
+                    else
+                    {
+                        <p>Не задано</p>
+                    }
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Прогресс сбора">
+            <Template Context="data">
+                @{
+                    var a = data.Assignments.Count;
+                    <RadzenProgressBar Max="@a" ShowValue="false"  Value="@data.Assignments.Count(asn => asn.IsCompleted)"/>
+                }
+                
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 @code {
-        IEnumerable<ReportRequestBase> list;
+
+    IEnumerable<ReportAssignmentGroup> list;
+
+    private ReportRequestBase request(ReportAssignmentGroup asnGroup) => asnGroup.GetReportRequest();
 
     protected override void OnInitialized()
     {
-        list = ReportRequestService.GetAllRequests();
+        list = AssignmentService.GetAssignmentGroups();
     }
 }

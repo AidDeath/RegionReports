@@ -1,0 +1,67 @@
+﻿@using RegionReports.Enums
+<RadzenAccordion class="m-2"  Expand="@((arg) => ChangeType(arg))">
+    <Items>
+        <RadzenAccordionItem Text="Ежемесячнно" Icon="calendar_view_month">
+            <p>
+            <RadzenLabel Component="DayOfMonthNumericBox" Text="День месяца"/>
+            <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" @bind-Value="@RequestSchedule.DayOfMonth" />
+            </p>
+            <p>
+            <RadzenLabel Component="SchedulledTime" Text="Время"/>
+            <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+            </p>
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Еженедельно" Icon="calendar_view_week">
+            <RadzenLabel Component="DayOfWeekRadioButtons" Text="День недели"/>
+            <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" 
+                        TValue="short?" @bind-Value="@RequestSchedule.DayOfWeek">
+                        <Items>
+                            <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
+                            <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
+                            <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
+                            <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
+                            <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
+                            <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
+                            <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
+                </Items>
+            </RadzenRadioButtonList>
+
+            <RadzenLabel Component="SchedulledTime" Text="Время"/>
+            <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Ежедневно" Icon="calendar_view_day">
+
+            <RadzenLabel Component="SchedulledTime" Text="Время"/>
+            <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+        </RadzenAccordionItem>
+    </Items>
+</RadzenAccordion>
+<RadzenLabel Component="DaysBeforeAssignNumericBox" Text="Дней до создания назначения"/>
+<RadzenNumeric class="w-25" Name="DaysBeforeAssignNumericBox" Min=1 Max="@maxDaysBeforeAssignment" 
+TValue="int" @bind-Value="@RequestSchedule.DaysBeforeAutoAssignment"/>
+
+@code {
+    [Parameter]
+    public ReportSchedule RequestSchedule { get; set; }
+
+    private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
+    private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
+    //Ограничение для календаря, чтобы не рендерило прошлые даты
+    void DateRenderNotBeforeToday(DateRenderEventArgs args)
+    {
+        args.Disabled = args.Disabled || args.Date < DateTime.Today;
+    }
+    private int maxDaysBeforeAssignment => ((ReportScheduleType)RequestSchedule.ScheduleType == ReportScheduleType.Ежедневный)
+        ? 1
+        : (RequestSchedule.ScheduleType == (int)ReportScheduleType.Еженедельный)
+            ? 6
+            : 15;
+
+    private void ChangeType(int arg)
+    {
+        RequestSchedule.ScheduleType = ++arg;
+    }
+}

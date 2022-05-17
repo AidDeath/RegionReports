@@ -38,5 +38,10 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         public IRepository<ReportSchedule> ReportSchedules { get; }
 
+        /// <summary>
+        /// Группы назначений отчетов
+        /// </summary>
+        public IRepository<ReportAssignmentGroup> AssignmentGroups { get; }
+
     }
 }

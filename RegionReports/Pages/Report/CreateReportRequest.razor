@@ -206,48 +206,7 @@
 
                         @*Для запроса с расписанием*@
                         <RadzenCard Visible=@isScheduledRequest>
-                            <RadzenAccordion class="m-2"  Expand="@((args) => SheduleTypeSelected(args))">
-                                <Items>
-                                    <RadzenAccordionItem Text="Ежемесячнно" Icon="calendar_view_month">
-                                        <p>
-                                        <RadzenLabel Component="DayOfMonthNumericBox" Text="День месяца"/>
-                                        <RadzenNumeric Name="DayOfMonthNumericBox" TValue="short?" Min="1" Max="31" @bind-Value="@requestSchedule.DayOfMonth" />
-                                        </p>
-                                        <p>
-                                       <RadzenLabel Component="SchedulledTime" Text="Время"/>
-                                        <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                                                DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
-                                        </p>
-                                    </RadzenAccordionItem>
-                                    <RadzenAccordionItem Text="Еженедельно" Icon="calendar_view_week">
-                                        <RadzenLabel Component="DayOfWeekRadioButtons" Text="День недели"/>
-                                        <RadzenRadioButtonList Name="DayOfWeekRadioButtons" Orientation="Orientation.Vertical" 
-                                                    TValue="short?" @bind-Value="@requestSchedule.DayOfWeek">
-                                                    <Items>
-                                                        <RadzenRadioButtonListItem Text="Понедельник" Value="(short?)1"/>
-                                                        <RadzenRadioButtonListItem Text="Вторник" Value="(short?)2"/>
-                                                        <RadzenRadioButtonListItem Text="Среда" Value="(short?)3"/>
-                                                        <RadzenRadioButtonListItem Text="Четверг" Value="(short?)4"/>
-                                                        <RadzenRadioButtonListItem Text="Пятница" Value="(short?)5"/>
-                                                        <RadzenRadioButtonListItem Text="Суббота" Value="(short?)6"/>
-                                                        <RadzenRadioButtonListItem Text="Воскресенье" Value="(short?)7"/>
-                                            </Items>
-                                        </RadzenRadioButtonList>
-
-                                       <RadzenLabel Component="SchedulledTime" Text="Время"/>
-                                        <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                                                DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
-                                    </RadzenAccordionItem>
-                                    <RadzenAccordionItem Text="Ежедневно" Icon="calendar_view_day">
-
-                                        <RadzenLabel Component="SchedulledTime" Text="Время"/>
-                                        <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                                                DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
-                                    </RadzenAccordionItem>
-                                </Items>
-                            </RadzenAccordion>
-                            <RadzenLabel Component="DaysBeforeAssignNumericBox" Text="Дней до создания назначения"/>
-                            <RadzenNumeric class="w-25" Name="DaysBeforeAssignNumericBox" Min=1 Max="@maxDaysBeforeAssignment" TValue="int" @bind-Value="@requestSchedule.DaysBeforeAutoAssignment"/>
+                            <ScheduleSettings RequestSchedule="@requestSchedule"/>
                         </RadzenCard>
                         
                     </RadzenFieldset>
@@ -395,20 +354,20 @@
 
     #region Scheduller
     // Данные в этих переменных хранятся временно, TODO: переписать в объект при сохранении запроса
-    private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
+    //private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
 
-    private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
-    private ReportSchedule requestSchedule = new ReportSchedule() {
-            DayOfMonth = 1,
-            DayOfWeek = 1,
-            Time = new TimeSpan(12, 30, 0)
-    };
+    //private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
+    //private ReportSchedule requestSchedule = new ReportSchedule() {
+    //        DayOfMonth = 1,
+    //        DayOfWeek = 1,
+    //        Time = new TimeSpan(12, 30, 0)
+    //};
 
     //Ограничение для календаря, чтобы не рендерило прошлые даты
-    void DateRenderNotBeforeToday(DateRenderEventArgs args)
-    {
-        args.Disabled = args.Disabled || args.Date < DateTime.Today;
-    }
+    //void DateRenderNotBeforeToday(DateRenderEventArgs args)
+    //{
+    //    args.Disabled = args.Disabled || args.Date < DateTime.Today;
+    //}
 
     private bool isScheduledRequest {
         get {
@@ -439,16 +398,16 @@
     }
 
 
-    private void SheduleTypeSelected(int selectedIndex)
-    {
-        requestSchedule.ScheduleType = selectedIndex + 1;
-    }
+    //private void SheduleTypeSelected(int selectedIndex)
+    //{
+    //    requestSchedule.ScheduleType = selectedIndex + 1;
+    //}
 
-    private int maxDaysBeforeAssignment => ((ReportScheduleType)requestSchedule.ScheduleType == ReportScheduleType.Ежедневный)
-        ? 1
-        : (requestSchedule.ScheduleType == (int)ReportScheduleType.Еженедельный)
-            ? 6
-            : 15;
+    //private int maxDaysBeforeAssignment => ((ReportScheduleType)requestSchedule.ScheduleType == ReportScheduleType.Ежедневный)
+    //    ? 1
+    //    : (requestSchedule.ScheduleType == (int)ReportScheduleType.Еженедельный)
+    //        ? 6
+    //        : 15;
 
 
     #endregion

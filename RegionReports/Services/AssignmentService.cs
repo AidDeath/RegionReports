@@ -25,7 +25,7 @@ namespace RegionReports.Services
                 ? GetDeadlineDate(request.ReportSchedule) 
                 : nonScheduledDeadline;
 
-            request.AssignmentsGroup = new()
+            var newGroup = new ReportAssignmentGroup()
             {
                 ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
                 ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
@@ -33,13 +33,34 @@ namespace RegionReports.Services
                 Assignments = new()
             };
 
+
             foreach (var user in usersToAssign)
             {
-                request.AssignmentsGroup.Assignments.Add(new()
+                newGroup.Assignments.Add(new()
                 {
                     ReportUser = user
                 });
             }
+
+            if (request.AssignmentsGroups is null)
+            {
+                request.AssignmentsGroups = new List<ReportAssignmentGroup>() { newGroup };
+            }
+            else request.AssignmentsGroups.Add(newGroup);
+        }
+
+
+        public List<ReportAssignmentGroup> GetAssignmentGroups()
+        {
+            var query = _database.AssignmentGroups.GetQueryable()
+                .Include(group => group.Assignments)
+                .Include(group => group.ReportRequestSurvey).ThenInclude(req => req.ReportSchedule)
+                .Include(group => group.ReportRequestSurvey.Options)
+                .Include(group => group.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
+                .Include(group => group.ReportRequestText.Files)
+                .OrderByDescending(rep => rep.DateAssigned);
+
+            return query.ToList();
         }
 
         /// <summary>
@@ -52,7 +73,7 @@ namespace RegionReports.Services
         {
             var query = _database.ReportAssignments.GetQueryable()
                 .Include(ass => ass.ReportUser)
-                .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.ReportSchedule)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey).ThenInclude(req => req.ReportSchedule)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey.Options)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.Files)

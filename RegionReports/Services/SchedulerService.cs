@@ -112,8 +112,8 @@ namespace RegionReports.Services
 
                     _dbContext.AssignmentGroups.Add(newGroup);
                     _dbContext.SaveChanges();
-                    _logger.Log(LogLevel.Information, $"{(ReportRequestType)newGroup.GetReportRequest().ReportSchedule.ScheduleType} " +
-                        $"Title: {newGroup.GetReportRequest().RequestTitle} - " +
+                    _logger.Log(LogLevel.Information, $"Request type {newGroup.GetReportRequest().ReportSchedule.ScheduleType} " +
+                        $"| Title: {newGroup.GetReportRequest().RequestTitle} - " +
                         $"created {newGroup.Assignments.Count} assignments by schedule");
                 } 
             }
