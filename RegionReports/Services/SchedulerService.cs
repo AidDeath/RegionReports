@@ -91,8 +91,9 @@ namespace RegionReports.Services
             {
                 var calculatedDeadline = GetDeadlineDate(request.ReportSchedule);
                 
-                //Если до сдачи отчета больше заданного в расписании кол-ва дней - не создаем назначение.
-                if (DateTime.Now.AddDays(request.ReportSchedule.DaysBeforeAutoAssignment) > calculatedDeadline)
+                //Если до сдачи отчета больше заданного в расписании кол-ва дней или на эту же дату уже есть назначение - не создаем назначение.
+                if (DateTime.Now.AddDays(request.ReportSchedule.DaysBeforeAutoAssignment) > calculatedDeadline
+                    && request.AssignmentsGroups.Any(asnGroup => asnGroup.ActualDeadline != calculatedDeadline))
                 {
                     var newGroup = new ReportAssignmentGroup()
                     {

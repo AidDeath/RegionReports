@@ -9,7 +9,7 @@
             <p>
             <RadzenLabel Component="SchedulledTime" Text="Время"/>
             <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime"/>
             </p>
         </RadzenAccordionItem>
         <RadzenAccordionItem Text="Еженедельно" Icon="calendar_view_week">
@@ -29,13 +29,13 @@
 
             <RadzenLabel Component="SchedulledTime" Text="Время"/>
             <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime"/>
         </RadzenAccordionItem>
         <RadzenAccordionItem Text="Ежедневно" Icon="calendar_view_day">
 
             <RadzenLabel Component="SchedulledTime" Text="Время"/>
             <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@scheduledTime"/>
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime"/>
         </RadzenAccordionItem>
     </Items>
 </RadzenAccordion>
@@ -47,13 +47,9 @@ TValue="int" @bind-Value="@RequestSchedule.DaysBeforeAutoAssignment"/>
     [Parameter]
     public ReportSchedule RequestSchedule { get; set; }
 
-    private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
-    private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
-    //Ограничение для календаря, чтобы не рендерило прошлые даты
-    void DateRenderNotBeforeToday(DateRenderEventArgs args)
-    {
-        args.Disabled = args.Disabled || args.Date < DateTime.Today;
-    }
+    [Parameter]
+    public DateTime ScheduledTime { get; set; }
+
     private int maxDaysBeforeAssignment => ((ReportScheduleType)RequestSchedule.ScheduleType == ReportScheduleType.Ежедневный)
         ? 1
         : (RequestSchedule.ScheduleType == (int)ReportScheduleType.Еженедельный)

@@ -206,7 +206,7 @@
 
                         @*Для запроса с расписанием*@
                         <RadzenCard Visible=@isScheduledRequest>
-                            <ScheduleSettings RequestSchedule="@requestSchedule"/>
+                            <ScheduleSettings RequestSchedule="@requestSchedule" ScheduledTime="@scheduledTime"/>
                         </RadzenCard>
                         
                     </RadzenFieldset>
@@ -354,20 +354,21 @@
 
     #region Scheduller
     // Данные в этих переменных хранятся временно, TODO: переписать в объект при сохранении запроса
-    //private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
+    private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
 
-    //private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
-    //private ReportSchedule requestSchedule = new ReportSchedule() {
-    //        DayOfMonth = 1,
-    //        DayOfWeek = 1,
-    //        Time = new TimeSpan(12, 30, 0)
-    //};
+    private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
+
+    private ReportSchedule requestSchedule = new ReportSchedule() {
+            DayOfMonth = 1,
+            DayOfWeek = 1,
+            Time = new TimeSpan(12, 30, 0)
+    };
 
     //Ограничение для календаря, чтобы не рендерило прошлые даты
-    //void DateRenderNotBeforeToday(DateRenderEventArgs args)
-    //{
-    //    args.Disabled = args.Disabled || args.Date < DateTime.Today;
-    //}
+    void DateRenderNotBeforeToday(DateRenderEventArgs args)
+    {
+        args.Disabled = args.Disabled || args.Date < DateTime.Today;
+    }
 
     private bool isScheduledRequest {
         get {
