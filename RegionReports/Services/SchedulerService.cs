@@ -75,6 +75,8 @@ namespace RegionReports.Services
                 .Include(group => group.Assignments).ThenInclude(asn => asn.ReportUser)
                 .Include(group => group.ReportRequestSurvey).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
                 .Include(group => group.ReportRequestText).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
+                .Include(group => group.ReportRequestText.AssignmentsGroups)
+                .Include(group => group.ReportRequestSurvey.AssignmentsGroups)
                 .Where(group => group.IsOverdued
                     && (group.ReportRequestSurvey.IsSchedulledRequest || group.ReportRequestText.IsSchedulledRequest)).ToListAsync();
 
@@ -93,7 +95,7 @@ namespace RegionReports.Services
                 
                 //Если до сдачи отчета больше заданного в расписании кол-ва дней или на эту же дату уже есть назначение - не создаем назначение.
                 if (DateTime.Now.AddDays(request.ReportSchedule.DaysBeforeAutoAssignment) > calculatedDeadline
-                    && request.AssignmentsGroups.Any(asnGroup => asnGroup.ActualDeadline != calculatedDeadline))
+                    && request.AssignmentsGroups.All(asnGroup => asnGroup.ActualDeadline != calculatedDeadline))
                 {
                     var newGroup = new ReportAssignmentGroup()
                     {
