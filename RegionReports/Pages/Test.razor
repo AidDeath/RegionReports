@@ -12,7 +12,7 @@
     protected override void OnInitialized()
     {
         var a = AssignmentService.GetForUser(UserService.GetCurrentUserModel(), true);
-        ass =  a.FirstOrDefault(a => a.ReportRequestSurvey is not null);
+        //ass =  a.FirstOrDefault(a => a.ReportRequestSurvey is not null);
     }
 
 }

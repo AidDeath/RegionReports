@@ -57,29 +57,35 @@ namespace RegionReports.Services
             // Назначение выполнено либо отменено (Так не будет создаваться назначение, если ещё активно предыдущее)
             //  В назначении лежит отчет с признаком IsScheduledRequest.
 
-            var assignments = await _dbContext.ReportAssignments
-                .Include(asn => asn.ReportRequestSurvey).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
-                .Include(asn => asn.ReportRequestText).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
-                .Include(asn => asn.ReportUser)
-                .Where(asn => asn.IsCancelledByOverDue
-                            && (asn.ReportRequestSurvey.IsSchedulledRequest || asn.ReportRequestText.IsSchedulledRequest)).ToListAsync();
+            //var assignments = await _dbContext.ReportAssignments
+            //    .Include(asn => asn.ReportRequestSurvey).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
+            //    .Include(asn => asn.ReportRequestText).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
+            //    .Include(asn => asn.ReportUser)
+            //    .Where(asn => asn.IsCancelledByOverDue
+            //                && (asn.ReportRequestSurvey.IsSchedulledRequest || asn.ReportRequestText.IsSchedulledRequest)).ToListAsync();
 
-            var requests = assignments.Distinct()
+
+            //var requests = assignments.Distinct()
+            //    .Select(asn => asn.GetReportRequest())
+            //    .Where(req => req.ReportSchedule.IsScheduleActive ?? false)
+            //    .Distinct();
+
+
+            var assignGroups = await _dbContext.AssignmentGroups
+                .Include(group => group.Assignments).ThenInclude(asn => asn.ReportUser)
+                .Include(group => group.ReportRequestSurvey).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
+                .Include(group => group.ReportRequestText).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
+                .Where(group => group.IsOverdued
+                    && (group.ReportRequestSurvey.IsSchedulledRequest || group.ReportRequestText.IsSchedulledRequest)).ToListAsync();
+
+            var requests = assignGroups
                 .Select(asn => asn.GetReportRequest())
                 .Where(req => req.ReportSchedule.IsScheduleActive ?? false)
                 .Distinct();
 
 
-            //var schedules = await _dbContext.ReportSchedules
-            //    .Include(sch => sch.Districts).ThenInclude(distr => distr.ReportUser)
-            //    .Include(sch => sch.ReportRequestSurvey.ReportAssignments)
-            //    .Include(sch => sch.ReportRequestText.ReportAssignments)
-            //    .Include(sch => sch.ReportRequestSurvey.ReportSchedule)
-            //    .Include(sch => sch.ReportRequestText.ReportSchedule)
-            //    .Where(distr => distr.IsScheduleActive ?? false).ToListAsync();
-
-
-            List<ReportAssignment> newAssignments = new List<ReportAssignment>();
+            //List<ReportAssignment> newAssignments = new List<ReportAssignment>();
+            //List<ReportAssignmentGroup> groups = new();
             //Теперь нужно продублировать назначения для этих отчетов
             foreach (var request in requests)
             {
@@ -88,22 +94,27 @@ namespace RegionReports.Services
                 //Если до сдачи отчета больше заданного в расписании кол-ва дней - не создаем назначение.
                 if (DateTime.Now.AddDays(request.ReportSchedule.DaysBeforeAutoAssignment) > calculatedDeadline)
                 {
-                    ReportAssignmentGroup group = new();
+                    var newGroup = new ReportAssignmentGroup()
+                    {
+                        ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
+                        ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
+                        ActualDeadline = calculatedDeadline,
+                        Assignments = new()
+                    };
+                    
                     foreach (var user in request.ReportSchedule.Districts.Select(distr => distr.ReportUser))
                     {
-                        newAssignments.Add(new()
+                        newGroup.Assignments.Add(new()
                         {
                             ReportUser = user,
-                            ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
-                            ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
-                            ActualDeadline = calculatedDeadline,
-                            ReportAssignmentGroup = group
                         });
                     }
 
-                    _dbContext.ReportAssignments.AddRange(newAssignments);
+                    _dbContext.AssignmentGroups.Add(newGroup);
                     _dbContext.SaveChanges();
-                    _logger.Log(LogLevel.Information, $"Created {newAssignments.Count} assignments by schedule");
+                    _logger.Log(LogLevel.Information, $"{(ReportRequestType)newGroup.GetReportRequest().ReportSchedule.ScheduleType} " +
+                        $"Title: {newGroup.GetReportRequest().RequestTitle} - " +
+                        $"created {newGroup.Assignments.Count} assignments by schedule");
                 } 
             }
         }
@@ -113,10 +124,10 @@ namespace RegionReports.Services
         /// </summary>
         private async Task SetOverdueOnAssignments()
         {
-            await _dbContext.ReportAssignments
-                .Where(assignment =>  !assignment.IsCancelledByOverDue && assignment.ActualDeadline < DateTime.Now)
-                .ForEachAsync(ass =>ass.IsCancelledByOverDue = true);
-            _dbContext.SaveChanges();
+            await _dbContext.AssignmentGroups
+                .Where(asnGroup =>  !asnGroup.IsOverdued && asnGroup.ActualDeadline < DateTime.Now)
+                .ForEachAsync(asnGroup =>asnGroup.IsOverdued = true);
+            await _dbContext.SaveChangesAsync();
 
             _logger.Log(LogLevel.Information, $"Assignments clean-up successful");
         }

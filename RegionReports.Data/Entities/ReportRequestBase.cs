@@ -22,6 +22,6 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Назначения этого отчета для пользователей
         /// </summary>
-        public List<ReportAssignment> ReportAssignments { get; set; } = new List<ReportAssignment>();
+        public ReportAssignmentGroup AssignmentsGroup { get; set; } = new ();
     }
 }

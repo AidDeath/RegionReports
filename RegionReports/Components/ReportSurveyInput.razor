@@ -6,7 +6,7 @@
     </HeaderTemplate>
     <ChildContent>
 
-        @if (ReportAssignment.ReportRequestSurvey.MultipleChoises)
+        @if (ReportAssignment.ReportAssignmentGroup.ReportRequestSurvey.MultipleChoises)
         {
             @foreach(var opt in reportSurvey.SelectableOptions)
             {
@@ -51,13 +51,13 @@
     [Parameter]
     public ReportAssignment ReportAssignment { get; set; }
 
-    private string TextProceedToFill => (ReportAssignment.ReportRequestSurvey.MultipleChoises) ? "Выберите один или несколько вариантов ответа" : "Выберите один вариант ответа";
+    private string TextProceedToFill => (ReportAssignment.ReportAssignmentGroup.ReportRequestSurvey.MultipleChoises) ? "Выберите один или несколько вариантов ответа" : "Выберите один вариант ответа";
 
     private ReportSurvey reportSurvey = new(){SelectableOptions = new()};
 
     protected override void OnInitialized()
     {
-        foreach (var option in ReportAssignment.ReportRequestSurvey.Options)
+        foreach (var option in ReportAssignment.ReportAssignmentGroup.ReportRequestSurvey.Options)
         {
             reportSurvey.SelectableOptions.Add(new() { ReportRequestSurveyOption = option });
         }

@@ -9,12 +9,6 @@ namespace RegionReports.Data.Entities
         public int ReportUserId { get; set; }
         public ReportUser ReportUser { get; set; }
 
-        public DateTime DateAssigned { get; set; } = DateTime.Now;
-
-        public int? ReportRequestTextId { get; set; }
-        public ReportRequestText? ReportRequestText { get; set; }
-        public int? ReportRequestSurveyId { get; set; }
-        public ReportRequestSurvey? ReportRequestSurvey { get; set; }
 
         public int? ReportSurveyId { get; set; }
         /// <summary>
@@ -29,35 +23,15 @@ namespace RegionReports.Data.Entities
         public ReportText? ReportText { get; set; }
 
         /// <summary>
-        /// Крайний срок предоставления по этому назначению
-        /// </summary>
-        public DateTime ActualDeadline { get; set; }
-
-        /// <summary>
         /// Сдан ли отчет по этому назначению
         /// </summary>
         public bool IsCompleted { get; set; } = false;
 
-        /// <summary>
-        /// Назначение просрочено, в связи с выдачей следующего по расписанию, или из-за невыполнения.
-        /// </summary>
-        public bool IsCancelledByOverDue { get; set; }
 
         /// <summary>
         /// Группа назначений отчета
         /// </summary>
         public ReportAssignmentGroup ReportAssignmentGroup { get; set; }
-
-        public ReportRequestBase? GetReportRequest()
-        {
-            if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();
-
-            if (ReportRequestText is not null) return ReportRequestText;
-            if (ReportRequestSurvey is not null) return ReportRequestSurvey;
-
-            return null;
-            
-        }
 
         public ReportBase GetReportBase()
         {

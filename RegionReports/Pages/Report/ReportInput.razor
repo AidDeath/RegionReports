@@ -41,7 +41,7 @@ else
         ReportAssignment = AssignmentService.GetById(currentUser, assignmentId);
         if (ReportAssignment is not null)
         {
-            request = ReportAssignment.GetReportRequest();
+            request = ReportAssignment.ReportAssignmentGroup.GetReportRequest();
         }
     }
 

@@ -3,7 +3,7 @@ using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
 using RegionReports.Enums;
 
-#nullable disable
+
 namespace RegionReports.Services
 {
     public class AssignmentService
@@ -12,30 +12,6 @@ namespace RegionReports.Services
         public AssignmentService(IDbAccessor database)
         {
             _database = database;
-        }
-
-        public void AddAssignment(ReportRequestBase request, int userId)
-        {
-
-        }
-
-        /// <summary>
-        /// Вписать новые назначения в запрос отчета
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="usersToAssign"></param>
-        [Obsolete]
-        public void AddAssignmentsRange(ReportRequestBase request, IEnumerable<ReportUser>? usersToAssign)
-        {
-            foreach(var user in usersToAssign)
-            {
-                request.ReportAssignments.Add(new()
-                {
-                    ReportUser = user,
-                    ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
-                    ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
-                });
-            }
         }
 
         /// <summary>
@@ -49,16 +25,19 @@ namespace RegionReports.Services
                 ? GetDeadlineDate(request.ReportSchedule) 
                 : nonScheduledDeadline;
 
-            ReportAssignmentGroup group = new();
+            request.AssignmentsGroup = new()
+            {
+                ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
+                ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
+                ActualDeadline = calculatedDeadline,
+                Assignments = new()
+            };
+
             foreach (var user in usersToAssign)
             {
-                request.ReportAssignments.Add(new()
+                request.AssignmentsGroup.Assignments.Add(new()
                 {
-                    ReportUser = user,
-                    ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
-                    ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
-                    ActualDeadline = calculatedDeadline,
-                    ReportAssignmentGroup = group
+                    ReportUser = user
                 });
             }
         }
@@ -73,13 +52,13 @@ namespace RegionReports.Services
         {
             var query = _database.ReportAssignments.GetQueryable()
                 .Include(ass => ass.ReportUser)
-                .Include(ass => ass.ReportRequestSurvey).ThenInclude(repSurvey => repSurvey.ReportSchedule)
-                .Include(ass => ass.ReportRequestSurvey.Options)
-                .Include(ass => ass.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
-                .Include(ass => ass.ReportRequestText.Files)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.ReportSchedule)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey.Options)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.Files)
                 .Include(ass => ass.ReportSurvey)
                 .Include(ass => ass.ReportText)
-                .OrderByDescending(rep => rep.DateAssigned);
+                .OrderByDescending(rep => rep.ReportAssignmentGroup.DateAssigned);
 
 
             return (uncompetedOnly)
@@ -91,10 +70,10 @@ namespace RegionReports.Services
         {
             return _database.ReportAssignments.GetQueryable()
                 .Include(ass => ass.ReportUser)
-                .Include(ass => ass.ReportRequestSurvey).ThenInclude(repSurvey => repSurvey.ReportSchedule)
-                .Include(ass => ass.ReportRequestSurvey.Options)
-                .Include(ass => ass.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
-                .Include(ass => ass.ReportRequestText.Files)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey).ThenInclude(req => req.ReportSchedule)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey.Options)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.Files)
                 .Include(ass => ass.ReportSurvey)
                 .Include(ass => ass.ReportText)
                 .Where(ass => ass.ReportUser == user && ass.Id == id).FirstOrDefault();

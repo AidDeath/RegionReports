@@ -15,12 +15,12 @@
         <Columns>
             <RadzenDataGridColumn TItem="ReportAssignment" Property="DateAssigned" Title="Отчет назначен" Width="140px">
                 <Template Context="data">
-                    <p class="mb-1">@data.DateAssigned</p>
+                    <p class="mb-1">@data.ReportAssignmentGroup.DateAssigned</p>
                     @if (data.IsCompleted)
                     {
                         <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Ответ отправлен" />
                     }
-                    @if (!data.IsCompleted && data.IsCancelledByOverDue)
+                    @if (!data.IsCompleted && data.ReportAssignmentGroup.IsOverdued)
                     {
                         <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Просрочено" />
                     }
@@ -28,11 +28,11 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment"  Filterable="false" Title="Тип запроса" Frozen="true" Width="200px" >
                 <Template Context="assignment">
-                    @if (assignment.ReportRequestText is not null)
+                    @if (assignment.ReportAssignmentGroup.ReportRequestText is not null)
                     {
                         <p>Текстовая информация</p>
                     }
-                    @if (assignment.ReportRequestSurvey is not null)
+                    @if (assignment.ReportAssignmentGroup.ReportRequestSurvey is not null)
                     {
                             <p>Опрос</p>
                     }
@@ -40,24 +40,26 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment" Title="Заголовок" Frozen="true"  >
                 <Template Context="assignment">
-                    @if (assignment.ReportRequestText is not null)
+@*                    @if (assignment.ReportRequestText is not null)
                     {
                         <p>@assignment.ReportRequestText.RequestTitle</p>
                     }
                     @if (assignment.ReportRequestSurvey is not null)
                     {
                         <p>@assignment.ReportRequestSurvey.RequestTitle</p>
-                    }
+                    }*@
+
+                    @assignment.ReportAssignmentGroup.GetReportRequest().RequestTitle
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment" Title="Срок отчета">
                 <Template Context="data">
-                    @($"До {data.ActualDeadline.Date:d}, {data.ActualDeadline.TimeOfDay:t}")
+                    @($"До {data.ReportAssignmentGroup.ActualDeadline.Date:d}, {data.ReportAssignmentGroup.ActualDeadline.TimeOfDay:t}")
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment" Title="Действия" Width="90px">
                 <Template Context="data">
-                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Disabled="@(data.IsCompleted || data.IsCancelledByOverDue)" Click="(() => RedirectToReportInput(data.Id))"/>
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="edit" MouseEnter="@((args) => TooltipService.Open(args, "Ответить"))" Disabled="@(data.IsCompleted || data.ReportAssignmentGroup.IsOverdued)" Click="(() => RedirectToReportInput(data.Id))"/>
                     <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="info" MouseEnter="@((args) => TooltipService.Open(args, "Детали"))" Click="(() =>ShowRequestInfo(data) )"/>
                 </Template>
             </RadzenDataGridColumn>
@@ -83,8 +85,9 @@
     {       
         ReportRequestBase request = null;
 
-        if (assignment.ReportRequestText is not null) request = assignment.ReportRequestText;
-        if (assignment.ReportRequestSurvey is not null) request = assignment.ReportRequestSurvey;
+        //if (assignment.ReportRequestText is not null) request = assignment.ReportRequestText;
+        //if (assignment.ReportRequestSurvey is not null) request = assignment.ReportRequestSurvey;
+        request = assignment.ReportAssignmentGroup.GetReportRequest();
 
         if (request is null) throw new NullReferenceException();
 
