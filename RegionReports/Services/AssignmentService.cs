@@ -49,6 +49,7 @@ namespace RegionReports.Services
                 ? GetDeadlineDate(request.ReportSchedule) 
                 : nonScheduledDeadline;
 
+            ReportAssignmentGroup group = new();
             foreach (var user in usersToAssign)
             {
                 request.ReportAssignments.Add(new()
@@ -56,7 +57,8 @@ namespace RegionReports.Services
                     ReportUser = user,
                     ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
                     ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
-                    ActualDeadline = calculatedDeadline
+                    ActualDeadline = calculatedDeadline,
+                    ReportAssignmentGroup = group
                 });
             }
         }

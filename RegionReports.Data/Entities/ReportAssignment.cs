@@ -43,6 +43,11 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public bool IsCancelledByOverDue { get; set; }
 
+        /// <summary>
+        /// Группа назначений отчета
+        /// </summary>
+        public ReportAssignmentGroup ReportAssignmentGroup { get; set; }
+
         public ReportRequestBase? GetReportRequest()
         {
             if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();

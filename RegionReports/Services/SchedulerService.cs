@@ -70,13 +70,14 @@ namespace RegionReports.Services
                 .Distinct();
 
 
-            var schedules = _dbContext.ReportSchedules
-                .Include(sch => sch.Districts).ThenInclude(distr => distr.ReportUser)
-                .Include(sch => sch.ReportRequestSurvey.ReportAssignments)
-                .Include(sch => sch.ReportRequestText.ReportAssignments)
-                .Include(sch => sch.ReportRequestSurvey.ReportSchedule)
-                .Include(sch => sch.ReportRequestText.ReportSchedule)
-                .Where(distr => distr.IsScheduleActive ?? false);
+            //var schedules = await _dbContext.ReportSchedules
+            //    .Include(sch => sch.Districts).ThenInclude(distr => distr.ReportUser)
+            //    .Include(sch => sch.ReportRequestSurvey.ReportAssignments)
+            //    .Include(sch => sch.ReportRequestText.ReportAssignments)
+            //    .Include(sch => sch.ReportRequestSurvey.ReportSchedule)
+            //    .Include(sch => sch.ReportRequestText.ReportSchedule)
+            //    .Where(distr => distr.IsScheduleActive ?? false).ToListAsync();
+
 
             List<ReportAssignment> newAssignments = new List<ReportAssignment>();
             //Теперь нужно продублировать назначения для этих отчетов
@@ -87,6 +88,7 @@ namespace RegionReports.Services
                 //Если до сдачи отчета больше заданного в расписании кол-ва дней - не создаем назначение.
                 if (DateTime.Now.AddDays(request.ReportSchedule.DaysBeforeAutoAssignment) > calculatedDeadline)
                 {
+                    ReportAssignmentGroup group = new();
                     foreach (var user in request.ReportSchedule.Districts.Select(distr => distr.ReportUser))
                     {
                         newAssignments.Add(new()
@@ -94,7 +96,8 @@ namespace RegionReports.Services
                             ReportUser = user,
                             ReportRequestText = (request is ReportRequestText) ? (ReportRequestText)request : null,
                             ReportRequestSurvey = (request is ReportRequestSurvey) ? (ReportRequestSurvey)request : null,
-                            ActualDeadline = calculatedDeadline
+                            ActualDeadline = calculatedDeadline,
+                            ReportAssignmentGroup = group
                         });
                     }
 

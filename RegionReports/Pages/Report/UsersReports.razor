@@ -10,7 +10,7 @@
 <RadzenCheckBox TValue=bool Name="ShowUnansweredOnlyCheckBox" @bind-Value="@ShowUnansweredOnly" Change="@RefreshRequestsList"></RadzenCheckBox>
 <RadzenLabel Component ="ShowUnansweredOnlyCheckBox" Text="Только невыполненные задания"/>
                 
-    <RadzenDataGrid AllowColumnResize="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" 
+    <RadzenDataGrid AllowColumnResize="true" PageSize="7" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" 
     PagerPosition="PagerPosition.Bottom" ShowPagingSummary="true" Data="@assignments" TItem="ReportAssignment" ColumnWidth="300px" EmptyText="Нет запросов для отображения">
         <Columns>
             <RadzenDataGridColumn TItem="ReportAssignment" Property="DateAssigned" Title="Отчет назначен" Width="140px">

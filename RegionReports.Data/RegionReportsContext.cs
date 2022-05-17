@@ -30,6 +30,7 @@ namespace RegionReports.Data
         public DbSet<UploadableFileType> AlowedUploadFileTypes { get; set; }
 
         public DbSet<ReportAssignment> ReportAssignments { get; set; }
+        public DbSet<ReportAssignmentGroup> AssignmentGroups { get; set; }
 
         public DbSet<ReportSchedule> ReportSchedules { get; set; }
 
