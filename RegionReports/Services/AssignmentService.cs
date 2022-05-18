@@ -54,9 +54,9 @@ namespace RegionReports.Services
         {
             var query = _database.AssignmentGroups.GetQueryable()
                 .Include(group => group.Assignments)
-                .Include(group => group.ReportRequestSurvey).ThenInclude(req => req.ReportSchedule)
+                .Include(group => group.ReportRequestSurvey).ThenInclude(req => req.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
                 .Include(group => group.ReportRequestSurvey.Options)
-                .Include(group => group.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
+                .Include(group => group.ReportRequestText).ThenInclude(repText => repText.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
                 .Include(group => group.ReportRequestText.Files)
                 .OrderByDescending(rep => rep.DateAssigned);
 

@@ -9,7 +9,7 @@
             <p>
             <RadzenLabel Component="SchedulledTime" Text="Время"/>
             <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime"/>
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime" Change="@(args => TimeChange(args ?? new DateTime()))"/>
             </p>
         </RadzenAccordionItem>
         <RadzenAccordionItem Text="Еженедельно" Icon="calendar_view_week">
@@ -29,13 +29,13 @@
 
             <RadzenLabel Component="SchedulledTime" Text="Время"/>
             <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime"/>
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime" Change="@(args => TimeChange(args ?? new DateTime()))"/>
         </RadzenAccordionItem>
         <RadzenAccordionItem Text="Ежедневно" Icon="calendar_view_day">
 
             <RadzenLabel Component="SchedulledTime" Text="Время"/>
             <RadzenDatePicker Name="SchedulledTime" AllowInput="false" ShowTime="true" TimeOnly="true" 
-                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime"/>
+                    DateFormat="HH:mm" TValue="DateTime" @bind-Value="@ScheduledTime" Change="@(args => TimeChange(args ?? new DateTime()))"/>
         </RadzenAccordionItem>
     </Items>
 </RadzenAccordion>
@@ -50,6 +50,9 @@ TValue="int" @bind-Value="@RequestSchedule.DaysBeforeAutoAssignment"/>
     [Parameter]
     public DateTime ScheduledTime { get; set; }
 
+    [Parameter]
+    public EventCallback<DateTime> ScheduledTimeChanged { get; set; }
+
     private int maxDaysBeforeAssignment => ((ReportScheduleType)RequestSchedule.ScheduleType == ReportScheduleType.Ежедневный)
         ? 1
         : (RequestSchedule.ScheduleType == (int)ReportScheduleType.Еженедельный)
@@ -59,5 +62,10 @@ TValue="int" @bind-Value="@RequestSchedule.DaysBeforeAutoAssignment"/>
     private void ChangeType(int arg)
     {
         RequestSchedule.ScheduleType = ++arg;
+    }
+
+    private async Task TimeChange(DateTime time)
+    {
+        await ScheduledTimeChanged.InvokeAsync(time);
     }
 }

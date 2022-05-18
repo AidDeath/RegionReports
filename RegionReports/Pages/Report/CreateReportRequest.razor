@@ -206,7 +206,7 @@
 
                         @*Для запроса с расписанием*@
                         <RadzenCard Visible=@isScheduledRequest>
-                            <ScheduleSettings RequestSchedule="@requestSchedule" ScheduledTime="@scheduledTime"/>
+                            <ScheduleSettings RequestSchedule="@requestSchedule" @bind-ScheduledTime=@scheduledTime/>
                         </RadzenCard>
                         
                     </RadzenFieldset>

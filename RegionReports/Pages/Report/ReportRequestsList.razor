@@ -20,10 +20,10 @@
 
 
 *@
-<PageTitle>Сбор отчетов</PageTitle>
+<PageTitle>Расписания</PageTitle>
 <h3>Прогресс сбора отчетов</h3>
 
-<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list" PageSize="7">
+<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list" PageSize="7" EmptyText="Нет назначений для отображения">
     <Columns>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="DateAssigned" Title="Назначен"/>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
@@ -49,6 +49,24 @@
                         <RadzenLabel class="text-wrap" Text=@request.WhenToCollect()/>
                     }
                 </div>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Респонденты">
+            <Template Context="data">
+                @{
+                    var request = data.GetReportRequest();
+                    if (request.IsSchedulledRequest)
+                    {
+                        var assigntdDistricts = request.ReportSchedule.Districts;
+                        var btnText = $"{assigntdDistricts.Count} назначено" ;
+                        <RadzenButton Icon="user" Text="@btnText"/>
+                    }
+                    else
+                    {
+                        <p> @data.Assignments.Count назначено></p>
+                    }
+
+                }
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Прогресс сбора">
@@ -102,7 +120,7 @@
             </div>
             @if (isScheduleActive)
                 {
-                    <ScheduleSettings RequestSchedule="@tempSchedule" ScheduledTime="@scheduledTime"/>
+                    <ScheduleSettings RequestSchedule="@tempSchedule" @bind-ScheduledTime=@scheduledTime/>
                 }
 
             
@@ -141,7 +159,7 @@
             }
 
             AssignmentService.UpdateSchedule(schedule);
-            //AssignmentService.UpdateAssignment(asnGroup);
+
             StateHasChanged();
             if (result) NotificationService.Notify(NotificationSeverity.Success, "Расписание изменено");
         }
