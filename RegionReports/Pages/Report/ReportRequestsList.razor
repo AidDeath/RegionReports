@@ -1,7 +1,7 @@
 ﻿@page "/reportrequestslist"
 @inject AssignmentService AssignmentService
 @inject NotificationService NotificationService
-@inject SettingsService SettingsService
+@inject DialogService DialogService
 
 @*
     Что здесь должно быть:
@@ -23,7 +23,7 @@
 <PageTitle>Сбор отчетов</PageTitle>
 <h3>Прогресс сбора отчетов</h3>
 
-<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list">
+<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list" PageSize="7">
     <Columns>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="DateAssigned" Title="Назначен"/>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
@@ -37,28 +37,37 @@
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Расписание" >
+        <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Расписание">
             <Template Context="data">
-                @{
-                    if (data.GetReportRequest().IsSchedulledRequest)
-                    {
-                        var scheduleText = data.GetReportRequest().WhenToCollect();
-                        <RadzenButton Text="@scheduleText"/>
+                <div class="my-0">
+                    @{
+                        var request = data.GetReportRequest();
+                        if (request.IsSchedulledRequest)
+                        {
+                            <RadzenButton class="text-wrap" Icon="edit" ButtonStyle="ButtonStyle.Secondary" Click="@(() => ShowScheduleEditDialog(data))"/>
+                        }
+                        <RadzenLabel class="text-wrap" Text=@request.WhenToCollect()/>
                     }
-                    else
-                    {
-                        <p>Не задано</p>
-                    }
-                }
+                </div>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Прогресс сбора">
             <Template Context="data">
-                @{
-                    var a = data.Assignments.Count;
-                    <RadzenProgressBar Max="@a" ShowValue="false"  Value="@data.Assignments.Count(asn => asn.IsCompleted)"/>
-                }
-                
+                <div>
+                    @{
+                        var partlyText = $"Сдано {@data.Assignments.Count(asn => asn.IsCompleted)} из {@data.Assignments.Count}";
+
+                        <RadzenProgressBar Max="@data.Assignments.Count" ShowValue="false"  Value="@data.Assignments.Count(asn => asn.IsCompleted)"/>
+                    if (data.Assignments.All(asn => asn.IsCompleted)) 
+                    {
+                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Выполнено"/>
+                    }
+                    else
+                    {
+                        <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@partlyText"/>
+                    }
+                 }
+                </div>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -74,4 +83,71 @@
     {
         list = AssignmentService.GetAssignmentGroups();
     }
+
+    private async Task ShowScheduleEditDialog(ReportAssignmentGroup asnGroup)
+    {
+        var tempSchedule = new ReportSchedule()
+        {
+            DayOfMonth=1,
+            DayOfWeek=1
+        };
+        DateTime scheduledTime = new DateTime().AddHours(16);
+        bool isScheduleActive = true;
+
+        var result = await DialogService.OpenAsync("Задать новое расписание", dialog =>
+        @<RadzenCard>
+            <div>
+                <RadzenLabel Component="switch" Text="Расписание включено"/>    
+                <RadzenSwitch Name="switch" @bind-Value="@isScheduleActive"/>
+            </div>
+            @if (isScheduleActive)
+                {
+                    <ScheduleSettings RequestSchedule="@tempSchedule" ScheduledTime="@scheduledTime"/>
+                }
+
+            
+            <div>
+                <RadzenButton Text="Сохранить" Click="@(() => dialog.Close(true))"/>
+                <RadzenButton Text="Отмена" ButtonStyle="ButtonStyle.Secondary" Click="@(() => dialog.Close(false))" />
+            </div>
+
+        </RadzenCard>
+    , new DialogOptions(){ShowClose=false} 
+    );
+
+
+        if (result)
+        {
+            var schedule = asnGroup.GetReportRequest().ReportSchedule;
+
+            if (!isScheduleActive)
+            {
+                schedule.IsScheduleActive = false;
+            }
+            else
+            {
+                if (tempSchedule.ScheduleType == 0)
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Расписание не сохранено!", "Не выбран тип расписания");
+                    return;
+                }
+
+                schedule.ScheduleType = tempSchedule.ScheduleType;
+                schedule.DayOfMonth = tempSchedule.DayOfMonth;
+                schedule.DayOfWeek = tempSchedule.DayOfWeek;
+                schedule.DaysBeforeAutoAssignment = tempSchedule.DaysBeforeAutoAssignment;
+                schedule.Time = scheduledTime.TimeOfDay;
+                schedule.IsScheduleActive = tempSchedule.IsScheduleActive;
+            }
+
+            AssignmentService.UpdateSchedule(schedule);
+            //AssignmentService.UpdateAssignment(asnGroup);
+            StateHasChanged();
+            if (result) NotificationService.Notify(NotificationSeverity.Success, "Расписание изменено");
+        }
+
+        
+    }
+
+
 }

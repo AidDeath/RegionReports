@@ -57,18 +57,6 @@ namespace RegionReports.Services
             // Назначение выполнено либо отменено (Так не будет создаваться назначение, если ещё активно предыдущее)
             //  В назначении лежит отчет с признаком IsScheduledRequest.
 
-            //var assignments = await _dbContext.ReportAssignments
-            //    .Include(asn => asn.ReportRequestSurvey).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
-            //    .Include(asn => asn.ReportRequestText).ThenInclude(rep => rep.ReportSchedule.Districts).ThenInclude(distr => distr.ReportUser)
-            //    .Include(asn => asn.ReportUser)
-            //    .Where(asn => asn.IsCancelledByOverDue
-            //                && (asn.ReportRequestSurvey.IsSchedulledRequest || asn.ReportRequestText.IsSchedulledRequest)).ToListAsync();
-
-
-            //var requests = assignments.Distinct()
-            //    .Select(asn => asn.GetReportRequest())
-            //    .Where(req => req.ReportSchedule.IsScheduleActive ?? false)
-            //    .Distinct();
 
 
             var assignGroups = await _dbContext.AssignmentGroups
@@ -86,8 +74,6 @@ namespace RegionReports.Services
                 .Distinct();
 
 
-            //List<ReportAssignment> newAssignments = new List<ReportAssignment>();
-            //List<ReportAssignmentGroup> groups = new();
             //Теперь нужно продублировать назначения для этих отчетов
             foreach (var request in requests)
             {

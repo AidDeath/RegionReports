@@ -152,5 +152,15 @@ namespace RegionReports.Services
             return calculatedDeadline;
         }
 
+        public void UpdateSchedule(ReportSchedule schedule)
+        {
+            _database.ReportSchedules.Update(schedule);
+        }
+
+        public void UpdateAssignment(ReportAssignmentGroup asnGroup)
+        {
+            _database.AssignmentGroups.Update(asnGroup);
+        }
+
     }
 }

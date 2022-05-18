@@ -30,10 +30,12 @@ namespace RegionReports.Data.Entities
 
             if (IsSchedulledRequest && ReportSchedule is null) throw new NullReferenceException();
 
+            if (!ReportSchedule.IsScheduleActive ?? false) return "Расписание выключено";
+
             switch (ReportSchedule.ScheduleType)
             {
                 case 1:
-                    return $"Ежемесячно, не позднее {ReportSchedule.DayOfMonth} числа, до {ReportSchedule.Time.Hours}:{ReportSchedule.Time.Minutes}";
+                    return $"Ежемесячно, до {ReportSchedule.DayOfMonth} числа, до {ReportSchedule.Time.Hours}:{ReportSchedule.Time.Minutes}";
                 case 2:
                     return $"Еженедельно, {daysDictionary[ReportSchedule.DayOfWeek ?? 0]}, до {ReportSchedule.Time.Hours}:{ReportSchedule.Time.Minutes}";
                 case 3:

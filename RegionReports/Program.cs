@@ -20,7 +20,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContext<RegionReportsContext>(ServiceLifetime.Transient);
-builder.Services.AddSingleton<IDbAccessor, DbAccessor>();
+builder.Services.AddTransient<IDbAccessor, DbAccessor>();
 builder.Services.AddHttpContextAccessor();
 
 //Radzen services
