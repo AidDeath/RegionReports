@@ -58,6 +58,7 @@ namespace RegionReports.Services
                 .Include(group => group.ReportRequestSurvey.Options)
                 .Include(group => group.ReportRequestText).ThenInclude(repText => repText.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
                 .Include(group => group.ReportRequestText.Files)
+                .Where(group => !group.IsOverdued)
                 .OrderByDescending(rep => rep.DateAssigned);
 
             return query.ToList();

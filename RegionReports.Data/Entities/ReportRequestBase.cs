@@ -35,11 +35,11 @@ namespace RegionReports.Data.Entities
             switch (ReportSchedule.ScheduleType)
             {
                 case 1:
-                    return $"Ежемесячно, до {ReportSchedule.DayOfMonth} числа, до {ReportSchedule.Time.Hours}:{ReportSchedule.Time.Minutes}";
+                    return $"Ежемесячно, до {ReportSchedule.DayOfMonth} числа, до {ReportSchedule.Time.Hours:00}:{ReportSchedule.Time.Minutes:00}";
                 case 2:
-                    return $"Еженедельно, {daysDictionary[ReportSchedule.DayOfWeek ?? 0]}, до {ReportSchedule.Time.Hours}:{ReportSchedule.Time.Minutes}";
+                    return $"Еженедельно, {daysDictionary[ReportSchedule.DayOfWeek ?? 0]}, до {ReportSchedule.Time.Hours:00}:{ReportSchedule.Time.Minutes:00}";
                 case 3:
-                    return $"Ежедневно до {ReportSchedule.Time.Hours}:{ReportSchedule.Time.Minutes}";
+                    return $"Ежедневно до {ReportSchedule.Time.Hours:00}:{ReportSchedule.Time.Minutes:00}";
             }
             return string.Empty;
 
