@@ -42,7 +42,7 @@ namespace RegionReports.Services
                     _logger.Log(LogLevel.Error, $"CreateAssignmentsForSchedule: {ex.GetBaseException().Message}");
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(10));
+                await Task.Delay(TimeSpan.FromMinutes(3));
             }
 
             // Если нужно дождаться завершения очистки, но контролировать время, то стоит предусмотреть в контракте использование CancellationToken

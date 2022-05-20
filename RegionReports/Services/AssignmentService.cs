@@ -157,7 +157,7 @@ namespace RegionReports.Services
             _database.ReportSchedules.Update(schedule);
         }
 
-        public void UpdateAssignment(ReportAssignmentGroup asnGroup)
+        public void UpdateAssignmentGroup(ReportAssignmentGroup asnGroup)
         {
             _database.AssignmentGroups.Update(asnGroup);
         }

@@ -3,16 +3,19 @@
 @inject NotificationService NotificationService
 @inject AssignmentService  AssignmentService
 @inject UserService UserService
+@inject DistrictService DistrictService
 
-<ReportSurveyInput ReportAssignment=@ass/>
+   
+
 
 @code {
-    ReportAssignment ass;
 
-    protected override void OnInitialized()
+
+
+    private void Do(MouseEventArgs args)
     {
-        var a = AssignmentService.GetForUser(UserService.GetCurrentUserModel(), true);
-        //ass =  a.FirstOrDefault(a => a.ReportRequestSurvey is not null);
+        var sdsa = false;
     }
+
 
 }

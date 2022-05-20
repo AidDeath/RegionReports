@@ -2,6 +2,7 @@
 @inject AssignmentService AssignmentService
 @inject NotificationService NotificationService
 @inject DialogService DialogService
+@inject DistrictService DistrictService; 
 
 @*
     Что здесь должно быть:
@@ -13,15 +14,12 @@
         - Скольким пользователям назначен и солько из них выполнили назначение.
         - По расписанию отчет или нет, можно выключить расписание, тогда оно автоматически создаваться не будет.
 
-        - Детали выбранного отчета
         - Изменение расписания и назначения пользователей
-
-        -- Вывод агрегирующего отчета
 
 
 *@
-<PageTitle>Расписания</PageTitle>
-<h3>Прогресс сбора отчетов</h3>
+<PageTitle>Управленеие отчетами</PageTitle>
+<h3>Управленеие отчетами</h3>
 
 <RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list" PageSize="7" EmptyText="Нет назначений для отображения">
     <Columns>
@@ -57,9 +55,9 @@
                     var request = data.GetReportRequest();
                     if (request.IsSchedulledRequest)
                     {
-                        var assigntdDistricts = request.ReportSchedule.Districts;
-                        var btnText = $"{assigntdDistricts.Count} назначено" ;
-                        <RadzenButton Icon="user" Text="@btnText"/>
+                        var assignedDistricts = request.ReportSchedule.Districts;
+                        var btnText = $"{assignedDistricts.Count} назначено" ;
+                        <RadzenButton Icon="user" Text="@btnText" Click="@(() => ShowDistrictsListEditDialog(data))"/>
                     }
                     else
                     {
@@ -102,6 +100,7 @@
         list = AssignmentService.GetAssignmentGroups();
     }
 
+    //Задать новое расписание
     private async Task ShowScheduleEditDialog(ReportAssignmentGroup asnGroup)
     {
         var tempSchedule = new ReportSchedule()
@@ -164,8 +163,58 @@
             if (result) NotificationService.Notify(NotificationSeverity.Success, "Расписание изменено");
         }
 
-        
+
     }
 
+    //Изменение пользователей для назначения
+    private async Task ShowDistrictsListEditDialog(ReportAssignmentGroup asnGroup)
+    {
+        var assignedDistricts = asnGroup.GetReportRequest().ReportSchedule.Districts;
+
+        IList<District> SelectedDistricts = assignedDistricts;
+
+        IEnumerable<District> Districts = await DistrictService.GetDistrictsWithUsersAsync();
+
+        RadzenDataGrid<District> districtsDataGrid;
+
+        //assignedDistricts.ForEach(d => SelectedDistricts.Add(d));
+
+       var result = await DialogService.OpenAsync("Выбор пользователей", ds =>
+            @<RadzenCard>
+                <RadzenDataGrid @ref="districtsDataGrid" AllowRowSelectOnRowClick="true" 
+                        AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="8"
+                                AllowSorting="true" Data="@Districts" TItem="District" ColumnWidth="200px"
+                                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedDistricts>
+                    <Columns>
+                        <RadzenDataGridColumn TItem="District" Width="40px" Sortable="false" Filterable="false">
+                            <HeaderTemplate>
+                                <RadzenCheckBox TriState="false" TValue="bool" 
+                                    Value="@(Districts.Any(i => SelectedDistricts != null && SelectedDistricts.Contains(i)))"
+                                    Change="@(args => {SelectedDistricts = args ? Districts.ToList() : null;})" />
+                            </HeaderTemplate>
+                            <Template Context="data">
+                                <RadzenCheckBox TriState="false" Value="@(SelectedDistricts != null && SelectedDistricts.Contains(data))" 
+                                    TValue="bool"/>
+                            </Template>
+                        </RadzenDataGridColumn>
+
+                        <RadzenDataGridColumn TItem="District" Property="DistrictName" Title="Район"  SortOrder="SortOrder.Ascending"/>
+                        <RadzenDataGridColumn TItem="District" Property="ReportUser.FullName" Title="Представитель" />
+                    </Columns>
+                </RadzenDataGrid>
+                <div>
+                <RadzenButton Text="Сохранить" Click="@(() => ds.Close(true))"/>
+                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Отмена" Click="@(() => ds.Close(false))"/>
+                </div>
+         </RadzenCard>
+     );
+
+        if (result)
+        {
+            asnGroup.GetReportRequest().ReportSchedule.Districts = SelectedDistricts.ToList();
+            AssignmentService.UpdateAssignmentGroup(asnGroup);
+        }
+        
+    }
 
 }

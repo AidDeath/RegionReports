@@ -164,25 +164,28 @@
             <div class="row align-content-center">
                 <div class="col-md-6 col-lg-6 align-items-center">
                     <RadzenFieldset Text="Назначение отчёта пользователям">
-                        <RadzenDataGrid @ref="districtsDataGrid" AllowRowSelectOnRowClick="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="6"
-                                        AllowSorting="true" Data="@districts" TItem="District" ColumnWidth="200px"
-                                        SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedDistricts>
-                                <Columns>
-                                    <RadzenDataGridColumn TItem="District" Width="40px" Sortable="false" Filterable="false">
-                                        <HeaderTemplate>
-                                            <RadzenCheckBox TriState="true" TValue="bool" Value="@(districts.Any(i => selectedDistricts != null && selectedDistricts.Contains(i)))"
-                                                            Change="@(args => selectedDistricts = args ? districts.ToList() : null)" />
-                                        </HeaderTemplate>
-                                        <Template Context="data">
-                                            <RadzenCheckBox TriState="false" Value="@(selectedDistricts != null && selectedDistricts.Contains(data))" 
-                                                TValue="bool" Change=@(args => { districtsDataGrid.SelectRow(data); }) />
-                                        </Template>
-                                    </RadzenDataGridColumn>
+                        <RadzenDataGrid @ref="districtsDataGrid" AllowRowSelectOnRowClick="true" 
+                                AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="8"
+                                        AllowSorting="true" Data="@Districts" TItem="District" ColumnWidth="200px"
+                                        SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedDistricts>
+                            <Columns>
+                                <RadzenDataGridColumn TItem="District" Width="40px" Sortable="false" Filterable="false">
+                                    <HeaderTemplate>
+                                        <RadzenCheckBox TriState="false" TValue="bool" 
+                                            Value="@(Districts.Any(i => SelectedDistricts != null && SelectedDistricts.Contains(i)))"
+                                            Change="@(args => {SelectedDistricts = args ? Districts.ToList() : null;})" />
+                                    </HeaderTemplate>
+                                    <Template Context="data">
+                                        <RadzenCheckBox TriState="false" Value="@(SelectedDistricts != null && SelectedDistricts.Contains(data))" 
+                                            TValue="bool"/>
+                                    </Template>
+                                </RadzenDataGridColumn>
 
-                                    <RadzenDataGridColumn TItem="District" Property="DistrictName" Title="Район"  SortOrder="SortOrder.Ascending"/>
-                                    <RadzenDataGridColumn TItem="District" Property="ReportUser.FullName" Title="Представитель" />
-                                </Columns>
-                            </RadzenDataGrid>
+                                <RadzenDataGridColumn TItem="District" Property="DistrictName" Title="Район"  SortOrder="SortOrder.Ascending"/>
+                                <RadzenDataGridColumn TItem="District" Property="ReportUser.FullName" Title="Представитель" />
+                            </Columns>
+                        </RadzenDataGrid>
+
                     </RadzenFieldset>
                 </div>
                 <div class="col-md-6 col-lg-6 align-items-center">
@@ -353,7 +356,7 @@
 
 
     #region Scheduller
-    // Данные в этих переменных хранятся временно, TODO: переписать в объект при сохранении запроса
+    
     private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
 
     private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
@@ -399,26 +402,14 @@
     }
 
 
-    //private void SheduleTypeSelected(int selectedIndex)
-    //{
-    //    requestSchedule.ScheduleType = selectedIndex + 1;
-    //}
-
-    //private int maxDaysBeforeAssignment => ((ReportScheduleType)requestSchedule.ScheduleType == ReportScheduleType.Ежедневный)
-    //    ? 1
-    //    : (requestSchedule.ScheduleType == (int)ReportScheduleType.Еженедельный)
-    //        ? 6
-    //        : 15;
-
-
     #endregion
 
     #region District or user selection
 
     RadzenDataGrid<District>? districtsDataGrid;
 
-    IEnumerable<District>? districts;
-    IList<District>? selectedDistricts;
+    IEnumerable<District>? Districts;
+    IList<District>? SelectedDistricts;
 
 
     #endregion
@@ -467,8 +458,8 @@
     private string surveyOptionsCheckResult => (isSurveyOptionsOk) ? "Варианты ответов для опроса добавлены" : "Необходимо хотя бы два варианта ответа для опроса";
 
     //Назначение исполнителей
-    private bool isDistrictAssignmentOk => (selectedDistricts?.Count ?? 0) > 0;
-    private string districtAssignmentCheckResult => (isDistrictAssignmentOk) ? $"{selectedDistricts?.Select(d => d.DistrictName).Aggregate((a, b) => a + ", " + b)}" : "Не указано ни одного исполнителя!";
+    private bool isDistrictAssignmentOk => (SelectedDistricts?.Count ?? 0) > 0;
+    private string districtAssignmentCheckResult => (isDistrictAssignmentOk) ? $"{SelectedDistricts?.Select(d => d.DistrictName).Aggregate((a, b) => a + ", " + b)}" : "Не указано ни одного исполнителя!";
 
     //Периодичность - без расписания
     private string nonScheduledCheckResult => $"Без расписания, срок до {nonScheduledDeadline.Date:D} в {nonScheduledDeadline:t}";
@@ -525,7 +516,7 @@
     private void CommitReportRequest(MouseEventArgs args)
     {
         requestSchedule.Time = new TimeSpan(scheduledTime.Hour, scheduledTime.Minute, 0);
-        requestSchedule.Districts = selectedDistricts.ToList();
+        requestSchedule.Districts = SelectedDistricts.ToList();
 
         switch (reportRequestType){
             case ReportRequestType.SurveyReport:
@@ -538,7 +529,7 @@
                 //    AssignmentService.AddAssignmentsRange(SurveyRequest, selectedDistricts.Select(distr => distr.ReportUser), nonScheduledDeadline:);
                 //}
 
-                AssignmentService.AddAssignmentsRange(SurveyRequest, selectedDistricts.Select(distr => distr.ReportUser), nonScheduledDeadline);
+                AssignmentService.AddAssignmentsRange(SurveyRequest, SelectedDistricts.Select(distr => distr.ReportUser), nonScheduledDeadline);
 
                 ReportRequestService.CreateReportRequestSurvey(SurveyRequest);
                 break;
@@ -552,7 +543,7 @@
                 //    AssignmentService.AddAssignmentsRange(TextRequest, selectedDistricts.Select(distr => distr.ReportUser));
                 //}
 
-                AssignmentService.AddAssignmentsRange(TextRequest, selectedDistricts.Select(distr => distr.ReportUser), nonScheduledDeadline);
+                AssignmentService.AddAssignmentsRange(TextRequest, SelectedDistricts.Select(distr => distr.ReportUser), nonScheduledDeadline);
 
                 ReportRequestService.CreateReportRequestText(TextRequest);
                 break;
@@ -572,7 +563,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        districts = await DistrictService.GetDistrictsWithUsersAsync();
+        Districts = await DistrictService.GetDistrictsWithUsersAsync();
     }
 
     void OnChange(string html)

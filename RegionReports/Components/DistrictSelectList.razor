@@ -1,0 +1,41 @@
+﻿@if (Districts is not null)
+{
+<RadzenDataGrid @ref="districtsDataGrid" AllowRowSelectOnRowClick="true" 
+        AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="8"
+                AllowSorting="true" Data="@Districts" TItem="District" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@SelectedDistricts>
+    <Columns>
+        <RadzenDataGridColumn TItem="District" Width="40px" Sortable="false" Filterable="false">
+            <HeaderTemplate>
+                <RadzenCheckBox TriState="false" TValue="bool" 
+                    Value="@(Districts.Any(i => SelectedDistricts != null && SelectedDistricts.Contains(i)))"
+                    Change="@(args => {SelectedDistricts = args ? Districts.ToList() : null;})" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox TriState="false" Value="@(SelectedDistricts != null && SelectedDistricts.Contains(data))" 
+                    TValue="bool"/>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="District" Property="DistrictName" Title="Район"  SortOrder="SortOrder.Ascending"/>
+        <RadzenDataGridColumn TItem="District" Property="ReportUser.FullName" Title="Представитель" />
+    </Columns>
+</RadzenDataGrid>
+}
+else
+{
+    <p>Пожалуйста, подождите</p>
+}
+
+@code {
+
+    private RadzenDataGrid<District> districtsDataGrid { get; set; }
+
+    [Parameter]
+    public List<District> Districts { get; set; }
+
+    [Parameter]
+    public IList<District> SelectedDistricts { get; set; }
+
+    
+}
