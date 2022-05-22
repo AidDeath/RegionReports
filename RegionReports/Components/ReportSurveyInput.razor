@@ -8,7 +8,7 @@
 
         @if (ReportAssignment.ReportAssignmentGroup.ReportRequestSurvey.MultipleChoises)
         {
-            @foreach(var opt in reportSurvey.SelectableOptions)
+            @foreach(var opt in reportSurvey.ProcessedOptions)
             {
                 <p>
                     <RadzenCheckBox TValue="bool" @bind-Value="opt.Checked"/>
@@ -29,7 +29,7 @@
             </RadzenRadioButtonList>*@
 
             @*Вариант получше, но похоже, затратный*@
-            @foreach(var opt in reportSurvey.SelectableOptions)
+            @foreach(var opt in reportSurvey.ProcessedOptions)
             {
                 <p>
                     <RadzenCheckBox TValue="bool" @bind-Value="opt.Checked" Change="@((value) =>OnCheckBoxChange(opt, value) )"/>
@@ -53,31 +53,31 @@
 
     private string TextProceedToFill => (ReportAssignment.ReportAssignmentGroup.ReportRequestSurvey.MultipleChoises) ? "Выберите один или несколько вариантов ответа" : "Выберите один вариант ответа";
 
-    private ReportSurvey reportSurvey = new(){SelectableOptions = new()};
+    private ReportSurvey reportSurvey = new(){ProcessedOptions = new()};
 
     protected override void OnInitialized()
     {
         foreach (var option in ReportAssignment.ReportAssignmentGroup.ReportRequestSurvey.Options)
         {
-            reportSurvey.SelectableOptions.Add(new() { ReportRequestSurveyOption = option });
+            reportSurvey.ProcessedOptions.Add(new() { ReportRequestSurveyOption = option });
         }
 
     }
 
-    private bool isAnyOptionSelected => reportSurvey.SelectableOptions.Any(opt => opt.Checked);
+    private bool isAnyOptionSelected => reportSurvey.ProcessedOptions.Any(opt => opt.Checked);
 
     //Для варианта с радио-баттонами
     private void OnCheckBoxChange(int selectedIndex)
     {
-        reportSurvey.SelectableOptions.ForEach(o => o.Checked = false);
-        reportSurvey.SelectableOptions[selectedIndex].Checked = true;
+        reportSurvey.ProcessedOptions.ForEach(o => o.Checked = false);
+        reportSurvey.ProcessedOptions[selectedIndex].Checked = true;
     }
 
     private void OnCheckBoxChange(ReportSurveyOption opt, bool value)
     {
         if (!value) return;
-        reportSurvey.SelectableOptions.ForEach(o => o.Checked = false);
-        reportSurvey.SelectableOptions[reportSurvey.SelectableOptions.IndexOf(opt)].Checked = true;
+        reportSurvey.ProcessedOptions.ForEach(o => o.Checked = false);
+        reportSurvey.ProcessedOptions[reportSurvey.ProcessedOptions.IndexOf(opt)].Checked = true;
     }
     
     [Parameter]

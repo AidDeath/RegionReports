@@ -1,0 +1,295 @@
+﻿@page "/reportresults"
+@inject DialogService DialogService
+@inject AssignmentService AssignmentService
+<PageTitle>Отчеты пользователей</PageTitle>
+
+
+@if (asnGroups == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-5">
+            <RadzenDataGrid ColumnWidth="160px" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@asnGroups" TItem="ReportAssignmentGroup" @bind-Value="@SelectedGroups">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="ActualDeadline" Title="Собран"/>
+                    <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
+                        <Template Context="data">
+                            @data.GetRequestTypeName()
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Заголовок">
+                        <Template Context="data">
+                            @data.GetReportRequest().RequestTitle
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </div>
+        <div class="col-md-7">
+            <RadzenCard Style="margin-bottom:20px">
+                <div>
+                <b>Запрос от @SelectedGroups?.FirstOrDefault()?.DateAssigned.ToString("D")</b>
+                <RadzenButton Icon="info" Click="(() =>ShowRequestInfo(SelectedGroups?.FirstOrDefault()))" ButtonStyle="ButtonStyle.Light" Text="Подробности"/>
+                </div>
+            </RadzenCard>
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Пользователи">
+                        <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@(SelectedGroups.FirstOrDefault()?.Assignments)" TItem="ReportAssignment">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="ReportAssignment" Property="ReportUser.FullName" Title="Пользователь"/>
+                                <RadzenDataGridColumn TItem="ReportAssignment" Property="IsCompleted" Title="Исполнено" >
+                                    <Template Context="data">
+                                        @{
+                                            if (data.IsCompleted)
+                                            {
+                                                var report = data.GetReportBase();
+                                                
+                                                    <p class="my-0">
+                                                        <RadzenIcon Icon="done" IconStyle="IconStyle.Success"/>
+                                                        @report.DateFilled
+                                                    </p>
+                                            }
+                                            else
+                                            {
+                                                    <RadzenIcon Icon="dangerous" IconStyle="IconStyle.Danger"/>
+                                            }
+                                        }
+
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Ответы">
+                        @{
+                            var AsnGroup = SelectedGroups.FirstOrDefault();
+                            var Request = AsnGroup.GetReportRequest();
+
+                            if (Request is ReportRequestSurvey)
+                            {
+                                <div>
+                                    <RadzenSwitch ValueExpression="@(() => showDetailedSurveyResponse)" Value="@showDetailedSurveyResponse"
+                                    Change="@((arg) => showDetailedSurveyResponse = arg)"/>
+                                    <p>В виде диаграммы</p>
+                                </div>
+
+                                if (showDetailedSurveyResponse)
+                                {
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-lg-12 my-3">
+                                                <RadzenChart >
+                                                    @{
+                                                        var diargamSource = PrepareDiargamObject(AsnGroup);
+                                                        <RadzenPieSeries Data="@diargamSource" Title="Выбрали" CategoryProperty="ResponseOptionText" ValueProperty="CountAnswered">
+                                                        @*<TitleTemplate>
+                                                            <div class="rz-donut-content">
+                                                                <div>Revenue</div> 
+                                                                <div>for 2020</div>
+                                                            </div>
+                                                        </TitleTemplate>*@
+                                                    </RadzenPieSeries>
+                                                }
+
+                                                </RadzenChart>
+     
+                                                </div>
+                                            </div>
+                                        </div>
+                                }
+                                else
+                                {
+                                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(AsnGroup.Assignments)" TItem="ReportAssignment" PageSize="10">
+                                    <Template Context="assignment">
+                                
+                                        @if (assignment.IsCompleted)
+                                        {
+                                            var report = assignment.GetReportBase();
+                                            <RadzenCard>
+                                                <h4>Ответ от @assignment.ReportUser.FullName</h4>
+                                                @{
+                                                var survRep =  (ReportSurvey)report;
+                                                foreach(var opt in survRep.ProcessedOptions)
+                                                {
+                                                    <div class="row my-0">
+                                                        <div class="col-3">
+                                                            @if (opt.Checked)
+                                                            {
+                                                                <RadzenIcon class="my-0" Icon="check"/>
+                                                            }
+                                                            else
+                                                            {
+                                                                <RadzenIcon class="my-0" Icon="check_box_outline_blank"/>
+                                                            }
+                                                        </div>
+                                                        <div class="col-9">
+                                                            @opt.ReportRequestSurveyOption.OptionName
+                                                        </div>
+                                                    </div>
+                                                }
+                                                }
+
+                                                
+                                                
+
+                                            </RadzenCard>
+                                        }
+
+                                
+                                    </Template>
+                                </RadzenDataList>
+                                }
+
+                            }
+
+                            if (Request is ReportRequestText)
+                            {
+                                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(AsnGroup.Assignments)" TItem="ReportAssignment" PageSize="10">
+                                    <Template Context="assignment">
+                                    @{
+                                        if (assignment.IsCompleted)
+                                        {
+                                            var report = assignment.GetReportBase();
+                                            <RadzenCard>
+                                            @{
+                                                <h4>Ответ от @assignment.ReportUser.FullName</h4>
+                                                var textRep =  (ReportText)report;
+                                                <p class="my-0">@makeMarkupString(textRep.RepsonseString)</p>
+                                            }  
+                                            </RadzenCard>
+                                        }
+                                    }
+                                    </Template>
+                                </RadzenDataList>
+                            }
+                        }
+
+
+
+@*                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(SelectedGroups.FirstOrDefault()?.Assignments)" TItem="ReportAssignment" PageSize="10">
+                            <Template Context="assignment">
+                                
+                                @if (assignment.IsCompleted)
+                                {
+                                    var report = assignment.GetReportBase();
+                                    <RadzenCard>
+                                        <h4>Ответ от @assignment.ReportUser.FullName</h4>
+                                        
+                                        @if (report is ReportText){
+                                            var textRep =  (ReportText)report;
+                                            <p class="my-0">@makeMarkupString(textRep.RepsonseString)</p>
+                                        }
+
+                                        @if (report is ReportSurvey && showDetailedSurveyResponse)
+                                        {
+                                            var survRep =  (ReportSurvey)report;
+                                            foreach(var opt in survRep.SelectableOptions)
+                                            {
+                                                <div class="row my-0">
+                                                    <div class="col-3">
+                                                        @if (opt.Checked)
+                                                        {
+                                                            <RadzenIcon class="my-0" Icon="check"/>
+                                                        }
+                                                        else
+                                                        {
+                                                            <RadzenIcon class="my-0" Icon="check_box_outline_blank"/>
+                                                        }
+                                                    </div>
+                                                    <div class="col-9">
+                                                        @opt.ReportRequestSurveyOption.OptionName
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+
+                                    </RadzenCard>
+                                }
+
+                                
+                            </Template>
+                        </RadzenDataList>*@
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </div>
+    </div>
+}
+
+
+@code {
+
+    IEnumerable<ReportAssignmentGroup> asnGroups { get; set; }
+
+    IList<ReportAssignmentGroup> SelectedGroups { get; set; }
+
+    private bool showDetailedSurveyResponse { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        asnGroups = AssignmentService.GetOverduedAssignmentGroups();
+        SelectedGroups = new List<ReportAssignmentGroup>(){ asnGroups.FirstOrDefault() };
+    }
+
+    private async Task ShowRequestInfo(ReportAssignmentGroup asnGroup)
+    {       
+        ReportRequestBase request = null;
+
+        //if (assignment.ReportRequestText is not null) request = assignment.ReportRequestText;
+        //if (assignment.ReportRequestSurvey is not null) request = assignment.ReportRequestSurvey;
+        request = asnGroup.GetReportRequest();
+
+        if (request is null) throw new NullReferenceException();
+
+        await DialogService.OpenAsync("Информация о запросе", ds =>
+        @<ReportRequestInfo ReportRequest=request/>
+    , new(){ShowClose=true, CloseDialogOnEsc=true, CloseDialogOnOverlayClick=true, Draggable=true}
+                    );
+    }
+
+    private MarkupString makeMarkupString(string text)
+    {
+        return (MarkupString)text;
+    }
+
+    private List<SurveyDiagramSource> PrepareDiargamObject(ReportAssignmentGroup asnGroup)
+    {
+        List<SurveyDiagramSource> diagramSource = new();
+
+        List<ReportSurveyOption> allOptionsOfAllUsers = new();
+        var allReports = asnGroup.Assignments.Select(asn => asn.ReportSurvey).Where(rep => rep is not null);
+        var allCheckedOptions = allReports.SelectMany(rep => rep.ProcessedOptions).Where(opt => opt.Checked);
+
+        foreach (var opt in asnGroup.ReportRequestSurvey.Options)
+        {
+            diagramSource.Add(new SurveyDiagramSource()
+                {
+                    ResponseOptionText = opt.OptionName,
+                    CountAnswered = allCheckedOptions.Count(checkedOpt => checkedOpt.ReportRequestSurveyOption == opt)
+                });
+        }
+
+        //Добавляем количество людей, кто не ответил на запрос
+        diagramSource.Add(new SurveyDiagramSource()
+            {
+                CountAnswered = asnGroup.Assignments.Count(asn => !asn.IsCompleted),
+                ResponseOptionText = "Нет ответа"
+            }) ;
+
+        return diagramSource;
+    }
+
+    /// <summary>
+    /// Класс для представления на диаграмме результатов опроса
+    /// </summary>
+    private class SurveyDiagramSource
+    {
+        public string ResponseOptionText { get; set; }
+
+        public int CountAnswered { get; set; }
+    }
+}

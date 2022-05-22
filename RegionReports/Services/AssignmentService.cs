@@ -49,8 +49,10 @@ namespace RegionReports.Services
             else request.AssignmentsGroups.Add(newGroup);
         }
 
-
-        public List<ReportAssignmentGroup> GetAssignmentGroups()
+        /// <summary>
+        /// Получить все группы назначения отчетов, актуальные на данный момент
+        /// </summary>
+        public List<ReportAssignmentGroup> GetActualAssignmentGroups()
         {
             var query = _database.AssignmentGroups.GetQueryable()
                 .Include(group => group.Assignments)
@@ -59,6 +61,27 @@ namespace RegionReports.Services
                 .Include(group => group.ReportRequestText).ThenInclude(repText => repText.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
                 .Include(group => group.ReportRequestText.Files)
                 .Where(group => !group.IsOverdued)
+                .OrderByDescending(rep => rep.DateAssigned);
+
+            return query.ToList();
+        }
+
+
+        /// <summary>
+        /// Получить все группы назначений, срок сбора по которым истек
+        /// </summary>
+        /// <returns></returns>
+        public List<ReportAssignmentGroup> GetOverduedAssignmentGroups()
+        {
+            var query = _database.AssignmentGroups.GetQueryable()
+                .Include(group => group.Assignments).ThenInclude(asn => asn.ReportText)
+                .Include(group => group.Assignments).ThenInclude(asn => asn.ReportSurvey.ProcessedOptions)
+                .Include(group => group.Assignments).ThenInclude(asn => asn.ReportUser)
+                .Include(group => group.ReportRequestSurvey)
+                .Include(group => group.ReportRequestSurvey.Options)
+                .Include(group => group.ReportRequestText)
+                .Include(group => group.ReportRequestText.Files)
+                .Where(group => group.IsOverdued)
                 .OrderByDescending(rep => rep.DateAssigned);
 
             return query.ToList();

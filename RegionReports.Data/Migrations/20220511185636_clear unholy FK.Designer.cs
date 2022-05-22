@@ -772,7 +772,7 @@ namespace RegionReports.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("RegionReports.Data.Entities.ReportSurvey", "ReportSurvey")
-                        .WithMany("SelectableOptions")
+                        .WithMany("ProcessedOptions")
                         .HasForeignKey("ReportSurveyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -843,7 +843,7 @@ namespace RegionReports.Data.Migrations
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>
                 {
-                    b.Navigation("SelectableOptions");
+                    b.Navigation("ProcessedOptions");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUser", b =>

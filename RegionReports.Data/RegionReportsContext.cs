@@ -89,7 +89,7 @@ namespace RegionReports.Data
                 .HasForeignKey(opt => opt.ReportRequestSurveyId);
 
             modelBuilder.Entity<ReportSurvey>()
-                .HasMany(rep => rep.SelectableOptions)
+                .HasMany(rep => rep.ProcessedOptions)
                 .WithOne(opt => opt.ReportSurvey)
                 .HasForeignKey(opt => opt.ReportSurveyId);
 

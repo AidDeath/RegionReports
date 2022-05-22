@@ -11,7 +11,7 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Отмеченные пользователем пункты опроса
         /// </summary>
-        public List<ReportSurveyOption> SelectableOptions { get; set; } = new List<ReportSurveyOption>();
+        public List<ReportSurveyOption> ProcessedOptions { get; set; } = new List<ReportSurveyOption>();
 
     }
 

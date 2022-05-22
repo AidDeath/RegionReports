@@ -26,6 +26,7 @@
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="DateAssigned" Title="Назначен"/>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
             <Template Context="data">
+                <RadzenButton Icon="info" Click="(() =>ShowRequestInfo(data) )" ButtonStyle="ButtonStyle.Light"/>
                 @data.GetRequestTypeName()
             </Template>
         </RadzenDataGridColumn>
@@ -102,7 +103,7 @@
 
     protected override void OnInitialized()
     {
-        list = AssignmentService.GetAssignmentGroups();
+        list = AssignmentService.GetActualAssignmentGroups();
     }
 
     //Задать новое расписание
@@ -221,5 +222,21 @@
         }
         
     }
+
+        private async Task ShowRequestInfo(ReportAssignmentGroup asnGroup)
+    {       
+        ReportRequestBase request = null;
+
+        //if (assignment.ReportRequestText is not null) request = assignment.ReportRequestText;
+        //if (assignment.ReportRequestSurvey is not null) request = assignment.ReportRequestSurvey;
+        request = asnGroup.GetReportRequest();
+
+        if (request is null) throw new NullReferenceException();
+
+        await DialogService.OpenAsync("Информация о запросе", ds =>
+            @<ReportRequestInfo ReportRequest=request/>
+            , new(){ShowClose=true, CloseDialogOnEsc=true, CloseDialogOnOverlayClick=true, Draggable=true}
+                    );
+    } 
 
 }
