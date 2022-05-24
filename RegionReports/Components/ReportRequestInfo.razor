@@ -6,6 +6,11 @@
     <ReportRequestSurveyInfo ReportRequestSurvey="@((ReportRequestSurvey)ReportRequest)" Collapsed="@Collapsed"/>
 }
 
+@if (ReportRequest is ReportRequestWithFile)
+{
+    <ReportRequestWithFileInfo ReportRequestWithFile="@((ReportRequestWithFile)ReportRequest)" Collapsed=@Collapsed/>
+}
+
 
 
 @code {

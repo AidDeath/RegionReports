@@ -14,7 +14,7 @@ else
         <div class="col-md-5">
             <RadzenDataGrid ColumnWidth="160px" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@asnGroups" TItem="ReportAssignmentGroup" @bind-Value="@SelectedGroups">
                 <Columns>
-                    <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="ActualDeadline" Title="Собран"/>
+                    <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="ActualDeadline" Title="Cрок сбора"/>
                     <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
                         <Template Context="data">
                             @data.GetRequestTypeName()

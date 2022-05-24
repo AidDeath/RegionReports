@@ -45,6 +45,21 @@ namespace RegionReports.Controllers
             }
         }
 
+        
+        [HttpPost("upload/singlefileresponse")]
+        public async Task<IActionResult> SingleResponse(IFormFile file)
+        {
+            try
+            {
+                if (file.Length > _maxFileSize) throw new Exception("Превышено ограничение на размер файла");
+                var uploadedFile = await _fileService.UploadResponseFileAsync(file);
+                return Ok(uploadedFile);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
         [HttpPost("upload/multiple")]
         public async Task<IActionResult> Multiple(IFormFile[] files)

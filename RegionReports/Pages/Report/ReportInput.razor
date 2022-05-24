@@ -16,6 +16,11 @@
     {
         <ReportTextInput SubmitChanges="@SubmitChanges" ReportAssignment="@ReportAssignment"/>
     }
+
+    @if (request is ReportRequestWithFile)
+    {
+        <ReportWithFileInput SubmitChanges="@SubmitChanges" ReportAssignment="@ReportAssignment"/>
+    }
 }
 else
 {
@@ -52,6 +57,7 @@ else
 
         if (report is ReportSurvey) ReportAssignment.ReportSurvey = (ReportSurvey)report;
         if (report is ReportText) ReportAssignment.ReportText = (ReportText)report;
+        if (report is ReportWithFile) ReportAssignment.ReportWithFile = (ReportWithFile)report;
 
         ReportAssignment.IsCompleted = true;
 

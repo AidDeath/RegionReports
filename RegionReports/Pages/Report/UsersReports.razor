@@ -29,14 +29,15 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment"  Filterable="false" Title="Тип запроса" Frozen="true" Width="200px" >
                 <Template Context="assignment">
-                    @if (assignment.ReportAssignmentGroup.ReportRequestText is not null)
+@*                    @if (assignment.ReportAssignmentGroup.ReportRequestText is not null)
                     {
                         <p>Текстовая информация</p>
                     }
                     @if (assignment.ReportAssignmentGroup.ReportRequestSurvey is not null)
                     {
                             <p>Опрос</p>
-                    }
+                    }*@
+                    @assignment.ReportAssignmentGroup.GetRequestTypeName()
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="ReportAssignment" Title="Заголовок" Frozen="true"  >

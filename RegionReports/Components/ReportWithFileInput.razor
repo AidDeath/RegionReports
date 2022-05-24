@@ -1,0 +1,89 @@
+﻿@inject NotificationService NotificationService 
+@using System.Text.Json
+@using RegionReports.Enums
+@inject FileService FileService 
+@inject SettingsService SettingsService
+
+
+<div>
+    <h3>Загрузите файл с ответом</h3>
+    <div>
+        <RadzenUpload @ref="@upload" Url="upload/singlefileresponse"  ChooseText="Выбрать файл" Multiple=false Complete="@OnReportFileUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
+        Error="@OnUploadError"/> Accept="@SettingsService.GetUploadableMimeTypes()"
+        @*Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>*@                         
+        <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
+        @if (reportWithFile.ResponseFile is not null)
+        {
+            <h5>Загружен файл: 
+                <FileIcon FileType="(UploadedFileType)reportWithFile.ResponseFile.FileType"/>
+                @reportWithFile.ResponseFile.FileOriginalName
+            </h5>
+        }
+    </div>
+   
+</div>
+ <RadzenButton class="my-3" Text="Отправить ответ" Click="@(() => Submit())" Disabled="@(reportWithFile.ResponseFile is null)"/>
+
+
+@code {
+    [Parameter]
+    public ReportAssignment ReportAssignment { get; set; }
+
+    private ReportWithFile reportWithFile = new();
+
+
+    [Parameter]
+    public EventCallback<ReportBase> SubmitChanges { get; set; }
+
+    private void Submit()
+    {
+        SubmitChanges.InvokeAsync(reportWithFile);
+    }
+
+
+    private void OnReportFileUploadComplete(UploadCompleteEventArgs args)
+    {
+        JsonDocument jsonDocument = args.JsonResponse;
+
+        var uploadedFile = jsonDocument.RootElement.Deserialize<ResponseFile> ();
+
+
+
+        if (uploadedFile is not null)
+        {
+            if (reportWithFile.ResponseFile is not null) RemoveFileFromServer(reportWithFile.ResponseFile);
+            reportWithFile.ResponseFile = uploadedFile;
+        }
+        
+
+        upload.ClearFiles();
+        progressVisible = false;
+
+        NotificationService.Notify(NotificationSeverity.Success, "Файл загружен");
+    }
+
+    private RadzenUpload upload;
+    private double uploadProgress;
+    private bool progressVisible;
+
+    private void OnProgress(UploadProgressArgs args)
+    {
+        if (args.Progress != 100) {
+            progressVisible = true;
+            uploadProgress = args.Progress;
+        }
+
+    }
+
+    private void OnUploadError(UploadErrorEventArgs args){
+        NotificationService.Notify(NotificationSeverity.Error, "Ошибка при загрузке", args.Message);
+
+        upload.ClearFiles();
+        progressVisible = false;
+    }
+
+    private void RemoveFileFromServer(ReportFileBase file)
+    {
+        FileService.DeleteFileFromFileSystem(file);
+    }
+}

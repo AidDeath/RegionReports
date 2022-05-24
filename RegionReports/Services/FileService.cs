@@ -83,6 +83,26 @@ namespace RegionReports.Services
             return uploadedFile;
         }
 
+        public async Task<ResponseFile> UploadResponseFileAsync(IFormFile file)
+        {
+            var trustedFileName = Path.GetRandomFileName();
+
+            using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
+            await file.OpenReadStream().CopyToAsync(fs);
+
+            var uploadedFile = new ResponseFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
+
+            var fileExtension = Path.GetExtension(file.FileName);
+
+            if (fileExtension.Contains("xls")) uploadedFile.FileType = (int)UploadedFileType.Excel;
+            if (fileExtension.Contains("doc")) uploadedFile.FileType = (int)UploadedFileType.Word;
+            if (fileExtension.Contains("pdf")) uploadedFile.FileType = (int)UploadedFileType.Pdf;
+
+            if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
+
+            return uploadedFile;
+        }
+
         /// <summary>
         /// Синхронная загрузка нескольких файлов
         /// </summary>
