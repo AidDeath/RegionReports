@@ -23,6 +23,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="PdfSharp" Version="1.50.5147" />
     <PackageReference Include="Radzen.Blazor" Version="3.18.8" />
   </ItemGroup>
 

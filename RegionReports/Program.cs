@@ -35,6 +35,7 @@ builder.Services.AddTransient<DistrictService>();
 builder.Services.AddTransient<ReportRequestService>();
 builder.Services.AddTransient<FileService>();
 builder.Services.AddScoped<AssignmentService>();
+builder.Services.AddScoped<PdfService>();
 
 builder.Services.AddTransient<SettingsService>();
 

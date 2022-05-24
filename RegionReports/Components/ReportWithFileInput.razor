@@ -9,7 +9,7 @@
     <h3>Загрузите файл с ответом</h3>
     <div>
         <RadzenUpload @ref="@upload" Url="upload/singlefileresponse"  ChooseText="Выбрать файл" Multiple=false Complete="@OnReportFileUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
-        Error="@OnUploadError"/> Accept="@SettingsService.GetUploadableMimeTypes()"
+        Error="@OnUploadError" Accept="@SettingsService.GetUploadableMimeTypes()"/> 
         @*Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>*@                         
         <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
         @if (reportWithFile.ResponseFile is not null)

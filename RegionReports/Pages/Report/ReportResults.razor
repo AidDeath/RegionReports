@@ -1,6 +1,9 @@
 ﻿@page "/reportresults"
+@using RegionReports.Enums
 @inject DialogService DialogService
 @inject AssignmentService AssignmentService
+@inject FileService FileService
+
 <PageTitle>Отчеты пользователей</PageTitle>
 
 
@@ -166,53 +169,31 @@ else
                                     </Template>
                                 </RadzenDataList>
                             }
-                        }
 
-
-
-@*                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(SelectedGroups.FirstOrDefault()?.Assignments)" TItem="ReportAssignment" PageSize="10">
-                            <Template Context="assignment">
-                                
-                                @if (assignment.IsCompleted)
-                                {
-                                    var report = assignment.GetReportBase();
-                                    <RadzenCard>
-                                        <h4>Ответ от @assignment.ReportUser.FullName</h4>
-                                        
-                                        @if (report is ReportText){
-                                            var textRep =  (ReportText)report;
-                                            <p class="my-0">@makeMarkupString(textRep.RepsonseString)</p>
-                                        }
-
-                                        @if (report is ReportSurvey && showDetailedSurveyResponse)
+                            if (Request is ReportRequestWithFile)
+                            {
+                                <RadzenButton Icon="file_download" Click="@(() => FileService.MergeAndDownloadPdf(AsnGroup))" Text="Скачать общий pdf"
+                                Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Any(f => f.FileType == (int)UploadedFileType.Pdf) )"/>
+                                <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(AsnGroup.Assignments)" TItem="ReportAssignment" PageSize="10">
+                                    <Template Context="assignment">
+                                    @{
+                                        if (assignment.IsCompleted)
                                         {
-                                            var survRep =  (ReportSurvey)report;
-                                            foreach(var opt in survRep.SelectableOptions)
-                                            {
-                                                <div class="row my-0">
-                                                    <div class="col-3">
-                                                        @if (opt.Checked)
-                                                        {
-                                                            <RadzenIcon class="my-0" Icon="check"/>
-                                                        }
-                                                        else
-                                                        {
-                                                            <RadzenIcon class="my-0" Icon="check_box_outline_blank"/>
-                                                        }
-                                                    </div>
-                                                    <div class="col-9">
-                                                        @opt.ReportRequestSurveyOption.OptionName
-                                                    </div>
-                                                </div>
-                                            }
+                                            var report = assignment.GetReportBase();
+                                            <RadzenCard>
+                                            @{
+                                                <h4>Ответ от @assignment.ReportUser.FullName</h4>
+                                                var fileRep =  (ReportWithFile)report;
+                                                <p><RadzenButton Icon="file_download" Click="@(() => FileService.DownloadFileFromServer(fileRep.ResponseFile))"/>  @fileRep.ResponseFile.FileOriginalName</p>
+                                                
+                                            }  
+                                            </RadzenCard>
                                         }
-
-                                    </RadzenCard>
-                                }
-
-                                
-                            </Template>
-                        </RadzenDataList>*@
+                                    }
+                                    </Template>
+                                </RadzenDataList>
+                            }
+                        }
                     </RadzenTabsItem>
                 </Tabs>
             </RadzenTabs>

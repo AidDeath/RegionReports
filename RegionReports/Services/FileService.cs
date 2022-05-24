@@ -13,12 +13,14 @@ namespace RegionReports.Services
         private IJSObjectReference _imageStreamScript;
         private IJSObjectReference _fileDownloadScript;
         private IJSRuntime _jsRuntime;
+        private readonly PdfService _pdfService;
         private readonly string FileStoragePath;
 
-        public FileService(IDbAccessor database, IJSRuntime jsRuntime, SettingsService settingsService)
+        public FileService(IDbAccessor database, IJSRuntime jsRuntime, SettingsService settingsService, PdfService pdfService)
         {
             _jsRuntime = jsRuntime;
             _database = database;
+            _pdfService = pdfService;
             FileStoragePath = settingsService.GetFileStoragePath();
 
             Task.Run(() => LoadScripts());
@@ -196,5 +198,20 @@ namespace RegionReports.Services
             }
 
         }
+
+        public async Task MergeAndDownloadPdf(ReportAssignmentGroup asnGroup)
+        {
+            var request = asnGroup.GetReportRequest();
+
+            if (request is not ReportRequestWithFile) throw new Exception("Неподходящий тип отчета");
+
+            var responseFiles = asnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Where(file => file.FileType == (int)UploadedFileType.Pdf);
+
+            var paths = responseFiles.Select(file => Path.Combine(FileStoragePath, file.FileUniqueName));
+
+            using var streamRef = new DotNetStreamReference(_pdfService.GetMergedPdfStream(paths));
+                await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.pdf", streamRef);
+        }
+
     }
 }
