@@ -12,17 +12,32 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    [Migration("20220504094338_some repairments")]
-    partial class somerepairments
+    [Migration("20220524083346_All migrations rebuilt")]
+    partial class Allmigrationsrebuilt
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("DistrictReportSchedule", b =>
+                {
+                    b.Property<int>("DistrictsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SchedulesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DistrictsId", "SchedulesId");
+
+                    b.HasIndex("SchedulesId");
+
+                    b.ToTable("DistrictReportSchedule");
+                });
 
             modelBuilder.Entity("RegionReports.Data.Entities.District", b =>
                 {
@@ -250,10 +265,60 @@ namespace RegionReports.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ReportAssignmentGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReportSurveyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReportTextId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReportUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReportWithFileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportAssignmentGroupId");
+
+                    b.HasIndex("ReportSurveyId")
+                        .IsUnique()
+                        .HasFilter("[ReportSurveyId] IS NOT NULL");
+
+                    b.HasIndex("ReportTextId")
+                        .IsUnique()
+                        .HasFilter("[ReportTextId] IS NOT NULL");
+
+                    b.HasIndex("ReportUserId");
+
+                    b.HasIndex("ReportWithFileId")
+                        .IsUnique()
+                        .HasFilter("[ReportWithFileId] IS NOT NULL");
+
+                    b.ToTable("ReportAssignments");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportAssignmentGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("ActualDeadline")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateAssigned")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsCompleted")
+                    b.Property<bool>("IsOverdued")
                         .HasColumnType("bit");
 
                     b.Property<int?>("ReportRequestSurveyId")
@@ -262,10 +327,7 @@ namespace RegionReports.Data.Migrations
                     b.Property<int?>("ReportRequestTextId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReportSurveyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReportUserId")
+                    b.Property<int?>("ReportRequestWithFileId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -274,14 +336,9 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportRequestTextId");
 
-                    b.HasIndex("ReportSurveyId")
-                        .IsUnique()
-                        .HasFilter("[ReportSurveyId] IS NOT NULL");
+                    b.HasIndex("ReportRequestWithFileId");
 
-                    b.HasIndex("ReportUserId")
-                        .IsUnique();
-
-                    b.ToTable("ReportAssignments");
+                    b.ToTable("AssignmentGroups");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestFile", b =>
@@ -330,9 +387,6 @@ namespace RegionReports.Data.Migrations
                     b.Property<bool>("MultipleChoises")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("NonScheduledDeadline")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("ReportScheduleId")
                         .HasColumnType("int");
 
@@ -346,7 +400,9 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReportScheduleId");
+                    b.HasIndex("ReportScheduleId")
+                        .IsUnique()
+                        .HasFilter("[ReportScheduleId] IS NOT NULL");
 
                     b.ToTable("ReportRequestsSurvey");
                 });
@@ -373,6 +429,30 @@ namespace RegionReports.Data.Migrations
                     b.ToTable("ReportRequestSurveyOptions");
                 });
 
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestTemplateFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileOriginalName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FileType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileUniqueName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReportRequestTemplateFile");
+                });
+
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestText", b =>
                 {
                     b.Property<int>("Id")
@@ -386,9 +466,6 @@ namespace RegionReports.Data.Migrations
 
                     b.Property<bool>("IsSchedulledRequest")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("NonScheduledDeadline")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("ReportScheduleId")
                         .HasColumnType("int");
@@ -410,6 +487,44 @@ namespace RegionReports.Data.Migrations
                     b.ToTable("ReportRequestsText");
                 });
 
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestWithFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsSchedulledRequest")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ReportRequestFileId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReportScheduleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequestText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RequestTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportRequestFileId")
+                        .IsUnique();
+
+                    b.HasIndex("ReportScheduleId");
+
+                    b.ToTable("ReportRequestsWithFile");
+                });
+
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSchedule", b =>
                 {
                     b.Property<int>("Id")
@@ -423,6 +538,9 @@ namespace RegionReports.Data.Migrations
 
                     b.Property<short?>("DayOfWeek")
                         .HasColumnType("smallint");
+
+                    b.Property<int>("DaysBeforeAutoAssignment")
+                        .HasColumnType("int");
 
                     b.Property<bool?>("IsScheduleActive")
                         .IsRequired()
@@ -438,7 +556,7 @@ namespace RegionReports.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportSchedule");
+                    b.ToTable("ReportSchedules");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>
@@ -451,9 +569,6 @@ namespace RegionReports.Data.Migrations
 
                     b.Property<DateTime>("DateFilled")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ReportAssignmentId")
-                        .HasColumnType("int");
 
                     b.Property<int>("ReportUserId")
                         .HasColumnType("int");
@@ -488,7 +603,32 @@ namespace RegionReports.Data.Migrations
 
                     b.HasIndex("ReportSurveyId");
 
-                    b.ToTable("ReportSurveySelectedOptions");
+                    b.ToTable("ReportSurveySelectableOptions");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportText", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateFilled")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReportUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RepsonseString")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportUserId");
+
+                    b.ToTable("ReportsText");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUser", b =>
@@ -588,6 +728,57 @@ namespace RegionReports.Data.Migrations
                     b.ToTable("ReportUserSuggestedChanges");
                 });
 
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportWithFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("DateFilled")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReportUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResponseFileId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportUserId");
+
+                    b.HasIndex("ResponseFileId")
+                        .IsUnique();
+
+                    b.ToTable("ReportsWithFile");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ResponseFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileOriginalName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FileType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileUniqueName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ResponseFile");
+                });
+
             modelBuilder.Entity("RegionReports.Data.Entities.UploadableFileType", b =>
                 {
                     b.Property<int>("Id")
@@ -632,6 +823,21 @@ namespace RegionReports.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DistrictReportSchedule", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.District", null)
+                        .WithMany()
+                        .HasForeignKey("DistrictsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RegionReports.Data.Entities.ReportSchedule", null)
+                        .WithMany()
+                        .HasForeignKey("SchedulesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RegionReports.Data.Entities.District", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.Region", "Region")
@@ -651,31 +857,58 @@ namespace RegionReports.Data.Migrations
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportAssignment", b =>
                 {
-                    b.HasOne("RegionReports.Data.Entities.ReportRequestSurvey", "ReportRequestSurvey")
-                        .WithMany("ReportAssignments")
-                        .HasForeignKey("ReportRequestSurveyId");
-
-                    b.HasOne("RegionReports.Data.Entities.ReportRequestText", "ReportRequestText")
-                        .WithMany("ReportAssignments")
-                        .HasForeignKey("ReportRequestTextId");
+                    b.HasOne("RegionReports.Data.Entities.ReportAssignmentGroup", "ReportAssignmentGroup")
+                        .WithMany("Assignments")
+                        .HasForeignKey("ReportAssignmentGroupId");
 
                     b.HasOne("RegionReports.Data.Entities.ReportSurvey", "ReportSurvey")
                         .WithOne("ReportAssignment")
                         .HasForeignKey("RegionReports.Data.Entities.ReportAssignment", "ReportSurveyId");
 
+                    b.HasOne("RegionReports.Data.Entities.ReportText", "ReportText")
+                        .WithOne("ReportAssignment")
+                        .HasForeignKey("RegionReports.Data.Entities.ReportAssignment", "ReportTextId");
+
                     b.HasOne("RegionReports.Data.Entities.ReportUser", "ReportUser")
-                        .WithOne()
-                        .HasForeignKey("RegionReports.Data.Entities.ReportAssignment", "ReportUserId")
+                        .WithMany()
+                        .HasForeignKey("ReportUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RegionReports.Data.Entities.ReportWithFile", "ReportWithFile")
+                        .WithOne("ReportAssignment")
+                        .HasForeignKey("RegionReports.Data.Entities.ReportAssignment", "ReportWithFileId");
+
+                    b.Navigation("ReportAssignmentGroup");
+
+                    b.Navigation("ReportSurvey");
+
+                    b.Navigation("ReportText");
+
+                    b.Navigation("ReportUser");
+
+                    b.Navigation("ReportWithFile");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportAssignmentGroup", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.ReportRequestSurvey", "ReportRequestSurvey")
+                        .WithMany("AssignmentsGroups")
+                        .HasForeignKey("ReportRequestSurveyId");
+
+                    b.HasOne("RegionReports.Data.Entities.ReportRequestText", "ReportRequestText")
+                        .WithMany("AssignmentsGroups")
+                        .HasForeignKey("ReportRequestTextId");
+
+                    b.HasOne("RegionReports.Data.Entities.ReportRequestWithFile", "ReportRequestWithFile")
+                        .WithMany("AssignmentsGroups")
+                        .HasForeignKey("ReportRequestWithFileId");
 
                     b.Navigation("ReportRequestSurvey");
 
                     b.Navigation("ReportRequestText");
 
-                    b.Navigation("ReportSurvey");
-
-                    b.Navigation("ReportUser");
+                    b.Navigation("ReportRequestWithFile");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestFile", b =>
@@ -692,8 +925,8 @@ namespace RegionReports.Data.Migrations
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestSurvey", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.ReportSchedule", "ReportSchedule")
-                        .WithMany()
-                        .HasForeignKey("ReportScheduleId");
+                        .WithOne("ReportRequestSurvey")
+                        .HasForeignKey("RegionReports.Data.Entities.ReportRequestSurvey", "ReportScheduleId");
 
                     b.Navigation("ReportSchedule");
                 });
@@ -712,10 +945,27 @@ namespace RegionReports.Data.Migrations
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestText", b =>
                 {
                     b.HasOne("RegionReports.Data.Entities.ReportSchedule", "ReportSchedule")
-                        .WithOne()
+                        .WithOne("ReportRequestText")
                         .HasForeignKey("RegionReports.Data.Entities.ReportRequestText", "ReportScheduleId");
 
                     b.Navigation("ReportSchedule");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestWithFile", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.ReportRequestTemplateFile", "TemplateFile")
+                        .WithOne("ReportRequestWithFile")
+                        .HasForeignKey("RegionReports.Data.Entities.ReportRequestWithFile", "ReportRequestFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RegionReports.Data.Entities.ReportSchedule", "ReportSchedule")
+                        .WithMany()
+                        .HasForeignKey("ReportScheduleId");
+
+                    b.Navigation("ReportSchedule");
+
+                    b.Navigation("TemplateFile");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>
@@ -738,7 +988,7 @@ namespace RegionReports.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("RegionReports.Data.Entities.ReportSurvey", "ReportSurvey")
-                        .WithMany("SelectedOptions")
+                        .WithMany("ProcessedOptions")
                         .HasForeignKey("ReportSurveyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -746,6 +996,17 @@ namespace RegionReports.Data.Migrations
                     b.Navigation("ReportRequestSurveyOption");
 
                     b.Navigation("ReportSurvey");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportText", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.ReportUser", "ReportUser")
+                        .WithMany()
+                        .HasForeignKey("ReportUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportUser");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
@@ -777,31 +1038,77 @@ namespace RegionReports.Data.Migrations
                     b.Navigation("ReportUserApprovalClaim");
                 });
 
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportWithFile", b =>
+                {
+                    b.HasOne("RegionReports.Data.Entities.ReportUser", "ReportUser")
+                        .WithMany()
+                        .HasForeignKey("ReportUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RegionReports.Data.Entities.ResponseFile", "ResponseFile")
+                        .WithOne("ReportWithFile")
+                        .HasForeignKey("RegionReports.Data.Entities.ReportWithFile", "ResponseFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportUser");
+
+                    b.Navigation("ResponseFile");
+                });
+
             modelBuilder.Entity("RegionReports.Data.Entities.Region", b =>
                 {
                     b.Navigation("Districts");
                 });
 
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportAssignmentGroup", b =>
+                {
+                    b.Navigation("Assignments");
+                });
+
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestSurvey", b =>
                 {
-                    b.Navigation("Options");
+                    b.Navigation("AssignmentsGroups");
 
-                    b.Navigation("ReportAssignments");
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestTemplateFile", b =>
+                {
+                    b.Navigation("ReportRequestWithFile")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestText", b =>
                 {
-                    b.Navigation("Files");
+                    b.Navigation("AssignmentsGroups");
 
-                    b.Navigation("ReportAssignments");
+                    b.Navigation("Files");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportRequestWithFile", b =>
+                {
+                    b.Navigation("AssignmentsGroups");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportSchedule", b =>
+                {
+                    b.Navigation("ReportRequestSurvey");
+
+                    b.Navigation("ReportRequestText");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportSurvey", b =>
                 {
-                    b.Navigation("ReportAssignment")
-                        .IsRequired();
+                    b.Navigation("ProcessedOptions");
 
-                    b.Navigation("SelectedOptions");
+                    b.Navigation("ReportAssignment");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportText", b =>
+                {
+                    b.Navigation("ReportAssignment");
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUser", b =>
@@ -814,6 +1121,17 @@ namespace RegionReports.Data.Migrations
             modelBuilder.Entity("RegionReports.Data.Entities.ReportUserApprovalClaim", b =>
                 {
                     b.Navigation("ReportUserSuggestedChanges")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ReportWithFile", b =>
+                {
+                    b.Navigation("ReportAssignment");
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.ResponseFile", b =>
+                {
+                    b.Navigation("ReportWithFile")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

@@ -20,23 +20,10 @@ namespace RegionReports.Data.Entities
     /// <summary>
     /// Файл к запросу текстового отчета
     /// </summary>
-    public class ReportRequestFile
+    public class ReportRequestFile : ReportFileBase
     {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-
-        [JsonPropertyName("fileUniqueName")]
-        public string FileUniqueName { get; set; } = "";
-
-        [JsonPropertyName("fileOriginalName")]
-        public string FileOriginalName { get; set; } = "";
-
-        [JsonPropertyName("fileType")]
-        public int FileType { get; set; }
-
         [JsonPropertyName("reportRequestTextId")]
         public int ReportRequestTextId { get; set; }
-
         public ReportRequestText RelatedReportText { get; set; }
 
     }

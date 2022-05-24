@@ -27,6 +27,12 @@ namespace RegionReports.Data
 
         #endregion
 
+        #region File Reports
+        public DbSet<ReportRequestWithFile> ReportRequestsWithFile { get; set; }
+        public DbSet<ReportWithFile> ReportsWithFile { get; set; }
+        #endregion
+
+
         public DbSet<UploadableFileType> AlowedUploadFileTypes { get; set; }
 
         public DbSet<ReportAssignment> ReportAssignments { get; set; }
@@ -135,10 +141,29 @@ namespace RegionReports.Data
 
             #endregion
 
+            #region File Reports
+            modelBuilder.Entity<ReportWithFile>()
+                .HasOne(rep => rep.ReportUser)
+                .WithMany()
+                .HasForeignKey(rep => rep.ReportUserId);
+
+            modelBuilder.Entity<ReportWithFile>()
+                .HasOne(rep => rep.ResponseFile)
+                .WithOne(file => file.ReportWithFile)
+                .HasForeignKey<ReportWithFile>(rep => rep.ResponseFileId);
+
+            modelBuilder.Entity<ReportRequestWithFile>()
+                .HasOne(rep => rep.TemplateFile)
+                .WithOne(file => file.ReportRequestWithFile)
+                .HasForeignKey<ReportRequestWithFile>(repReq => repReq.ReportRequestFileId);
+
+            #endregion
+
             modelBuilder.Entity<ReportSchedule>()
                 .Property(sch => sch.IsScheduleActive)
                 .HasDefaultValue(true)
                 .IsRequired();
+
 
 
             #region Report Assignments
@@ -150,16 +175,17 @@ namespace RegionReports.Data
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportSurvey)
                 .WithOne(rep => rep.ReportAssignment)
-                .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId)
-                //.HasForeignKey<ReportSurvey>(rep => rep.ReportAssignmentId)
-                ;
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId);
             
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportText)
                 .WithOne(rep => rep.ReportAssignment)
-                .HasForeignKey<ReportAssignment>(assign => assign.ReportTextId)
-                //.HasForeignKey<ReportText>(rep => rep.ReportAssignmentId)
-                ;
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportTextId);
+
+            modelBuilder.Entity<ReportAssignment>()
+                .HasOne(assign => assign.ReportWithFile)
+                .WithOne(rep => rep.ReportAssignment)
+                .HasForeignKey<ReportAssignment>(assign => assign.ReportWithFileId);
             #endregion
 
 

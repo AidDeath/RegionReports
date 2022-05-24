@@ -58,6 +58,8 @@ namespace RegionReports.Services
                 .Include(group => group.Assignments)
                 .Include(group => group.ReportRequestSurvey).ThenInclude(req => req.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
                 .Include(group => group.ReportRequestSurvey.Options)
+                .Include(group => group.ReportRequestWithFile).ThenInclude(req => req.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
+                .Include(group => group.ReportRequestWithFile.TemplateFile)
                 .Include(group => group.ReportRequestText).ThenInclude(repText => repText.ReportSchedule).ThenInclude(sch => sch.Districts).ThenInclude(dst => dst.ReportUser)
                 .Include(group => group.ReportRequestText.Files)
                 .Where(group => !group.IsOverdued)
@@ -76,11 +78,13 @@ namespace RegionReports.Services
             var query = _database.AssignmentGroups.GetQueryable()
                 .Include(group => group.Assignments).ThenInclude(asn => asn.ReportText)
                 .Include(group => group.Assignments).ThenInclude(asn => asn.ReportSurvey.ProcessedOptions)
+                .Include(group => group.Assignments).ThenInclude(asn => asn.ReportWithFile.ResponseFile)
                 .Include(group => group.Assignments).ThenInclude(asn => asn.ReportUser)
                 .Include(group => group.ReportRequestSurvey)
                 .Include(group => group.ReportRequestSurvey.Options)
                 .Include(group => group.ReportRequestText)
                 .Include(group => group.ReportRequestText.Files)
+                .Include(group => group.ReportRequestWithFile.TemplateFile)
                 .Where(group => group.IsOverdued)
                 .OrderByDescending(rep => rep.DateAssigned);
 
@@ -101,8 +105,11 @@ namespace RegionReports.Services
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey.Options)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.Files)
+                .Include(asn => asn.ReportAssignmentGroup.ReportRequestWithFile).ThenInclude(repFile => repFile.ReportSchedule)
+                .Include(asn => asn.ReportAssignmentGroup.ReportRequestWithFile.TemplateFile)
                 .Include(ass => ass.ReportSurvey)
                 .Include(ass => ass.ReportText)
+                .Include(asn => asn.ReportWithFile)
                 .OrderByDescending(rep => rep.ReportAssignmentGroup.DateAssigned);
 
 
@@ -119,8 +126,11 @@ namespace RegionReports.Services
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestSurvey.Options)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestText).ThenInclude(repText => repText.ReportSchedule)
                 .Include(ass => ass.ReportAssignmentGroup.ReportRequestText.Files)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestWithFile).ThenInclude(req => req.ReportSchedule)
+                .Include(ass => ass.ReportAssignmentGroup.ReportRequestWithFile.TemplateFile)
                 .Include(ass => ass.ReportSurvey)
                 .Include(ass => ass.ReportText)
+                .Include(asn => asn.ReportWithFile)
                 .Where(ass => ass.ReportUser == user && ass.Id == id).FirstOrDefault();
         }
 
@@ -130,6 +140,7 @@ namespace RegionReports.Services
 
             if (report is ReportText reportText) _database.ReportsText.Create(reportText);
             if (report is ReportSurvey reportSurvey) _database.ReportsSurvey.Create(reportSurvey);
+            if (report is ReportWithFile reportWithFile) _database.ReportsWithFile.Create(reportWithFile);
         }
 
         private DateTime GetDeadlineDate(ReportSchedule schedule)

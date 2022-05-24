@@ -22,6 +22,9 @@ namespace RegionReports.Data.Entities
         /// </summary>
         public ReportText? ReportText { get; set; }
 
+        public int? ReportWithFileId { get; set; }
+        public ReportWithFile? ReportWithFile { get; set; }
+
         /// <summary>
         /// Сдан ли отчет по этому назначению
         /// </summary>
@@ -35,10 +38,11 @@ namespace RegionReports.Data.Entities
 
         public ReportBase GetReportBase()
         {
-            if (ReportText is null && ReportSurvey is null) throw new NullReferenceException();
+            if (ReportText is null && ReportSurvey is null && ReportWithFile is null) throw new NullReferenceException();
 
             if (ReportText is not null) return ReportText;
             if (ReportSurvey is not null) return ReportSurvey;
+            if (ReportWithFile is not null) return ReportWithFile;
 
             return null;
         }

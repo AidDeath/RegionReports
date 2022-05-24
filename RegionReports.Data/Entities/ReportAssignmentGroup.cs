@@ -13,6 +13,8 @@
         public int? ReportRequestSurveyId { get; set; }
         public ReportRequestSurvey? ReportRequestSurvey { get; set; }
 
+        public ReportRequestWithFile? ReportRequestWithFile { get; set; }
+
         /// <summary>
         /// Дата назначения истекла
         /// </summary>
@@ -25,10 +27,11 @@
 
         public ReportRequestBase? GetReportRequest()
         {
-            if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();
+            if (ReportRequestText is null && ReportRequestSurvey is null && ReportRequestWithFile is null) throw new NullReferenceException();
 
             if (ReportRequestText is not null) return ReportRequestText;
             if (ReportRequestSurvey is not null) return ReportRequestSurvey;
+            if (ReportRequestWithFile is not null) return ReportRequestWithFile;
 
             return null;
 
@@ -36,10 +39,12 @@
 
         public string GetRequestTypeName()
         {
-            if (ReportRequestText is null && ReportRequestSurvey is null) throw new NullReferenceException();
+            if (ReportRequestText is null && ReportRequestSurvey is null && ReportRequestWithFile is null) throw new NullReferenceException();
 
             if (ReportRequestText is not null) return "Текстовый запрос";
             if (ReportRequestSurvey is not null) return "Запрос отчета";
+            if (ReportRequestWithFile is not null) return "Запрос с файлом";
+
 
             return string.Empty;
         }

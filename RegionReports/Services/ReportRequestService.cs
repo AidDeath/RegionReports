@@ -31,6 +31,11 @@ namespace RegionReports.Services
             _database.ReportRequestsText.Create(reportRequest);
         }
 
+        public void CreateReportRequestwithFile(ReportRequestWithFile reportRequest)
+        {
+            _database.ReportRequestsWithFile.Create(reportRequest);
+        }
+
 
         public IEnumerable<ReportRequestBase> GetAllRequests()
         {

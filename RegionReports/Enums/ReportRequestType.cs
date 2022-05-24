@@ -13,6 +13,11 @@
         /// <summary>
         /// Запрос в виде опроса с редактируемыми вариантами ответа
         /// </summary>
-        SurveyReport = 2
+        SurveyReport = 2,
+
+        /// <summary>
+        /// Запрос отчета файлом
+        /// </summary>
+        FileReport = 3
     }
 }

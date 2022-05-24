@@ -45,5 +45,10 @@ namespace RegionReports.Data.Repositories
         private IRepository<ReportAssignmentGroup> _assignmentsGroups { get; set; }
         public IRepository<ReportAssignmentGroup> AssignmentGroups => _assignmentsGroups ??= new Repository<ReportAssignmentGroup>(_context);
 
+        private IRepository<ReportRequestWithFile> _reportRequestsWithFile { get; set; }
+        public IRepository<ReportRequestWithFile> ReportRequestsWithFile => _reportRequestsWithFile ??= new Repository<ReportRequestWithFile>(_context);
+
+        private IRepository<ReportWithFile> _reportsWithFile { get; set; }
+        public IRepository<ReportWithFile> ReportsWithFile => _reportsWithFile ??= new Repository<ReportWithFile>(_context);
     }
 }

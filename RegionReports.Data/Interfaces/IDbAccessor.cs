@@ -43,5 +43,15 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         public IRepository<ReportAssignmentGroup> AssignmentGroups { get; }
 
+        /// <summary>
+        /// Запрос информации файлом
+        /// </summary>
+        public IRepository<ReportRequestWithFile> ReportRequestsWithFile { get; }
+
+        /// <summary>
+        /// Ответ на запрос файла
+        /// </summary>
+        public IRepository<ReportWithFile> ReportsWithFile { get; }
+
     }
 }

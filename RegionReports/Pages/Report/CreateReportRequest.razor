@@ -8,6 +8,7 @@
 @inject DistrictService DistrictService;
 @inject DialogService DialogService
 @inject AssignmentService  AssignmentService
+@inject NavigationManager NavigationManager
 
 
 <PageTitle>Новый запрос данных</PageTitle>
@@ -37,7 +38,7 @@
                                     <div class="row">
                                         <div>
                                             <h4 class="mb-3">Текст запроса: </h4>
-                                            <RadzenHtmlEditor @bind-Value="@SurveyRequest.RequestText" style="height: 400px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                                            <RadzenHtmlEditor @bind-Value="@SurveyRequest.RequestText" style="height: 400px; margin-bottom: 1rem;">
                                                     <RadzenHtmlEditorUndo Title="Отменить"/>
                                                     <RadzenHtmlEditorRedo Title="Повторить"/>
                                                     <RadzenHtmlEditorFontName Title="Шрифт"/>
@@ -115,7 +116,7 @@
                                 <RadzenLabel Text="Заголовок" Component="ReportRequestTitle"/>
                                 <RadzenTextBox Name="ReportRequestTitle" @bind-Value="@TextRequest.RequestTitle"/>
                                  <h3>Текст запроса информации</h3>
-                                <RadzenHtmlEditor @bind-Value="@TextRequest.RequestText" style="height: 400px; margin-bottom: 1rem;" Change=@OnChange Paste=@OnPaste Execute=@OnExecute>
+                                <RadzenHtmlEditor @bind-Value="@TextRequest.RequestText" style="height: 400px; margin-bottom: 1rem;">
                                     <RadzenHtmlEditorUndo Title="Отменить"/>
                                     <RadzenHtmlEditorRedo Title="Повторить"/>
                                     <RadzenHtmlEditorFontName Title="Шрифт"/>
@@ -148,7 +149,54 @@
                                             </p>
                                         }
 
-                                    <RadzenUpload @ref="@upload" Url="upload/multiple"  ChooseText="Добавить файлы" Multiple=true Complete="@OnUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
+                                    <RadzenUpload @ref="@upload" Url="upload/multiple"  ChooseText="Добавить файлы" Multiple=true Complete="@OnTextOnlyUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
+                                    Accept="@SettingsService.GetUploadableMimeTypes()" Error="@OnUploadError"/>
+                                    @*Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>*@                         
+                                    <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
+                                </div>
+                            </div>
+                    </RadzenCard>
+                    break;
+                case ReportRequestType.FileReport:
+                    <RadzenCard >
+                         <div class="row">
+                             <div class="col-sm-6 col-md-7 col-lg-8">
+                                <RadzenLabel Text="Заголовок" Component="ReportRequestTitle"/>
+                                <RadzenTextBox Name="ReportRequestTitle" @bind-Value="@FileRequest.RequestTitle"/>
+                                 <h3>Текст запроса информации</h3>
+                                <RadzenHtmlEditor @bind-Value="@FileRequest.RequestText" style="height: 400px; margin-bottom: 1rem;">
+                                    <RadzenHtmlEditorUndo Title="Отменить"/>
+                                    <RadzenHtmlEditorRedo Title="Повторить"/>
+                                    <RadzenHtmlEditorFontName Title="Шрифт"/>
+                                    <RadzenHtmlEditorFontSize Title="Размер шрифта"/>
+                                    <RadzenHtmlEditorSeparator/>
+                                    <RadzenHtmlEditorAlignLeft Title="По левому краю"/>
+                                    <RadzenHtmlEditorAlignCenter Title="По центру"/>
+                                    <RadzenHtmlEditorAlignRight Title="По правому краю"/>
+                                    <RadzenHtmlEditorSeparator/>
+                                    <RadzenHtmlEditorBold Title="Жирный"/>
+                                    <RadzenHtmlEditorItalic Title="Курсив"/>
+                                    <RadzenHtmlEditorUnderline Title="Подчеркнутый"/>
+                                    <RadzenHtmlEditorStrikeThrough Title="Зачеркнутый"/>
+                                    <RadzenHtmlEditorSeparator />
+                                    <RadzenHtmlEditorColor Title="Цвет шрифта"/>
+                                    <RadzenHtmlEditorBackground Title="Заливка"/>
+                                    <RadzenHtmlEditorRemoveFormat Title="Очистить форматирование" />
+                                </RadzenHtmlEditor>
+                             </div>
+
+                                 <div class="col-sm-6 col-md-5 col-lg-4">
+                                     <h4>Файл - шаблон</h4>
+                                    @if (@FileRequest.TemplateFile is not null)
+                                    {
+                                        <p>
+                                            <RadzenButton class="m-1" Icon="delete" Click="@(() => RemoveFile(FileRequest.TemplateFile))"/>
+                                            <FileIcon FileType="@((UploadedFileType)FileRequest.TemplateFile.FileType)"/>
+                                            @FileRequest.TemplateFile.FileOriginalName
+                                        </p>
+                                    }
+
+                                    <RadzenUpload @ref="@upload" Url="upload/singletemplate"  ChooseText="Выбрать файл" Multiple=false Complete="@OnFileReportUploadComplete" Progress="@OnProgress" Visible=@(!progressVisible)
                                     Accept="@SettingsService.GetUploadableMimeTypes()" Error="@OnUploadError"/>
                                     @*Accept="application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf"/>*@                         
                                     <RadzenProgressBar Visible="@progressVisible" Value="@uploadProgress"/>
@@ -228,6 +276,13 @@
                 <p class="@alertCssClass(isRequestTextOk)" >
                 Текст запроса:  <b class="text-muted">@requestTextCheckResult</b></p>
 
+            @if (reportRequestType == ReportRequestType.FileReport)
+            {
+                <p class="@alertCssClass(isTemplateFileLoaded)">
+                    Файл-шаблон: <b class="text-muted">@templateFileLoadedCheckResult</b>
+                </p>
+            }
+
                 @if (reportRequestType == ReportRequestType.SurveyReport)
                 {
                         <p class="@alertCssClass(isSurveyOptionsOk)" >
@@ -260,7 +315,8 @@
     private static Dictionary<int, string> DropDownText = new Dictionary<int, string>
     {
         {(int)ReportRequestType.TextOnlyReport, "Запрос текстовой информмации"},
-        {(int)ReportRequestType.SurveyReport, "Опрос"}
+        {(int)ReportRequestType.SurveyReport, "Опрос"},
+        {(int)ReportRequestType.FileReport, "Запрос файла"}
     };
 
     private void DropDownChanged(object selectedEntry)
@@ -272,6 +328,7 @@
         {
             SurveyRequest = new(){ Options = new()};
             TextRequest = null;
+            FileRequest = null;
         }
 
 
@@ -279,6 +336,14 @@
         {
             TextRequest = new() { Files = new() };
             SurveyRequest = null;
+            FileRequest = null;
+        }
+
+        if (reportRequestType == ReportRequestType.FileReport)
+        {
+            FileRequest = new();
+            SurveyRequest = null;
+            TextRequest = null;
         }
 
     }
@@ -301,6 +366,26 @@
     }
     #endregion
 
+    #region File
+    private ReportRequestWithFile? FileRequest { get; set; }
+
+    private void OnFileReportUploadComplete(UploadCompleteEventArgs args)
+    {
+        JsonDocument jsonDocument = args.JsonResponse;
+
+        var uploadedFile = jsonDocument.RootElement.Deserialize<ReportRequestTemplateFile> ();
+
+        if (uploadedFile is not null)
+            FileRequest.TemplateFile = uploadedFile;
+
+        upload.ClearFiles();
+        progressVisible = false;
+
+        NotificationService.Notify(NotificationSeverity.Success, "Файл загружен");
+    }
+
+    #endregion
+
 
     #region Text
     private ReportRequestText? TextRequest { get; set; }
@@ -317,7 +402,7 @@
 
     }
 
-    private void OnUploadComplete(UploadCompleteEventArgs args)
+    private void OnTextOnlyUploadComplete(UploadCompleteEventArgs args)
     {
         JsonDocument jsonDocument = args.JsonResponse;
 
@@ -344,9 +429,10 @@
     /// Удалить файл из списка и с сервера
     /// </summary>
     /// <param name="file"></param>
-    private void RemoveFile(ReportRequestFile file)
+    private void RemoveFile(ReportFileBase file)
     {
-        if (TextRequest?.Files is not null) TextRequest.Files.Remove(file);
+        if (TextRequest?.Files is not null) TextRequest.Files.Remove((ReportRequestFile)file);
+        if (FileRequest?.TemplateFile is not null) FileRequest.TemplateFile = null;
 
         FileService.DeleteFileFromFileSystem(file);
 
@@ -356,7 +442,7 @@
 
 
     #region Scheduller
-    
+
     private DateTime nonScheduledDeadline = DateTime.Now.Date.AddDays(1).AddHours(12).AddMinutes(30);
 
     private DateTime scheduledTime = default(DateTime).AddHours(12).AddMinutes(30);
@@ -380,6 +466,8 @@
                     return SurveyRequest?.IsSchedulledRequest ?? throw new NullReferenceException();
                 case ReportRequestType.TextOnlyReport:
                     return TextRequest?.IsSchedulledRequest ?? throw new NullReferenceException();
+                case ReportRequestType.FileReport:
+                    return FileRequest?.IsSchedulledRequest ?? throw new NullReferenceException();
                 default: throw new Exception("Не выбран тип отчета");
             }
         }
@@ -394,6 +482,11 @@
                 case ReportRequestType.TextOnlyReport:
                     if (TextRequest is null) throw new NullReferenceException();
                     TextRequest.IsSchedulledRequest = value;
+                    break;
+
+                case ReportRequestType.FileReport:
+                    if (FileRequest is null) throw new NullReferenceException();
+                    FileRequest.IsSchedulledRequest = value;
                     break;
 
                 default: throw new Exception("Не выбран тип отчета");
@@ -433,6 +526,9 @@
 
             case ReportRequestType.TextOnlyReport:
                 return TextRequest?.RequestTitle ?? string.Empty;
+
+            case ReportRequestType.FileReport:
+                return FileRequest?.RequestTitle ?? string.Empty;
         }
         return string.Empty;
     }
@@ -449,6 +545,9 @@
 
             case ReportRequestType.TextOnlyReport:
                 return TextRequest?.RequestText ?? string.Empty;
+
+            case ReportRequestType.FileReport:
+                return FileRequest?.RequestText ?? string.Empty;
         }
         return string.Empty;
     }
@@ -468,6 +567,9 @@
     //Периодичность - с расписанием
     private bool isReportScheduleTypeOk => new[] { 1, 2, 3 }.Contains(requestSchedule.ScheduleType);
     //private bool isReportScheduleTypeOk => (new[] { 1, 2, 3 }.Contains(reportSchedule.ScheduleType) && ());
+
+    private bool isTemplateFileLoaded => FileRequest.TemplateFile is not null;
+    private string templateFileLoadedCheckResult => (isTemplateFileLoaded) ? FileRequest.TemplateFile.FileOriginalName : "Не загружен файл-шаблон для отчета";
 
 
     private string scheduleTypeCheckResult()
@@ -502,10 +604,13 @@
         if (reportRequestType == ReportRequestType.SurveyReport) 
             final = final && isSurveyOptionsOk;
 
+        if (reportRequestType == ReportRequestType.FileReport)
+            final = final && isTemplateFileLoaded;
+
         if (isScheduledRequest) final = final && isReportScheduleTypeOk;
 
-        return !final;
 
+        return !final;
 
     }
 
@@ -547,6 +652,16 @@
 
                 ReportRequestService.CreateReportRequestText(TextRequest);
                 break;
+            case ReportRequestType.FileReport:
+                if (FileRequest is null) throw new NullReferenceException();
+
+                if (FileRequest.IsSchedulledRequest) FileRequest.ReportSchedule = requestSchedule;
+
+                AssignmentService.AddAssignmentsRange(FileRequest, SelectedDistricts.Select(distr => distr.ReportUser), nonScheduledDeadline);
+
+                ReportRequestService.CreateReportRequestwithFile(FileRequest);
+
+                break;
 
         }
 
@@ -558,7 +673,10 @@
                                     <RadzenButton Text="Ok" Click="() => ds.Close(true)" Class="mr-1" Style="width: 80px;" />
                                 </div>
                             </div>
-                        </div>);
+     </div>
+    );
+
+        NavigationManager.NavigateTo("reportrequestslist");
     }
 
     protected override async Task OnInitializedAsync()
@@ -566,24 +684,6 @@
         Districts = await DistrictService.GetDistrictsWithUsersAsync();
     }
 
-    void OnChange(string html)
-    {
-        var a = html;
-    }
-
-    void OnExecute(HtmlEditorExecuteEventArgs args)
-    {
-        var a = args.CommandName;
-    }
-
-    void OnPaste(HtmlEditorPasteEventArgs args)
-    {
-        var a = args.Html;
-    }
-
-    void Click(){
-
-    }
 
     void OnStepChange(int index)
     {

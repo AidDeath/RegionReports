@@ -62,6 +62,27 @@ namespace RegionReports.Services
             return uploadedFile;
         }
 
+
+        public async Task<ReportRequestTemplateFile> UploadTemplateFileAsync(IFormFile file)
+        {
+            var trustedFileName = Path.GetRandomFileName();
+
+            using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
+            await file.OpenReadStream().CopyToAsync(fs);
+
+            var uploadedFile = new ReportRequestTemplateFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
+
+            var fileExtension = Path.GetExtension(file.FileName);
+
+            if (fileExtension.Contains("xls")) uploadedFile.FileType = (int)UploadedFileType.Excel;
+            if (fileExtension.Contains("doc")) uploadedFile.FileType = (int)UploadedFileType.Word;
+            if (fileExtension.Contains("pdf")) uploadedFile.FileType = (int)UploadedFileType.Pdf;
+
+            if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
+
+            return uploadedFile;
+        }
+
         /// <summary>
         /// Синхронная загрузка нескольких файлов
         /// </summary>
@@ -132,14 +153,14 @@ namespace RegionReports.Services
 
         }
 
-        public void DeleteFileFromFileSystem(ReportRequestFile file)
+        public void DeleteFileFromFileSystem(ReportFileBase file)
         {
             var path = Path.Combine(FileStoragePath, file.FileUniqueName);
 
             if (File.Exists(path)) File.Delete(path);
         }
 
-        public async Task DownloadFileFromServer(ReportRequestFile requestFile)
+        public async Task DownloadFileFromServer(ReportFileBase requestFile)
         {
             var filePathWithUniqueName = Path.Combine(FileStoragePath, requestFile.FileUniqueName);
 
