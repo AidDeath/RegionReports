@@ -13,14 +13,14 @@ namespace RegionReports.Services
         private IJSObjectReference _imageStreamScript;
         private IJSObjectReference _fileDownloadScript;
         private IJSRuntime _jsRuntime;
-        private readonly PdfService _pdfService;
+        private readonly DocumentMergingService _mergingService;
         private readonly string FileStoragePath;
 
-        public FileService(IDbAccessor database, IJSRuntime jsRuntime, SettingsService settingsService, PdfService pdfService)
+        public FileService(IDbAccessor database, IJSRuntime jsRuntime, SettingsService settingsService, DocumentMergingService mergingService)
         {
             _jsRuntime = jsRuntime;
             _database = database;
-            _pdfService = pdfService;
+            _mergingService = mergingService;
             FileStoragePath = settingsService.GetFileStoragePath();
 
             Task.Run(() => LoadScripts());
@@ -199,6 +199,12 @@ namespace RegionReports.Services
 
         }
 
+        /// <summary>
+        /// Объединить все файлы из ответов в общий pdf  и отдать его на скачивание
+        /// </summary>
+        /// <param name="asnGroup"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task MergeAndDownloadPdf(ReportAssignmentGroup asnGroup)
         {
             var request = asnGroup.GetReportRequest();
@@ -209,8 +215,29 @@ namespace RegionReports.Services
 
             var paths = responseFiles.Select(file => Path.Combine(FileStoragePath, file.FileUniqueName));
 
-            using var streamRef = new DotNetStreamReference(_pdfService.GetMergedPdfStream(paths));
+            using var streamRef = new DotNetStreamReference(_mergingService.GetMergedPdfStream(paths));
                 await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.pdf", streamRef);
+        }
+
+
+        /// <summary>
+        /// Объединить все файлы из ответов в общий xls и отдать его на скачивание
+        /// </summary>
+        /// <param name="asnGroup"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task MergeAndDownloadExcel(ReportAssignmentGroup asnGroup)
+        {
+            var request = asnGroup.GetReportRequest();
+
+            if (request is not ReportRequestWithFile) throw new Exception("Неподходящий тип отчета");
+
+            var responseFiles = asnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Where(file => file.FileType == (int)UploadedFileType.Excel);
+
+            var paths = responseFiles.Select(file => Path.Combine(FileStoragePath, file.FileUniqueName));
+
+            using var streamRef = new DotNetStreamReference(_mergingService.GetMergedExcelStream(paths));
+                await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.xlsx", streamRef);
         }
 
     }

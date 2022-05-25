@@ -3,6 +3,7 @@
 @inject DialogService DialogService
 @inject AssignmentService AssignmentService
 @inject FileService FileService
+@inject NotificationService NotificationService
 
 <PageTitle>Отчеты пользователей</PageTitle>
 
@@ -172,8 +173,12 @@ else
 
                             if (Request is ReportRequestWithFile)
                             {
-                                <RadzenButton Icon="file_download" Click="@(() => FileService.MergeAndDownloadPdf(AsnGroup))" Text="Скачать общий pdf"
+                                <RadzenButton Icon="file_download" Click="@(() => DownloadMergedFile(AsnGroup, UploadedFileType.Pdf))" Text="Скачать общий pdf"
                                 Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Any(f => f.FileType == (int)UploadedFileType.Pdf) )"/>
+                                
+                                <RadzenButton Icon="file_download" Click="@(() => DownloadMergedFile(AsnGroup, UploadedFileType.Excel))" Text="Скачать общий xlsx"
+                                Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Any(f => f.FileType == (int)UploadedFileType.Excel) )"/>
+
                                 <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(AsnGroup.Assignments)" TItem="ReportAssignment" PageSize="10">
                                     <Template Context="assignment">
                                     @{
@@ -264,6 +269,30 @@ else
         return diagramSource;
     }
 
+    private async Task DownloadMergedFile(ReportAssignmentGroup asnGroup, UploadedFileType fileType)
+    {
+        try
+        {
+            switch (fileType)
+            {
+                case UploadedFileType.Excel:
+                    await FileService.MergeAndDownloadExcel(asnGroup);
+                    break;
+                case UploadedFileType.Pdf:
+                    await FileService.MergeAndDownloadPdf(asnGroup);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка при сборке общего файла", ex.GetBaseException().Message);
+        }
+    }
+
+
+
+
+
     /// <summary>
     /// Класс для представления на диаграмме результатов опроса
     /// </summary>
@@ -273,4 +302,6 @@ else
 
         public int CountAnswered { get; set; }
     }
+
+
 }
