@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegionReports.Data;
 
@@ -11,9 +12,10 @@ using RegionReports.Data;
 namespace RegionReports.Data.Migrations
 {
     [DbContext(typeof(RegionReportsContext))]
-    partial class RegionReportsContextModelSnapshot : ModelSnapshot
+    [Migration("20220526072717_added roles table")]
+    partial class addedrolestable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,40 +37,6 @@ namespace RegionReports.Data.Migrations
                     b.HasIndex("SchedulesId");
 
                     b.ToTable("DistrictReportSchedule");
-                });
-
-            modelBuilder.Entity("RegionReports.Data.Entities.AccessRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool>("IsAdministrator")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("WindowsRoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AccessRoles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsAdministrator = true,
-                            WindowsRoleName = "Everyone"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsAdministrator = true,
-                            WindowsRoleName = "Все"
-                        });
                 });
 
             modelBuilder.Entity("RegionReports.Data.Entities.District", b =>
@@ -853,6 +821,18 @@ namespace RegionReports.Data.Migrations
                             Id = 5,
                             AlowedMimeType = "application/pdf"
                         });
+                });
+
+            modelBuilder.Entity("RegionReports.Data.Entities.AccessRole", b =>
+                {
+                    b.Property<bool>("IsAdministrator")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("WindowsRoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("AccessRoles");
                 });
 
             modelBuilder.Entity("DistrictReportSchedule", b =>

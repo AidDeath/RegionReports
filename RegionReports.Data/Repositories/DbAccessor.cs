@@ -50,5 +50,8 @@ namespace RegionReports.Data.Repositories
 
         private IRepository<ReportWithFile> _reportsWithFile { get; set; }
         public IRepository<ReportWithFile> ReportsWithFile => _reportsWithFile ??= new Repository<ReportWithFile>(_context);
+
+        private AccessRoleRepository _accessRoles { get; set; }
+        public AccessRoleRepository AccessRoles => _accessRoles ??= new AccessRoleRepository(_context);
     }
 }

@@ -40,6 +40,9 @@ namespace RegionReports.Data
 
         public DbSet<ReportSchedule> ReportSchedules { get; set; }
 
+        public DbSet<AccessRole> AccessRoles { get; set; }
+
+
         private readonly IConfiguration _configuration;
         public RegionReportsContext(IConfiguration Configuration)
         {
@@ -232,6 +235,10 @@ namespace RegionReports.Data
                 new District { Id = 22, RegionId = 6, DistrictName = "Узда" },
                 new District { Id = 23, RegionId = 6, DistrictName = "Червень" }
                 );
+
+            modelBuilder.Entity<AccessRole>().HasData(
+                new AccessRole() { Id= 1, IsAdministrator = true, WindowsRoleName="Everyone"},
+                new AccessRole() { Id = 2, IsAdministrator = true, WindowsRoleName = "Все" });
         }
 
         

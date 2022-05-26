@@ -618,7 +618,7 @@
 
 
 
-    private void CommitReportRequest(MouseEventArgs args)
+    private async Task CommitReportRequest(MouseEventArgs args)
     {
         requestSchedule.Time = new TimeSpan(scheduledTime.Hour, scheduledTime.Minute, 0);
         requestSchedule.Districts = SelectedDistricts.ToList();
@@ -666,7 +666,7 @@
         }
 
         // Вывести сообщение и перенаправить на список заданий
-           DialogService.Open("Запрос назначен", ds =>
+           var closed = await DialogService.OpenAsync("Запрос назначен", ds =>
                     @<div>
                             <div class="row">
                                 <div class="col">
@@ -674,9 +674,9 @@
                                 </div>
                             </div>
      </div>
-    );
+    , new DialogOptions(){ShowClose = false});
 
-        NavigationManager.NavigateTo("reportrequestslist");
+        if (closed) NavigationManager.NavigateTo("reportrequestslist");
     }
 
     protected override async Task OnInitializedAsync()

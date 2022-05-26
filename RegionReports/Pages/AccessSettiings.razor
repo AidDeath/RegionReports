@@ -1,0 +1,250 @@
+﻿@page "/accesssettings"
+@inject SettingsService SettingsService
+@inject NotificationService NotificationService
+
+<PageTitle>Настройки доступа</PageTitle>
+
+<h3>Настройки доступа</h3>
+
+<div class="row">
+    <div class="col-md-6 col-lg-6">
+        <RadzenCard>
+            <h4 class="text-secondary">Доступ к администрированию есть у групп</h4>
+            <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" ButtonStyle="ButtonStyle.Secondary" Text="Добавить" Click="@InsertAdminRow" Disabled=@(roleToInsert != null) />
+            <RadzenDataGrid @ref="adminsGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                            Data="@adminRoles" TItem="AccessRole" RowUpdate="@OnUpdateAdminRow" EmptyText="Нет записей для отображения">
+                <Columns>
+                    <RadzenDataGridColumn TItem="AccessRole" Property="WindowsRoleName" Title="Группа безопасности windows">
+                        <EditTemplate Context="accessRole">
+                            <RadzenTextBox @bind-Value="accessRole.WindowsRoleName" Style="width:100%; display: block" Name="GroupName" />
+                            <RadzenRequiredValidator Text="Необходимо название группы" Component="GroupName" Popup="true" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AccessRole" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="120px">
+                        <Template Context="accessRole">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@(args => EditAdminRow(accessRole))" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="accessRole">
+                            <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Primary" Class="m-1" Click="@((args) => SaveAdminRow(accessRole))">
+                            </RadzenButton>
+                            <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@((args) => CancelAdminEdit(accessRole))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AccessRole" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                        <Template Context="accessRole">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteAdminRow(accessRole))" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="accessRole">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteAdminRow(accessRole))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </div>
+    <div class="col-md-6 col-lg-6">
+        <RadzenCard>
+            <h4 class="text-secondary">Доступ к отправке отчетов есть у групп</h4>
+            <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" ButtonStyle="ButtonStyle.Secondary" Text="Добавить" Click="@InsertNonAdminRow" Disabled=@(roleToInsert != null) />
+            <RadzenDataGrid @ref="nonAdminsGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                            Data="@nonAdminRoles" TItem="AccessRole" RowUpdate="@OnUpdateAdminRow" EmptyText="Не указано. Доступ разрешен всем.">
+                <Columns>
+                    <RadzenDataGridColumn TItem="AccessRole" Property="WindowsRoleName" Title="Группа безопасности windows">
+                        <EditTemplate Context="accessRole">
+                            <RadzenTextBox @bind-Value="accessRole.WindowsRoleName" Style="width:100%; display: block" Name="GroupName" />
+                            <RadzenRequiredValidator Text="Необходимо название группы" Component="GroupName" Popup="true" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AccessRole" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="120px">
+                        <Template Context="accessRole">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@(args => EditNonAdminRow(accessRole))" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="accessRole">
+                            <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Primary" Class="m-1" Click="@((args) => SaveNonAdminRow(accessRole))">
+                            </RadzenButton>
+                            <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@((args) => CancelNonAdminEdit(accessRole))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AccessRole" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                        <Template Context="accessRole">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteNonAdminRow(accessRole))" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="accessRole">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteNonAdminRow(accessRole))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </div>
+</div>
+<div>
+    <RadzenButton Text="Сохранить" Disabled=@(roleToInsert != null) class="my-2" Click="SaveChanges"/>
+</div>
+
+@code {
+    private IList<AccessRole> adminRoles { get; set; }
+    private IList<AccessRole> nonAdminRoles { get; set; }
+
+    RadzenDataGrid<AccessRole> adminsGrid;
+    RadzenDataGrid<AccessRole> nonAdminsGrid;
+
+    protected override void OnInitialized()
+    {
+        adminRoles = SettingsService.GetAccessRoles(true);
+        nonAdminRoles = SettingsService.GetAccessRoles(false);
+    }
+
+    #region Admin grid
+
+    async Task EditAdminRow(AccessRole accessRole)
+    {
+        await adminsGrid.EditRow(accessRole);
+    }
+
+    void OnUpdateAdminRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+    }
+
+    async Task SaveAdminRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        await adminsGrid.UpdateRow(accessRole);
+    }
+
+    void CancelAdminEdit(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        adminsGrid.CancelEditRow(accessRole);
+    }
+
+    async Task DeleteAdminRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        if (adminRoles.Contains(accessRole))
+        {
+
+            adminRoles.Remove(accessRole);
+
+            await adminsGrid.Reload();
+        }
+        else
+        {
+            adminsGrid.CancelEditRow(accessRole);
+        }
+    }
+
+    AccessRole? roleToInsert;
+
+    async Task InsertAdminRow()
+    {
+        roleToInsert = new AccessRole() { IsAdministrator = true };
+        adminRoles.Add(roleToInsert);
+        await adminsGrid.InsertRow(roleToInsert);
+    }
+    #endregion
+
+    #region NonAdmin grid
+
+    async Task EditNonAdminRow(AccessRole accessRole)
+    {
+        await nonAdminsGrid.EditRow(accessRole);
+    }
+
+    void OnUpdateNonAdminRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+    }
+
+    async Task SaveNonAdminRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        await nonAdminsGrid.UpdateRow(accessRole);
+    }
+
+    void CancelNonAdminEdit(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        nonAdminsGrid.CancelEditRow(accessRole);
+    }
+
+    async Task DeleteNonAdminRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        if (nonAdminRoles.Contains(accessRole))
+        {
+
+            nonAdminRoles.Remove(accessRole);
+
+            await nonAdminsGrid.Reload();
+        }
+        else
+        {
+            nonAdminsGrid.CancelEditRow(accessRole);
+        }
+    }
+
+    async Task InsertNonAdminRow()
+    {
+        roleToInsert = new AccessRole() { IsAdministrator = false };
+        nonAdminRoles.Add(roleToInsert);
+        await nonAdminsGrid.InsertRow(roleToInsert);
+    }
+    #endregion
+
+
+    private void SaveChanges(MouseEventArgs args)
+    {
+
+        try
+        {
+            var generalList = adminsGrid.Data.Concat(nonAdminsGrid.Data);
+            SettingsService.SaveAccessRoles(generalList);
+            NotificationService.Notify(NotificationSeverity.Success, "Изменения сохранены");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка сохранения", ex.GetBaseException().Message);
+        }
+    }
+
+}

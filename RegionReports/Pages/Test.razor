@@ -4,19 +4,145 @@
 @inject AssignmentService  AssignmentService
 @inject UserService UserService
 @inject DistrictService DistrictService
-@inject DocumentMergingService PdfService
+@inject SettingsService SettingsService
+
+
+    <RadzenButton Icon="add_circle_outline" style="margin-bottom: 10px" Text="Добавить" Click="@InsertRow" Disabled=@(roleToInsert != null) />
+    <RadzenDataGrid @ref="rolesGrid" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                Data="@adminRoles" TItem="AccessRole" RowUpdate="@OnUpdateRow">
+        <Columns>
+            <RadzenDataGridColumn TItem="AccessRole" Property="WindowsRoleName" Title="Группа безопасности windows">
+                <EditTemplate Context="userRole">
+                    <RadzenTextBox @bind-Value="userRole.WindowsRoleName" Style="width:100%; display: block" Name="GroupName" />
+                    <RadzenRequiredValidator Text="Необходимо название группы" Component="GroupName" Popup="true" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="AccessRole" Context="sampleBlazorModelsSampleOrder" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="120px">
+                <Template Context="userRole">
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@(args => EditRow(userRole))" @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="userRole">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Primary" Class="m-1" Click="@((args) => SaveRow(userRole))">
+                    </RadzenButton>
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Class="m-1" Click="@((args) => CancelEdit(userRole))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="AccessRole" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="60px">
+                <Template Context="userRole">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteRow(userRole))"  @onclick:stopPropagation="true">
+                    </RadzenButton>
+                </Template>
+                <EditTemplate Context="userRole">
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small" Class="m-1" Click="@(args => DeleteRow(userRole))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+
+
+
+
 
 <RadzenButton Click="@Do" Text="DoRoutine"/>
-   
 
 
 @code {
 
-
-
     private void Do(MouseEventArgs args)
     {
+        try
+        {
+            SettingsService.SaveAccessRoles(rolesGrid.Data);
+            NotificationService.Notify(NotificationSeverity.Success, "Изменения сохранены");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка сохранения", ex.GetBaseException().Message);
+        }
 
     }
+
+
+
+    RadzenDataGrid<AccessRole> rolesGrid;
+
+    IList<AccessRole> adminRoles;
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        adminRoles = SettingsService.GetAccessRoles(true);
+
+    }
+
+    async Task EditRow(AccessRole accessRole)
+    {
+        await rolesGrid.EditRow(accessRole);
+    }
+
+    void OnUpdateRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+    }
+
+    async Task SaveRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        await rolesGrid.UpdateRow(accessRole);
+    }
+
+    void CancelEdit(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        rolesGrid.CancelEditRow(accessRole);
+    }
+
+    async Task DeleteRow(AccessRole accessRole)
+    {
+        if (accessRole == roleToInsert)
+        {
+            roleToInsert = null;
+        }
+
+        if (adminRoles.Contains(accessRole))
+        {
+
+            adminRoles.Remove(accessRole);
+
+            await rolesGrid.Reload();
+        }
+        else
+        {
+            rolesGrid.CancelEditRow(accessRole);
+        }
+    }
+
+    AccessRole? roleToInsert;
+
+    async Task InsertRow()
+    {
+        roleToInsert = new AccessRole(){IsAdministrator = true};
+        adminRoles.Add(roleToInsert);
+        await rolesGrid.InsertRow(roleToInsert);
+    }
+
+
 
 }

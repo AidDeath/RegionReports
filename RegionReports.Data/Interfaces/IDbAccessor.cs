@@ -53,5 +53,8 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         public IRepository<ReportWithFile> ReportsWithFile { get; }
 
+
+        public AccessRoleRepository AccessRoles { get; }
+
     }
 }

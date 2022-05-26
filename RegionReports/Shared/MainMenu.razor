@@ -1,10 +1,12 @@
-﻿    <RadzenHeader>
+﻿@inject SettingsService SettingsService
+
+    <RadzenHeader>
       <ChildContent>
         <div class="row justify-content-start align-items-center">
           <div class="text-lg-right col-md-12  d-flex justify-content-center">
             <RadzenMenu style="display: flex; float: none; height: 51px; width: 760px">
               <ChildContent>
-                 <AuthorizeView Roles="RegionReportAdmins"> 
+                 <AuthorizeView Roles="@SettingsService.GetAdminAccessString(true)"> 
                     <RadzenMenuItem Icon="admin_panel_settings" Text="Администрирование">
                       <ChildContent>
                         <RadzenMenuItem Icon="book" Text="Справочники">
@@ -17,7 +19,7 @@
                             </RadzenMenuItem>
                             <RadzenMenuItem Icon="description" Text="Управление файлами">
                             </RadzenMenuItem>
-                            <RadzenMenuItem Icon="accessibility" Text="Настройки доступа">
+                            <RadzenMenuItem Icon="accessibility" Text="Настройки доступа" Path="accesssettings">
                             </RadzenMenuItem>
                           </ChildContent>
                         </RadzenMenuItem>
@@ -34,10 +36,13 @@
                       </ChildContent>
                     </RadzenMenuItem>
                 </AuthorizeView>
-                <RadzenMenuItem Icon="work_outline" Text="Мои отчеты" Path="usersreports">
-                </RadzenMenuItem>
-                <RadzenMenuItem Icon="account_box" Text="Кабинет" Path="userinfo">
-                </RadzenMenuItem>
+                <AuthorizeView Roles="@SettingsService.GetAdminAccessString(false)">
+                    <RadzenMenuItem Icon="work_outline" Text="Мои отчеты" Path="usersreports">
+                    </RadzenMenuItem>
+                    <RadzenMenuItem Icon="account_box" Text="Кабинет" Path="userinfo">
+                    </RadzenMenuItem>
+                </AuthorizeView>
+
               </ChildContent>
             </RadzenMenu>
           </div>
