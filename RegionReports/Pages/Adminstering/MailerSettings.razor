@@ -1,0 +1,165 @@
+﻿@page "/mailersettings"
+@inject MailerService MailerService 
+@inject NotificationService NotificationService
+
+<PageTitle>Настройка почты</PageTitle>
+
+<div >
+    <p>Текущий профиль:</p> <RadzenDropDown class="my-0" @ref="@profileSelectDropdown" Data="mailerProfiles" Placeholder="default"
+    TValue="MailerProfile" TextProperty="ProfileName"/>
+</div>
+
+
+
+@if(activeProfile is not null)
+{
+<RadzenTemplateForm TItem="MailerProfile" Data="@activeProfile" Submit="OnSubmit"> 
+    <div class="row">
+        <RadzenFieldset class="col-md-6 col-lg-6" Text="Настройки почтового сервера">
+            <div class="row my-1">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Почтовый сервер" Component="MailServer"/>
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox style="width: 100%;" Name="MailServer" Value="@activeProfile.MailServer"/>
+                    <RadzenRequiredValidator Component="MailServer" Text="Не может быть пустым" Popup="true"/>
+                </div>
+            </div>
+
+            <div class="row my-1">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Порт сервера" Component="MailServerPort"/>
+                </div>
+                <div class="col-md-8">
+                    <RadzenNumeric Min="1" Max="65535" ShowUpDown=false style="width: 100%;" Name="MailServerPort" Value="@activeProfile.MailServerPort"/>
+                    <RadzenRequiredValidator Component="MailServerPort" Text="Не может быть пустым" Popup="true"/>
+                </div>
+            </div>
+
+            <div class="row my-1">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Учетная запись для отправки" Component="MailerLogin"/>
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox style="width: 100%;" Name="MailerLogin" Value="@activeProfile.MailerLogin"/>
+                    <RadzenRequiredValidator Component="MailerLogin" Text="Не может быть пустым" Popup="true"/>
+                    <RadzenEmailValidator Component="MailerLogin" Text="Должен быть в формате email" Popup="true"/>
+                </div>
+            </div>
+
+            <div class="row my-1">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Пароль учетной записи" Component="MailerPassword"/>
+                </div>
+                <div class="col-md-8">
+                    <RadzenPassword style="width: 100%;" Name="MailerPassword" Value="@activeProfile.MailerPassword"/>
+                    <RadzenRequiredValidator Component="MailerPassword" Text="Не может быть пустым" Popup="true"/>
+                </div>
+            </div>
+        </RadzenFieldset>
+
+        <RadzenFieldset class="col-md-6 col-lg-6" Text="Настройки оповещений">
+            <div class="row my-1">
+                <div class="col-md-6 align-items-center d-flex">
+                    <RadzenLabel Text="Оповещать о новом назначении отчета" Component="SendAboutAssignment"/>
+                </div>
+                <div class="col">
+                    <RadzenSwitch Value="@activeProfile.SendAboutAssignment" Name="SendAboutAssignment" ValueChanged="@((arg) => activeProfile.SendAboutAssignment = arg )"/>
+                </div>
+            </div>
+            
+            <div class="row my-1">
+                <div class="col-md-6 align-items-center d-flex">
+                    <RadzenLabel Text="Напоминать о скором истечении срока отчета" Component="SendAboutNearDeadline"/>
+                </div>
+                <div class="col">
+                    <RadzenSwitch Value="@activeProfile.SendAboutNearDeadline" Name="SendAboutNearDeadline" ValueChanged="@((arg) => activeProfile.SendAboutNearDeadline = arg )"/>
+                </div>
+            </div>
+
+            @if(activeProfile.SendAboutNearDeadline)
+            {
+                <RadzenCard>
+                    <h3>Время до напоминания</h3>
+                    <div class="row my-1">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Ежемесячный,  дней" Component="DaysMonthlySending"/>
+                        </div>
+                        <div class="col">
+                            <RadzenNumeric Min="1" Max="27" ShowUpDown="false" Value="@activeProfile.DaysMonthlySending" Name="DaysMonthlySending"/>
+                             <RadzenRequiredValidator Component="DaysMonthlySending" Text="Не может быть пустым" Popup="true"/>
+                        </div>
+                    </div> 
+
+                    <div class="row my-1">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Еженедельный,  дней" Component="DaysBeforeWeeklySending"/>
+                        </div>
+                        <div class="col">
+                            <RadzenNumeric Min="1" Max="6" ShowUpDown="false" Value="@activeProfile.DaysBeforeWeeklySending" Name="DaysBeforeWeeklySending"/>
+                            <RadzenRequiredValidator Component="DaysBeforeWeeklySending" Text="Не может быть пустым" Popup="true"/>
+                        </div>
+                    </div> 
+
+                    <div class="row my-1">
+                        <div class="col-md-4 align-items-center d-flex">
+                            <RadzenLabel Text="Ежедневный,  часов" Component="HoursBeforeDailySending"/>
+                        </div>
+                        <div class="col">
+                            <RadzenNumeric Min="1" Max="23" ShowUpDown="false" Value="@activeProfile.HoursBeforeDailySending" Name="HoursBeforeDailySending"/>
+                            <RadzenRequiredValidator Component="HoursBeforeDailySending" Text="Не может быть пустым" Popup="true"/>
+                        </div>
+                    </div> 
+                </RadzenCard>
+
+            }
+
+            <div class="row my-1">
+                <div class="col-md-6 align-items-center d-flex">
+                    <RadzenLabel Text="Уведомлять о пропущенном сроке предоставления отчета" Component="SendAboutOverdue"/>
+                </div>
+                <div class="col">
+                    <RadzenSwitch Value="@activeProfile.SendAboutOverdue" Name="SendAboutOverdue" ValueChanged="@((arg) => activeProfile.SendAboutOverdue = arg )"/>
+                </div>
+            </div>
+            </RadzenFieldset>
+    </div>
+
+    <RadzenButton Click="@test" ButtonType="ButtonType.Submit" Text="Сохранить изменения"></RadzenButton>
+</RadzenTemplateForm>   
+}
+
+
+
+
+@code {
+    private RadzenDropDown<MailerProfile> profileSelectDropdown;
+    private IEnumerable<MailerProfile> mailerProfiles;
+
+    private MailerProfile activeProfile => mailerProfiles.FirstOrDefault(prof => prof.IsProfileActive);
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        mailerProfiles = MailerService.GetAllMailerProfiles();
+    }
+
+    private void test(MouseEventArgs args)
+    {
+        var a = mailerProfiles;
+    }
+
+    private void OnSubmit(MailerProfile mailerProfile)
+    {
+        try
+        {
+            MailerService.UpdateMailerProfile(mailerProfile);
+            NotificationService.Notify(NotificationSeverity.Success, "Настройки сохранены");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Ошибка", ex.GetBaseException().Message);
+        }
+
+    }
+}

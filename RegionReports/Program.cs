@@ -40,6 +40,7 @@ builder.Services.AddScoped<DocumentMergingService>();
 builder.Services.AddTransient<SettingsService>();
 
 builder.Services.AddHostedService<SchedulerService>();
+builder.Services.AddScoped<MailerService>();
 
 var app = builder.Build();
 

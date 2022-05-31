@@ -53,8 +53,15 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         public IRepository<ReportWithFile> ReportsWithFile { get; }
 
-
+        /// <summary>
+        /// Назначение ролей, которым доступно приложение
+        /// </summary>
         public AccessRoleRepository AccessRoles { get; }
+
+        /// <summary>
+        /// Профили настроек электронной почты
+        /// </summary>
+        public IRepository<MailerProfile> MailerProfiles { get; }
 
     }
 }

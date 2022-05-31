@@ -42,6 +42,8 @@ namespace RegionReports.Data
 
         public DbSet<AccessRole> AccessRoles { get; set; }
 
+        public DbSet<MailerProfile> MailersProfiles { get; set; }
+
 
         private readonly IConfiguration _configuration;
         public RegionReportsContext(IConfiguration Configuration)
@@ -239,6 +241,7 @@ namespace RegionReports.Data
             modelBuilder.Entity<AccessRole>().HasData(
                 new AccessRole() { Id= 1, IsAdministrator = true, WindowsRoleName="Everyone"},
                 new AccessRole() { Id = 2, IsAdministrator = true, WindowsRoleName = "Все" });
+
         }
 
         

@@ -53,5 +53,8 @@ namespace RegionReports.Data.Repositories
 
         private AccessRoleRepository _accessRoles { get; set; }
         public AccessRoleRepository AccessRoles => _accessRoles ??= new AccessRoleRepository(_context);
+
+        private IRepository<MailerProfile> _mailerProfiles { get; set; }
+        public IRepository<MailerProfile> MailerProfiles => _mailerProfiles ??= new Repository<MailerProfile>(_context);
     }
 }

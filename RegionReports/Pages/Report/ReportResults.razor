@@ -269,7 +269,18 @@ else
         return diagramSource;
     }
 
-    private async Task DownloadMergedFile(ReportAssignmentGroup asnGroup, UploadedFileType fileType)
+    /// <summary>
+    /// Класс для представления на диаграмме результатов опроса
+    /// </summary>
+    private class SurveyDiagramSource
+    {
+        public string ResponseOptionText { get; set; }
+
+        public int CountAnswered { get; set; }
+    }
+
+
+        private async Task DownloadMergedFile(ReportAssignmentGroup asnGroup, UploadedFileType fileType)
     {
         try
         {
@@ -288,20 +299,5 @@ else
             NotificationService.Notify(NotificationSeverity.Error, "Ошибка при сборке общего файла", ex.GetBaseException().Message);
         }
     }
-
-
-
-
-
-    /// <summary>
-    /// Класс для представления на диаграмме результатов опроса
-    /// </summary>
-    private class SurveyDiagramSource
-    {
-        public string ResponseOptionText { get; set; }
-
-        public int CountAnswered { get; set; }
-    }
-
 
 }
