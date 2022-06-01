@@ -68,12 +68,12 @@ else
                             </Columns>
                         </RadzenDataGrid>
                     </RadzenTabsItem>
-                    <RadzenTabsItem Text="Ответы">
+                    <RadzenTabsItem Text="Ответы" Disabled="@(SelectedGroups.FirstOrDefault() == null)">
                         @{
                             var AsnGroup = SelectedGroups.FirstOrDefault();
                             var Request = AsnGroup.GetReportRequest();
 
-                            if (Request is ReportRequestSurvey)
+                            if (Request is ReportRequestSurvey && AsnGroup is not null)
                             {
                                 <div>
                                     <RadzenSwitch ValueExpression="@(() => showDetailedSurveyResponse)" Value="@showDetailedSurveyResponse"
@@ -131,7 +131,7 @@ else
                                                             }
                                                         </div>
                                                         <div class="col-9">
-                                                            @opt.ReportRequestSurveyOption.OptionName
+                                                            @opt.ReportRequestSurveyOption?.OptionName
                                                         </div>
                                                     </div>
                                                 }
@@ -150,7 +150,7 @@ else
 
                             }
 
-                            if (Request is ReportRequestText)
+                            if (Request is ReportRequestText && AsnGroup is not null)
                             {
                                 <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(AsnGroup.Assignments)" TItem="ReportAssignment" PageSize="10">
                                     <Template Context="assignment">
@@ -171,13 +171,13 @@ else
                                 </RadzenDataList>
                             }
 
-                            if (Request is ReportRequestWithFile)
+                            if (Request is ReportRequestWithFile && AsnGroup is not null) 
                             {
                                 <RadzenButton Icon="file_download" Click="@(() => DownloadMergedFile(AsnGroup, UploadedFileType.Pdf))" Text="Скачать общий pdf"
-                                Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Any(f => f.FileType == (int)UploadedFileType.Pdf) )"/>
+                                Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile?.ResponseFile).Any(f => f?.FileType == (int)UploadedFileType.Pdf) )"/>
                                 
                                 <RadzenButton Icon="file_download" Click="@(() => DownloadMergedFile(AsnGroup, UploadedFileType.Excel))" Text="Скачать общий xlsx"
-                                Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile.ResponseFile).Any(f => f.FileType == (int)UploadedFileType.Excel) )"/>
+                                Visible="@(@AsnGroup.Assignments.Select(asn => asn.ReportWithFile?.ResponseFile).Any(f => f?.FileType == (int)UploadedFileType.Excel) )"/>
 
                                 <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(AsnGroup.Assignments)" TItem="ReportAssignment" PageSize="10">
                                     <Template Context="assignment">

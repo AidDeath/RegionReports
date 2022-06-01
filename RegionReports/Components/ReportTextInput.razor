@@ -5,7 +5,7 @@
         </h4>
     </HeaderTemplate>
     <ChildContent>
-        <RadzenHtmlEditor Value="@reportText.RepsonseString" style="height: 300px; margin-bottom: 1rem;">
+        <RadzenHtmlEditor @bind-Value="@reportText.RepsonseString" style="height: 300px; margin-bottom: 1rem;">
                 <RadzenHtmlEditorUndo Title="Отменить"/>
                 <RadzenHtmlEditorRedo Title="Повторить"/>
                 <RadzenHtmlEditorFontName Title="Шрифт"/> 
@@ -29,7 +29,7 @@
 </RadzenPanel>
 
 
-<RadzenButton Text="Отправить ответ" Click="@(() => Submit())" Disabled="@isTextNotFilled"/>
+<RadzenButton Text="Отправить ответ" Click="@(() => Submit())" Disabled=@(string.IsNullOrEmpty(reportText.RepsonseString))/>
 
 @code {
 
@@ -37,6 +37,11 @@
     public ReportAssignment ReportAssignment { get; set; }
 
     private ReportText reportText = new();
+
+    public ReportTextInput()
+    {
+        reportText = new();
+    }
 
     private bool isTextNotFilled => string.IsNullOrEmpty(reportText.RepsonseString);
 
