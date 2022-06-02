@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     public abstract class ReportRequestBase
     {
@@ -22,7 +16,7 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Назначения этого отчета для пользователей
         /// </summary>
-        public List<ReportAssignmentGroup> AssignmentsGroups { get; set; } = new ();
+        public List<ReportAssignmentGroup> AssignmentsGroups { get; set; } = new();
 
         public string WhenToCollect()
         {
@@ -36,13 +30,14 @@ namespace RegionReports.Data.Entities
             {
                 case 1:
                     return $"Ежемесячно, до {ReportSchedule.DayOfMonth} числа, до {ReportSchedule.Time.Hours:00}:{ReportSchedule.Time.Minutes:00}";
+
                 case 2:
                     return $"Еженедельно, {daysDictionary[ReportSchedule.DayOfWeek ?? 0]}, до {ReportSchedule.Time.Hours:00}:{ReportSchedule.Time.Minutes:00}";
+
                 case 3:
                     return $"Ежедневно до {ReportSchedule.Time.Hours:00}:{ReportSchedule.Time.Minutes:00}";
             }
             return string.Empty;
-
         }
 
         private Dictionary<short, string> daysDictionary = new()

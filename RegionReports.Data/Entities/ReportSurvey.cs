@@ -7,12 +7,10 @@ namespace RegionReports.Data.Entities
     /// </summary>
     public class ReportSurvey : ReportBase, IReport
     {
-
         /// <summary>
         /// Отмеченные пользователем пункты опроса
         /// </summary>
         public List<ReportSurveyOption> ProcessedOptions { get; set; } = new List<ReportSurveyOption>();
-
     }
 
     public class ReportSurveyOption
@@ -23,17 +21,16 @@ namespace RegionReports.Data.Entities
 
         public ReportSurvey? ReportSurvey { get; set; }
 
-
         /// <summary>
         /// Выбран ли этот конкретный пункт пользователем при заполнении опроса
         /// </summary>
         public bool Checked { get; set; } = false;
 
         public int ReportRequestSurveyOptionId { get; set; }
+
         /// <summary>
         /// Вариант выбора из задания
         /// </summary>
         public ReportRequestSurveyOption? ReportRequestSurveyOption { get; set; }
-
     }
 }

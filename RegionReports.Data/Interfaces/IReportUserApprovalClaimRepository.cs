@@ -17,6 +17,5 @@ namespace RegionReports.Data.Interfaces
         /// <param name="userId">Идентификатор пользователя</param>
         /// <returns></returns>
         IEnumerable<ReportUserApprovalClaim> GetAllClaimsForUser(int userId);
-        
     }
 }

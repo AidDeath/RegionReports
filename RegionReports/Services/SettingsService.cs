@@ -1,6 +1,6 @@
-﻿using RegionReports.Data.Interfaces;
+﻿using RegionReports.Data;
 using RegionReports.Data.Entities;
-using RegionReports.Data;
+using RegionReports.Data.Interfaces;
 
 namespace RegionReports.Services
 {
@@ -25,7 +25,6 @@ namespace RegionReports.Services
         {
             var a = _database.UploadableFileTypes.GetQueryable();
             return a.ToList().Select(mime => mime.AlowedMimeType).Aggregate((s1, s2) => s1 + ',' + s2);
-
         }
 
         public List<AccessRole> GetAccessRoles(bool isAdmin)
@@ -46,11 +45,10 @@ namespace RegionReports.Services
                 .Where(acc => acc.IsAdministrator == isAdmin)
                 .Select(acc => acc.WindowsRoleName)
                 .ToList();
-            var result =  (roles.Count > 1) ? roles.Aggregate((a, b) => $"{a}, {b}") : roles.FirstOrDefault();
+            var result = (roles.Count > 1) ? roles.Aggregate((a, b) => $"{a}, {b}") : roles.FirstOrDefault();
 
             if (!isAdmin && string.IsNullOrEmpty(result)) return "Everyone, Все";
             return result;
         }
-
     }
 }

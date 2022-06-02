@@ -10,7 +10,7 @@ namespace RegionReports.Data.Interfaces
         public ReportUserRepository ReportUsers { get; }
 
         public IRepository<District> Districts { get; }
-        
+
         public IReportUserApprovalClaimRepository ReportUserApprovalClaims { get; }
 
         public IRepository<ReportRequestSurvey> ReportRequestsSurvey { get; }
@@ -28,11 +28,12 @@ namespace RegionReports.Data.Interfaces
         /// Результаты отчета - текст
         /// </summary>
         public IRepository<ReportText> ReportsText { get; }
+
         /// <summary>
         /// Результаты отчета - опроса
         /// </summary>
         public IRepository<ReportSurvey> ReportsSurvey { get; }
-        
+
         /// <summary>
         /// Расписания отчетов
         /// </summary>
@@ -62,6 +63,5 @@ namespace RegionReports.Data.Interfaces
         /// Профили настроек электронной почты
         /// </summary>
         public IRepository<MailerProfile> MailerProfiles { get; }
-
     }
 }

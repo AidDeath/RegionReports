@@ -1,10 +1,5 @@
 ﻿using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RegionReports.Data.Repositories
 {
@@ -20,6 +15,7 @@ namespace RegionReports.Data.Repositories
                 ent.Id = 0;
             base.CreateRange(entities);
         }
+
         public void Clear()
         {
             Context.RemoveRange(Context.AccessRoles);

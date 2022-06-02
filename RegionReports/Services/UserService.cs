@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegionReports.Data.Entities;
-using RegionReports.Data.Exceptions;
 using RegionReports.Data.Interfaces;
 using RegionReports.Exceptions;
 
@@ -11,6 +10,7 @@ namespace RegionReports.Services
         private readonly string _currentUserName;
         private readonly HttpContext _httpContext;
         private readonly IDbAccessor _database;
+
         public UserService(IHttpContextAccessor httpContextAccessor, IDbAccessor database)
         {
             _currentUserName = httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? throw new UserIdentityRetrreivalException();
@@ -44,7 +44,6 @@ namespace RegionReports.Services
         {
             if (!_database.ReportUsers.GetQueryable().Any(u => u.WindowsUserName == _currentUserName))
                 await _database.ReportUsers.CreateAsync(new ReportUser { WindowsUserName = _currentUserName });
-
         }
 
         /// <summary>
@@ -53,7 +52,6 @@ namespace RegionReports.Services
         /// <returns>Объект ReportUser текущего пользователя</returns>
         public ReportUser GetCurrentUserWithClaims()
         {
-
             var userModel = _database.ReportUsers.GetQueryable()
                 .Where(u => u.WindowsUserName == _currentUserName)
                 .Include(u => u.RelatedDistrict)
@@ -70,7 +68,6 @@ namespace RegionReports.Services
         /// <returns>Объект ReportUser текущего пользователя</returns>
         public async Task<ReportUser> GetCurrentUserWithClaimsAsync()
         {
-
             var userModel = await _database.ReportUsers.GetQueryable()
                 .Where(u => u.WindowsUserName == _currentUserName)
                 .Include(u => u.RelatedDistrict)
@@ -106,7 +103,6 @@ namespace RegionReports.Services
 
             foreach (var groupSid in groupSids)
             {
-
                 try
                 {
                     result.Add(new System.Security.Principal.SecurityIdentifier(groupSid).Translate(typeof(System.Security.Principal.NTAccount)).ToString());
@@ -115,7 +111,6 @@ namespace RegionReports.Services
                 {
                     continue;
                 }
-                    
             }
 
             return result;
@@ -134,7 +129,6 @@ namespace RegionReports.Services
         /// <returns></returns>
         public ReportUser CreateNewApprovalClaim(ReportUser? actualUser, ReportUser tempData)
         {
-
             if (actualUser is null) actualUser = GetCurrentUserModel();
 
             var newClaim = new ReportUserApprovalClaim
@@ -161,7 +155,7 @@ namespace RegionReports.Services
         /// </summary>
         /// <param name="claim"></param>
         /// <returns></returns>
-        public bool RevokeApprovalClaim(ReportUserApprovalClaim claim) 
+        public bool RevokeApprovalClaim(ReportUserApprovalClaim claim)
         {
             try
             {
@@ -189,7 +183,7 @@ namespace RegionReports.Services
         /// <returns>Если район занят - возвращает пользователя, которым занят. Если нет - null</returns>
         public ReportUser? CheckIfDistrictAssigned(District district)
         {
-            var current = _database.Districts.GetQueryable().Include(d => d.ReportUser).FirstOrDefault(d =>d.Id == district.Id);
+            var current = _database.Districts.GetQueryable().Include(d => d.ReportUser).FirstOrDefault(d => d.Id == district.Id);
 
             if (current?.ReportUser is not null)
             {
@@ -206,7 +200,6 @@ namespace RegionReports.Services
         /// <returns></returns>
         public ReportUserApprovalClaim AcceptApprovalClaim(ReportUserApprovalClaim claim)
         {
-
             claim.ReportUser.TakeSuggestedChanges(claim);
             claim.ReportUser.IsApproved = true;
             claim.IsClaimProcessed = true;
@@ -222,7 +215,7 @@ namespace RegionReports.Services
         /// <returns></returns>
         public IEnumerable<ReportUser> GetAllUsersWithDistricts(bool approvedOnly = false)
         {
-            if (approvedOnly) return _database.ReportUsers.GetQueryable().Where(u => u.IsApproved ).Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
+            if (approvedOnly) return _database.ReportUsers.GetQueryable().Where(u => u.IsApproved).Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
 
             return _database.ReportUsers.GetQueryable().Include(u => u.RelatedDistrict).OrderBy(u => u.FullName).AsEnumerable();
         }
@@ -250,7 +243,6 @@ namespace RegionReports.Services
 
         public ReportUser UpdateUserData(ReportUser actualUser, ReportUser tempData)
         {
-
             actualUser.FullName = tempData.FullName;
             actualUser.Email = tempData.Email;
             actualUser.RelatedDistrict = tempData.RelatedDistrict;
@@ -264,7 +256,6 @@ namespace RegionReports.Services
                     claim.IsClaimProcessed = true;
                     _database.ReportUserApprovalClaims.Update(claim);
                 }
-
             }
             actualUser.IsApproved = tempData.IsApproved;
 

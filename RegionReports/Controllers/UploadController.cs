@@ -5,9 +5,9 @@ namespace RegionReports.Controllers
 {
     public partial class UploadController : Controller
     {
-
         private FileService _fileService;
         private readonly long _maxFileSize;
+
         public UploadController(FileService fileService, SettingsService settingsService)
         {
             _fileService = fileService;
@@ -29,7 +29,6 @@ namespace RegionReports.Controllers
             }
         }
 
-        
         [HttpPost("upload/singletemplate")]
         public async Task<IActionResult> SingleTemplate(IFormFile file)
         {
@@ -45,7 +44,6 @@ namespace RegionReports.Controllers
             }
         }
 
-        
         [HttpPost("upload/singlefileresponse")]
         public async Task<IActionResult> SingleResponse(IFormFile file)
         {

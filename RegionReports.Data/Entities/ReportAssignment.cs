@@ -1,7 +1,7 @@
-﻿
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
 #nullable disable
+
     public class ReportAssignment
     {
         public int Id { get; set; }
@@ -9,14 +9,15 @@ namespace RegionReports.Data.Entities
         public int ReportUserId { get; set; }
         public ReportUser ReportUser { get; set; }
 
-
         public int? ReportSurveyId { get; set; }
+
         /// <summary>
         /// Ответы на опрос
         /// </summary>
         public ReportSurvey? ReportSurvey { get; set; }
 
         public int? ReportTextId { get; set; }
+
         /// <summary>
         /// Ответ на текстовый запрос
         /// </summary>
@@ -29,7 +30,6 @@ namespace RegionReports.Data.Entities
         /// Сдан ли отчет по этому назначению
         /// </summary>
         public bool IsCompleted { get; set; } = false;
-
 
         /// <summary>
         /// Группа назначений отчета
@@ -46,7 +46,5 @@ namespace RegionReports.Data.Entities
 
             return null;
         }
-
-
     }
 }

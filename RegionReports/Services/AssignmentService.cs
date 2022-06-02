@@ -3,12 +3,12 @@ using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
 using RegionReports.Enums;
 
-
 namespace RegionReports.Services
 {
     public class AssignmentService
     {
         private readonly IDbAccessor _database;
+
         public AssignmentService(IDbAccessor database)
         {
             _database = database;
@@ -21,8 +21,8 @@ namespace RegionReports.Services
         /// <param name="usersToAssign"></param>
         public void AddAssignmentsRange(ReportRequestBase request, IEnumerable<ReportUser>? usersToAssign, DateTime nonScheduledDeadline = default(DateTime))
         {
-            DateTime calculatedDeadline = (request.IsSchedulledRequest) 
-                ? GetDeadlineDate(request.ReportSchedule) 
+            DateTime calculatedDeadline = (request.IsSchedulledRequest)
+                ? GetDeadlineDate(request.ReportSchedule)
                 : nonScheduledDeadline;
 
             var newGroup = new ReportAssignmentGroup()
@@ -32,7 +32,6 @@ namespace RegionReports.Services
                 ActualDeadline = calculatedDeadline,
                 Assignments = new()
             };
-
 
             foreach (var user in usersToAssign)
             {
@@ -67,7 +66,6 @@ namespace RegionReports.Services
 
             return query.ToList();
         }
-
 
         /// <summary>
         /// Получить все группы назначений, срок сбора по которым истек
@@ -111,7 +109,6 @@ namespace RegionReports.Services
                 .Include(ass => ass.ReportText)
                 .Include(asn => asn.ReportWithFile)
                 .OrderByDescending(rep => rep.ReportAssignmentGroup.DateAssigned);
-
 
             return (uncompetedOnly)
                 ? query.Where(ass => ass.ReportUser == user && !ass.IsCompleted).ToList()
@@ -162,23 +159,26 @@ namespace RegionReports.Services
                         ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, dayForCurrentMonth)
                         : new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, dayForNextMonth);
                     break;
+
                 case ReportScheduleType.Еженедельный:
                     calculatedDeadline = DateTime.Today;
-                    while ((short)calculatedDeadline.DayOfWeek != schedule.DayOfWeek )
+                    while ((short)calculatedDeadline.DayOfWeek != schedule.DayOfWeek)
                     {
                         calculatedDeadline = calculatedDeadline.AddDays(1);
                     }
-                    
+
                     if (calculatedDeadline.Date == DateTime.Today && DateTime.Now.TimeOfDay > schedule.Time)
                     {
                         calculatedDeadline = calculatedDeadline.AddDays(7);
                     }
                     break;
+
                 case ReportScheduleType.Ежедневный:
                     calculatedDeadline = (DateTime.Now.TimeOfDay < schedule.Time)
                         ? DateTime.Now.Date
                         : DateTime.Now.Date.AddDays(1);
                     break;
+
                 default: throw new Exception("В расписании не указан тип расписания");
             }
 
@@ -196,6 +196,5 @@ namespace RegionReports.Services
         {
             _database.AssignmentGroups.Update(asnGroup);
         }
-
     }
 }

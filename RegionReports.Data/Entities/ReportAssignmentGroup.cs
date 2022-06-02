@@ -1,6 +1,6 @@
 ﻿namespace RegionReports.Data.Entities
 {
-    public  class ReportAssignmentGroup
+    public class ReportAssignmentGroup
     {
         public int Id { get; set; }
 
@@ -34,7 +34,6 @@
             if (ReportRequestWithFile is not null) return ReportRequestWithFile;
 
             return null;
-
         }
 
         public string GetRequestTypeName()
@@ -45,10 +44,7 @@
             if (ReportRequestSurvey is not null) return "Запрос отчета";
             if (ReportRequestWithFile is not null) return "Запрос с файлом";
 
-
             return string.Empty;
         }
-
-
     }
 }

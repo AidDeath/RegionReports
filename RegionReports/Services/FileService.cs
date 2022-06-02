@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
@@ -25,19 +24,19 @@ namespace RegionReports.Services
 
             Task.Run(() => LoadScripts());
         }
-        
+
         private async Task LoadScripts()
         {
             _imageStreamScript = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/SetImgFromStream.js");
             _fileDownloadScript = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", @"/js/FileStreamDownload.js");
         }
 
-
         public void UploadFile(IBrowserFile file)
         {
-             using FileStream fs = new("uploadedfile.tst", FileMode.Create);
-                 file.OpenReadStream(file.Size).CopyTo(fs);
+            using FileStream fs = new("uploadedfile.tst", FileMode.Create);
+            file.OpenReadStream(file.Size).CopyTo(fs);
         }
+
         public async Task UploadFileAsync(IBrowserFile file)
         {
             await using FileStream fs = new("uploaded.tst", FileMode.Create);
@@ -49,7 +48,7 @@ namespace RegionReports.Services
             var trustedFileName = Path.GetRandomFileName();
 
             using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
-                await file.OpenReadStream().CopyToAsync(fs);
+            await file.OpenReadStream().CopyToAsync(fs);
 
             var uploadedFile = new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
 
@@ -63,7 +62,6 @@ namespace RegionReports.Services
 
             return uploadedFile;
         }
-
 
         public async Task<ReportRequestTemplateFile> UploadTemplateFileAsync(IFormFile file)
         {
@@ -119,7 +117,7 @@ namespace RegionReports.Services
                 var trustedFileName = Path.GetRandomFileName();
 
                 using FileStream fs = new(Path.Combine(FileStoragePath, trustedFileName), FileMode.Create);
-                    file.OpenReadStream().CopyToAsync(fs);
+                file.OpenReadStream().CopyToAsync(fs);
 
                 var uploadedFile = new ReportRequestFile() { FileUniqueName = trustedFileName, FileOriginalName = file.FileName };
 
@@ -131,13 +129,10 @@ namespace RegionReports.Services
 
                 if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
 
-
                 fileList.Add(uploadedFile);
-
             }
 
             return fileList;
-
         }
 
         /// <summary>
@@ -163,16 +158,13 @@ namespace RegionReports.Services
                 if (fileExtension.Contains("xls")) uploadedFile.FileType = (int)UploadedFileType.Excel;
                 if (fileExtension.Contains("doc")) uploadedFile.FileType = (int)UploadedFileType.Word;
                 if (fileExtension.Contains("pdf")) uploadedFile.FileType = (int)UploadedFileType.Pdf;
-                
+
                 if (uploadedFile.FileType == 0) uploadedFile.FileType = (int)UploadedFileType.Other;
 
-
                 fileList.Add(uploadedFile);
-
             }
 
             return fileList;
-
         }
 
         public void DeleteFileFromFileSystem(ReportFileBase file)
@@ -193,10 +185,9 @@ namespace RegionReports.Services
                 {
                     using var streamRef = new DotNetStreamReference(fileStream);
                     //await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-                    await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream",  requestFile.FileOriginalName, streamRef);
+                    await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", requestFile.FileOriginalName, streamRef);
                 }
             }
-
         }
 
         /// <summary>
@@ -216,9 +207,8 @@ namespace RegionReports.Services
             var paths = responseFiles.Select(file => Path.Combine(FileStoragePath, file.FileUniqueName));
 
             using var streamRef = new DotNetStreamReference(_mergingService.GetMergedPdfStream(paths));
-                await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.pdf", streamRef);
+            await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.pdf", streamRef);
         }
-
 
         /// <summary>
         /// Объединить все файлы из ответов в общий xls и отдать его на скачивание
@@ -237,8 +227,7 @@ namespace RegionReports.Services
             var paths = responseFiles.Select(file => Path.Combine(FileStoragePath, file.FileUniqueName));
 
             using var streamRef = new DotNetStreamReference(_mergingService.GetMergedExcelStream(paths));
-                await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.xlsx", streamRef);
+            await _fileDownloadScript.InvokeVoidAsync("downloadFileFromStream", $"Report_{asnGroup.ActualDeadline:d}.xlsx", streamRef);
         }
-
     }
 }

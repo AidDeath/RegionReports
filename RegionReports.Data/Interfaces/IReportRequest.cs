@@ -8,6 +8,7 @@ namespace RegionReports.Data.Interfaces
         /// Заголовок запроса
         /// </summary>
         public string RequestTitle { get; set; }
+
         /// <summary>
         /// Текст запроса
         /// </summary>
@@ -22,12 +23,12 @@ namespace RegionReports.Data.Interfaces
         /// Идентификатор расписания, если задано
         /// </summary>
         public int? ReportScheduleId { get; set; }
+
         public ReportSchedule? ReportSchedule { get; set; }
 
         /// <summary>
         /// Дата и время создания запроса
         /// </summary>
         public DateTime DateCreated { get; set; }
-
     }
 }

@@ -23,6 +23,5 @@ namespace RegionReports.Data.Repositories
             entity.LastChangesDate = DateTime.Now;
             base.Update(entity);
         }
-
     }
 }

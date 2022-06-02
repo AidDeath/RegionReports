@@ -13,12 +13,11 @@ namespace RegionReports.Data.Entities
         /// Возможность выбора нескольких пунктов
         /// </summary>
         public bool MultipleChoises { get; set; } = false;
-        
+
         /// <summary>
         /// Список вариантов ответа в опросе
         /// </summary>
         public List<ReportRequestSurveyOption> Options { get; set; } = new List<ReportRequestSurveyOption>();
-
     }
 
     /// <summary>
@@ -34,12 +33,10 @@ namespace RegionReports.Data.Entities
         public string OptionName { get; set; } = string.Empty;
 
         public int ReportRequestSurveyId { get; set; }
-        
+
         /// <summary>
-        /// Ссылка на запрос, к которому относится этот пункт 
+        /// Ссылка на запрос, к которому относится этот пункт
         /// </summary>
         public ReportRequestSurvey? ReportRequestSurvey { get; set; }
-
-
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Область
@@ -16,6 +10,5 @@ namespace RegionReports.Data.Entities
         public string RegionName { get; set; } = "";
 
         public List<District> Districts { get; set; } = new();
-
     }
 }

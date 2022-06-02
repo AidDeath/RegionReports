@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
-using RegionReports.Enums;
 
 namespace RegionReports.Services
 {
     public class ReportRequestService
     {
         private readonly IDbAccessor _database;
+
         public ReportRequestService(IDbAccessor database)
         {
             _database = database;
@@ -35,7 +35,6 @@ namespace RegionReports.Services
         {
             _database.ReportRequestsWithFile.Create(reportRequest);
         }
-
 
         public IEnumerable<ReportRequestBase> GetAllRequests()
         {

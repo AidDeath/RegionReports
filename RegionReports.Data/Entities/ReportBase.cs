@@ -9,6 +9,5 @@ namespace RegionReports.Data.Entities
         public ReportUser? ReportUser { get; set; }
         public DateTime DateFilled { get; set; } = DateTime.Now;
         public ReportAssignment? ReportAssignment { get; set; }
-
     }
 }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Изменения данных, которые пользователь о себе предоставляет
@@ -14,11 +6,9 @@ namespace RegionReports.Data.Entities
     /// </summary>
     public class ReportUserSuggestedChanges
     {
-
         public int Id { get; set; }
 
-
-        /// <summary> 
+        /// <summary>
         /// Полное имя пользователя.
         /// </summary>
         public string? FullName { get; set; }
@@ -26,7 +16,7 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Адрес электронной почты
         /// </summary>
-        public string? Email { get; set; } 
+        public string? Email { get; set; }
 
         /// <summary>
         /// Идентификатор обслуживаемого района
@@ -35,13 +25,11 @@ namespace RegionReports.Data.Entities
 
         public District? RelatedDistrict { get; set; }
 
-
         public int ReportUserApprovalClaimId { get; set; }
+
         /// <summary>
         /// Заявка на изменение данных
         /// </summary>
         public ReportUserApprovalClaim ReportUserApprovalClaim { get; set; } = new();
-
-
     }
 }

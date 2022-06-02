@@ -23,16 +23,14 @@ namespace RegionReports.Services
 
             mergedPdf.Save(memStream, false);
             return memStream;
-
-
         }
-
 
         public MemoryStream GetMergedExcelStream(IEnumerable<string> pathList)
         {
             DataSet ds = new DataSet();
 
-            foreach (string filePath in pathList) {
+            foreach (string filePath in pathList)
+            {
                 using (var fileStream = new FileStream(filePath, FileMode.Open))
                 using (XLWorkbook workBook = new XLWorkbook(fileStream))
                 {
@@ -84,10 +82,7 @@ namespace RegionReports.Services
                 return stream;
 
                 //return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Merge.xlsx");
-
             }
         }
     }
 }
-
-

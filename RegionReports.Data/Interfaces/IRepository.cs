@@ -81,7 +81,7 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         /// <param name="entities"></param>
         void DeleteRange(IEnumerable<TEntity> entities);
-        
+
         /// <summary>
         /// Удалить набор сущностей
         /// </summary>
@@ -94,7 +94,7 @@ namespace RegionReports.Data.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Update(TEntity entity);
-        
+
         /// <summary>
         /// Обновить сущность асинхронно
         /// </summary>
@@ -114,6 +114,5 @@ namespace RegionReports.Data.Interfaces
         /// <param name="entities"></param>
         /// <returns></returns>
         Task UpdateRangeAsync(IEnumerable<TEntity> entities);
-
     }
 }

@@ -1,9 +1,4 @@
 ﻿using RegionReports.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RegionReports.Data.Interfaces
 {
@@ -24,6 +19,5 @@ namespace RegionReports.Data.Interfaces
         public DateTime DateFilled { get; set; }
 
         public ReportAssignment? ReportAssignment { get; set; }
-
     }
 }

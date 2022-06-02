@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     public class MailerProfile
     {
@@ -74,12 +68,8 @@ namespace RegionReports.Data.Entities
         /// Дней до напоминания о отчете без расписаиня
         /// </summary>
         public int? DaysNonScheduledSending { get; set; }
-
     }
 }
-
-
-
 
 //Профили настройки почты:
 //Профиль настроек почты.
@@ -95,13 +85,11 @@ namespace RegionReports.Data.Entities
 
 //Активный профиль?
 
-
 //Отправлять респондентам письмо о назначении нового задания?
 
 //Отправлять напоминание респондентам о несданном отчете.
 //	Для ежемесячных -
-//	Для Еженедельных - 
-//	Для Ежедневных - 
+//	Для Еженедельных -
+//	Для Ежедневных -
 
 //Отправлять ли письмо о том, что предоставление ответа просрочено.
-

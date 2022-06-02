@@ -5,6 +5,7 @@ using RegionReports.Data.Entities;
 namespace RegionReports.Data
 {
 #nullable disable
+
     public class RegionReportsContext : DbContext
     {
         public DbSet<Region> Regions { get; set; }
@@ -14,24 +15,28 @@ namespace RegionReports.Data
         public DbSet<ReportUserSuggestedChanges> ReportUserSuggestedChanges { get; set; }
 
         #region Survey Reports
+
         public DbSet<ReportRequestSurvey> ReportRequestsSurvey { get; set; }
         public DbSet<ReportRequestSurveyOption> ReportRequestSurveyOptions { get; set; }
         public DbSet<ReportSurvey> ReportsSurvey { get; set; }
         public DbSet<ReportSurveyOption> ReportSurveySelectableOptions { get; set; }
-        #endregion
+
+        #endregion Survey Reports
 
         #region Text Reports
+
         public DbSet<ReportRequestText> ReportRequestsText { get; set; }
         public DbSet<ReportRequestFile> ReportRequestFiles { get; set; }
         public DbSet<ReportText> ReportsText { get; set; }
 
-        #endregion
+        #endregion Text Reports
 
         #region File Reports
+
         public DbSet<ReportRequestWithFile> ReportRequestsWithFile { get; set; }
         public DbSet<ReportWithFile> ReportsWithFile { get; set; }
-        #endregion
 
+        #endregion File Reports
 
         public DbSet<UploadableFileType> AlowedUploadFileTypes { get; set; }
 
@@ -44,8 +49,8 @@ namespace RegionReports.Data
 
         public DbSet<MailerProfile> MailersProfiles { get; set; }
 
-
         private readonly IConfiguration _configuration;
+
         public RegionReportsContext(IConfiguration Configuration)
         {
             _configuration = Configuration;
@@ -118,10 +123,11 @@ namespace RegionReports.Data
             //    .HasMany(rep => rep.ReportAssignments)
             //    .WithOne(assign => assign.ReportRequestSurvey)
             //    .HasForeignKey(assign => assign.ReportRequestSurveyId);
-            #endregion
 
+            #endregion Survey Reports
 
             #region Text Reports
+
             modelBuilder.Entity<ReportRequestFile>().Property(f => f.ReportRequestTextId).IsRequired();
 
             modelBuilder.Entity<ReportRequestText>()
@@ -144,9 +150,10 @@ namespace RegionReports.Data
                 .WithMany()
                 .HasForeignKey(rep => rep.ReportUserId);
 
-            #endregion
+            #endregion Text Reports
 
             #region File Reports
+
             modelBuilder.Entity<ReportWithFile>()
                 .HasOne(rep => rep.ReportUser)
                 .WithMany()
@@ -162,26 +169,24 @@ namespace RegionReports.Data
                 .WithOne(file => file.ReportRequestWithFile)
                 .HasForeignKey<ReportRequestWithFile>(repReq => repReq.ReportRequestFileId);
 
-            #endregion
+            #endregion File Reports
 
             modelBuilder.Entity<ReportSchedule>()
                 .Property(sch => sch.IsScheduleActive)
                 .HasDefaultValue(true)
                 .IsRequired();
 
-
-
             #region Report Assignments
+
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportUser)
                 .WithMany();
 
-            
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportSurvey)
                 .WithOne(rep => rep.ReportAssignment)
                 .HasForeignKey<ReportAssignment>(assign => assign.ReportSurveyId);
-            
+
             modelBuilder.Entity<ReportAssignment>()
                 .HasOne(assign => assign.ReportText)
                 .WithOne(rep => rep.ReportAssignment)
@@ -191,26 +196,24 @@ namespace RegionReports.Data
                 .HasOne(assign => assign.ReportWithFile)
                 .WithOne(rep => rep.ReportAssignment)
                 .HasForeignKey<ReportAssignment>(assign => assign.ReportWithFileId);
-            #endregion
 
-
-
+            #endregion Report Assignments
 
             modelBuilder.Entity<UploadableFileType>().HasData(
-                new UploadableFileType() {Id = 1, AlowedMimeType = @"application/msword" },
-                new UploadableFileType() {Id = 2, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-                new UploadableFileType() {Id = 3, AlowedMimeType = @"application/vnd.ms-excel"},
-                new UploadableFileType() {Id = 4, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-                new UploadableFileType() {Id = 5, AlowedMimeType = @"application/pdf" }
+                new UploadableFileType() { Id = 1, AlowedMimeType = @"application/msword" },
+                new UploadableFileType() { Id = 2, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                new UploadableFileType() { Id = 3, AlowedMimeType = @"application/vnd.ms-excel" },
+                new UploadableFileType() { Id = 4, AlowedMimeType = @"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                new UploadableFileType() { Id = 5, AlowedMimeType = @"application/pdf" }
                 );
 
             modelBuilder.Entity<Region>().HasData(
-                 new Region { Id= 1, RegionName = "Брестская область"},
-                 new Region { Id= 2, RegionName = "Гродненская область"},
-                 new Region { Id= 3, RegionName = "Витебская область"},
-                 new Region { Id= 4, RegionName = "Могилевская область"},
-                 new Region { Id= 5, RegionName = "Гомельская область"},
-                 new Region { Id= 6, RegionName = "Минская область"}
+                 new Region { Id = 1, RegionName = "Брестская область" },
+                 new Region { Id = 2, RegionName = "Гродненская область" },
+                 new Region { Id = 3, RegionName = "Витебская область" },
+                 new Region { Id = 4, RegionName = "Могилевская область" },
+                 new Region { Id = 5, RegionName = "Гомельская область" },
+                 new Region { Id = 6, RegionName = "Минская область" }
                  );
             modelBuilder.Entity<District>().HasData(
                 new District { Id = 1, RegionId = 6, DistrictName = "Березино" },
@@ -239,11 +242,8 @@ namespace RegionReports.Data
                 );
 
             modelBuilder.Entity<AccessRole>().HasData(
-                new AccessRole() { Id= 1, IsAdministrator = true, WindowsRoleName="Everyone"},
+                new AccessRole() { Id = 1, IsAdministrator = true, WindowsRoleName = "Everyone" },
                 new AccessRole() { Id = 2, IsAdministrator = true, WindowsRoleName = "Все" });
-
         }
-
-        
     }
 }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Район
@@ -25,12 +17,12 @@ namespace RegionReports.Data.Entities
         public Region? Region { get; set; }
 
         public int? ReportUserId { get; set; }
+
         /// <summary>
         /// Пользователь, закрепленный за районом
         /// </summary>
         public ReportUser? ReportUser { get; set; }
 
-        public List<ReportSchedule> Schedules { get; set; }  
-
+        public List<ReportSchedule> Schedules { get; set; }
     }
 }

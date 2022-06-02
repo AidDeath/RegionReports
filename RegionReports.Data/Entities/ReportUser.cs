@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace RegionReports.Data.Entities
 {
@@ -15,7 +9,7 @@ namespace RegionReports.Data.Entities
     {
         public int Id { get; set; }
 
-        /// <summary> 
+        /// <summary>
         /// Полное имя пользователя.
         /// </summary>
         public string FullName { get; set; } = "";
@@ -31,7 +25,6 @@ namespace RegionReports.Data.Entities
         /// Имя, под которым пользователь вошёл в систему
         /// </summary>
         public string WindowsUserName { get; set; } = "";
-
 
         /// <summary>
         /// Обслуживаемый район
@@ -52,7 +45,7 @@ namespace RegionReports.Data.Entities
         /// <summary>
         /// Дата последнего входа пользователя в систему
         /// </summary>
-        public DateTime? LastLoginDate { get;set; }
+        public DateTime? LastLoginDate { get; set; }
 
         public DateTime? LastChangesDate { get; set; }
 
@@ -64,12 +57,10 @@ namespace RegionReports.Data.Entities
         /// <param name="suggested"></param>
         public void TakeSuggestedChanges(ReportUserApprovalClaim claim)
         {
-            this.FullName = claim.ReportUserSuggestedChanges.FullName ?? String.Empty ;
+            this.FullName = claim.ReportUserSuggestedChanges.FullName ?? String.Empty;
             this.Email = claim.ReportUserSuggestedChanges.Email ?? String.Empty;
             this.RelatedDistrict = claim.ReportUserSuggestedChanges.RelatedDistrict;
             this.LastChangesDate = DateTime.Now;
-            
         }
-
     }
 }

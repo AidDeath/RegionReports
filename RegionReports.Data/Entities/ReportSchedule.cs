@@ -23,6 +23,5 @@
         public ReportRequestSurvey? ReportRequestSurvey { get; set; }
 
         public List<District> Districts { get; set; }
-
     }
 }

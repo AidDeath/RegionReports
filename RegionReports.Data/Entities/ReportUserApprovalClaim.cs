@@ -1,5 +1,4 @@
-﻿
-namespace RegionReports.Data.Entities
+﻿namespace RegionReports.Data.Entities
 {
     /// <summary>
     /// Заявка на изменение данных пользователя
@@ -7,9 +6,9 @@ namespace RegionReports.Data.Entities
     public class ReportUserApprovalClaim
     {
         public int Id { get; set; }
-    
+
         /// <summary>
-        /// изменения, предложенные пользователем 
+        /// изменения, предложенные пользователем
         /// </summary>
         public ReportUserSuggestedChanges ReportUserSuggestedChanges { get; set; }
 
@@ -25,6 +24,5 @@ namespace RegionReports.Data.Entities
         /// Признак обработки заявки
         /// </summary>
         public bool IsClaimProcessed { get; set; } = false;
-
     }
 }

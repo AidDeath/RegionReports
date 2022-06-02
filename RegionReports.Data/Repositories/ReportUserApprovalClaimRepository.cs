@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RegionReports.Data.Entities;
 using RegionReports.Data.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RegionReports.Data.Repositories
 {
@@ -14,7 +9,6 @@ namespace RegionReports.Data.Repositories
     /// </summary>
     public class ReportUserApprovalClaimRepository : Repositories.Repository<ReportUserApprovalClaim>, IReportUserApprovalClaimRepository
     {
-        
         public ReportUserApprovalClaimRepository(RegionReportsContext context) : base(context)
         { }
 
@@ -28,8 +22,7 @@ namespace RegionReports.Data.Repositories
             return _dbSet.Include(claim => claim.ReportUserSuggestedChanges).FirstOrDefault(a => a.Id == Id);
         }
 
-        
-        public  ReportUserApprovalClaim? GetLastClaimForUser(int userId)
+        public ReportUserApprovalClaim? GetLastClaimForUser(int userId)
         {
             return _dbSet.Include(claim => claim.ReportUserSuggestedChanges)
                          .FirstOrDefault(c => !c.IsClaimProcessed && c.ReportUserId == userId);
@@ -40,6 +33,5 @@ namespace RegionReports.Data.Repositories
             return _dbSet.Where(c => c.ReportUserId == userId && c.IsClaimProcessed)
                          .Include(claim => claim.ReportUserSuggestedChanges);
         }
-
     }
 }

@@ -19,7 +19,7 @@ namespace RegionReports.Services
         {
             return _database.MailerProfiles.GetQueryable().ToList();
         }
-    
+
         public void UpdateMailerProfile(MailerProfile mailerProfile)
         {
             _database.MailerProfiles.Update(mailerProfile);

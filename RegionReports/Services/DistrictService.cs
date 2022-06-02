@@ -7,6 +7,7 @@ namespace RegionReports.Services
     public class DistrictService
     {
         private readonly IDbAccessor _database;
+
         public DistrictService(IDbAccessor database)
         {
             _database = database;
@@ -30,6 +31,5 @@ namespace RegionReports.Services
         {
             return await _database.Districts.GetQueryable().Where(d => d.ReportUserId != null).Include(d => d.ReportUser).ToListAsync();
         }
-
     }
 }

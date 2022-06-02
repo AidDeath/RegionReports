@@ -7,7 +7,6 @@ namespace RegionReports.Services
 {
     public class SchedulerService : BackgroundService
     {
-
         private readonly ILogger<SchedulerService> _logger;
         private readonly RegionReportsContext _dbContext;
 
@@ -19,8 +18,6 @@ namespace RegionReports.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
-
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -31,7 +28,6 @@ namespace RegionReports.Services
                 {
                     _logger.Log(LogLevel.Error, $"SetOverdueOnAssignments: {ex.GetBaseException().Message}");
                 }
-
 
                 try
                 {
@@ -49,15 +45,12 @@ namespace RegionReports.Services
             //await someService.DoSomeCleanupAsync(cancellationToken);
         }
 
-
         private async Task CreateAssignmentsForSchedule()
         {
             // Создание назначений.
             // Вытягиваю назначения по след. условиям:
             // Назначение выполнено либо отменено (Так не будет создаваться назначение, если ещё активно предыдущее)
             // В назначении лежит отчет с признаком IsScheduledRequest.
-
-
 
             var assignGroups = await _dbContext.AssignmentGroups
                 .Include(group => group.Assignments).ThenInclude(asn => asn.ReportUser)
@@ -73,12 +66,11 @@ namespace RegionReports.Services
                 .Where(req => req.ReportSchedule.IsScheduleActive ?? false)
                 .Distinct();
 
-
             //Теперь нужно продублировать назначения для этих отчетов
             foreach (var request in requests)
             {
                 var calculatedDeadline = GetDeadlineDate(request.ReportSchedule);
-                
+
                 //Если до сдачи отчета больше заданного в расписании кол-ва дней или на эту же дату уже есть назначение - не создаем назначение.
                 if (DateTime.Now.AddDays(request.ReportSchedule.DaysBeforeAutoAssignment) > calculatedDeadline
                     && request.AssignmentsGroups.All(asnGroup => asnGroup.ActualDeadline != calculatedDeadline))
@@ -90,7 +82,7 @@ namespace RegionReports.Services
                         ActualDeadline = calculatedDeadline,
                         Assignments = new()
                     };
-                    
+
                     foreach (var user in request.ReportSchedule.Districts.Select(distr => distr.ReportUser))
                     {
                         newGroup.Assignments.Add(new()
@@ -104,7 +96,7 @@ namespace RegionReports.Services
                     _logger.Log(LogLevel.Information, $"Request type {newGroup.GetReportRequest().ReportSchedule.ScheduleType} " +
                         $"| Title: {newGroup.GetReportRequest().RequestTitle} - " +
                         $"created {newGroup.Assignments.Count} assignments by schedule");
-                } 
+                }
             }
         }
 
@@ -114,13 +106,12 @@ namespace RegionReports.Services
         private async Task SetOverdueOnAssignments()
         {
             await _dbContext.AssignmentGroups
-                .Where(asnGroup =>  !asnGroup.IsOverdued && asnGroup.ActualDeadline < DateTime.Now)
-                .ForEachAsync(asnGroup =>asnGroup.IsOverdued = true);
+                .Where(asnGroup => !asnGroup.IsOverdued && asnGroup.ActualDeadline < DateTime.Now)
+                .ForEachAsync(asnGroup => asnGroup.IsOverdued = true);
             await _dbContext.SaveChangesAsync();
 
             _logger.Log(LogLevel.Information, $"Assignments clean-up successful");
         }
-
 
         private DateTime GetDeadlineDate(ReportSchedule schedule)
         {
@@ -141,6 +132,7 @@ namespace RegionReports.Services
                         ? new DateTime(DateTime.Now.Year, DateTime.Now.Month, dayForCurrentMonth)
                         : new DateTime(DateTime.Now.AddMonths(1).Year, DateTime.Now.AddMonths(1).Month, dayForNextMonth);
                     break;
+
                 case ReportScheduleType.Еженедельный:
                     calculatedDeadline = DateTime.Today;
                     while ((short)calculatedDeadline.DayOfWeek != schedule.DayOfWeek)
@@ -153,11 +145,13 @@ namespace RegionReports.Services
                         calculatedDeadline = calculatedDeadline.AddDays(7);
                     }
                     break;
+
                 case ReportScheduleType.Ежедневный:
                     calculatedDeadline = (DateTime.Now.TimeOfDay < schedule.Time)
                         ? DateTime.Now.Date
                         : DateTime.Now.Date.AddDays(1);
                     break;
+
                 default: throw new Exception("В расписании не указан тип расписания");
             }
 
@@ -165,6 +159,5 @@ namespace RegionReports.Services
 
             return calculatedDeadline;
         }
-
     }
 }

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Radzen;
-using RegionReports.Services;
 using RegionReports.Data;
 using RegionReports.Data.Interfaces;
 using RegionReports.Data.Repositories;
+using RegionReports.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +29,6 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
-
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<DistrictService>();
 builder.Services.AddTransient<ReportRequestService>();
@@ -43,9 +42,6 @@ builder.Services.AddHostedService<SchedulerService>();
 builder.Services.AddScoped<MailerService>();
 
 var app = builder.Build();
-
-
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

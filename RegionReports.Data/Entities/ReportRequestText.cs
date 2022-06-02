@@ -14,7 +14,6 @@ namespace RegionReports.Data.Entities
         /// Перечень файлов прикрепленных к запросу
         /// </summary>
         public List<ReportRequestFile>? Files { get; set; }
-
     }
 
     /// <summary>
@@ -24,7 +23,7 @@ namespace RegionReports.Data.Entities
     {
         [JsonPropertyName("reportRequestTextId")]
         public int ReportRequestTextId { get; set; }
-        public ReportRequestText RelatedReportText { get; set; }
 
+        public ReportRequestText RelatedReportText { get; set; }
     }
 }
