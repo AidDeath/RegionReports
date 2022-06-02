@@ -16,6 +16,7 @@ else
 {
     <div class="row">
         <div class="col-md-5">
+            <h3>Результаты сбора отчетов</h3>
             <RadzenDataGrid ColumnWidth="160px" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" Data="@asnGroups" TItem="ReportAssignmentGroup" @bind-Value="@SelectedGroups">
                 <Columns>
                     <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="ActualDeadline" Title="Cрок сбора"/>

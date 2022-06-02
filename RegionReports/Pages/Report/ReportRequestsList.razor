@@ -18,10 +18,10 @@
 
 
 *@
-<PageTitle>Управленеие отчетами</PageTitle>
-<h3>Управленеие отчетами</h3>
+<PageTitle>Управленеие текущим сбором отчетности</PageTitle>
+<h3>Управление отчетами</h3>
 
-<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list" PageSize="7" EmptyText="Нет назначений для отображения">
+<RadzenDataGrid TItem="ReportAssignmentGroup" AllowPaging="true" Data="@list" PageSize="5" EmptyText="Нет назначений для отображения">
     <Columns>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Property="DateAssigned" Title="Назначен"/>
         <RadzenDataGridColumn TItem="ReportAssignmentGroup" Title="Тип запроса">
@@ -64,7 +64,7 @@
                     }
                     else
                     {
-                            <p> @data.Assignments.Count назначено></p>
+                            <p> @data.Assignments.Count назначено</p>
                     }
 
                 }
@@ -87,6 +87,7 @@
                     }
                  }
                 </div>
+                <div><RadzenButton Text="Завершить сбор" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger"/></div>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -223,7 +224,7 @@
         
     }
 
-        private async Task ShowRequestInfo(ReportAssignmentGroup asnGroup)
+    private async Task ShowRequestInfo(ReportAssignmentGroup asnGroup)
     {       
         ReportRequestBase request = null;
 
