@@ -39,9 +39,26 @@ builder.Services.AddScoped<DocumentMergingService>();
 builder.Services.AddTransient<SettingsService>();
 
 builder.Services.AddHostedService<SchedulerService>();
+
+builder.Services.AddSingleton<MailQueueMonitor>();
+builder.Services.AddHostedService<QueuedHostedService>();
+///Очередь ограничена рамками
+builder.Services.AddSingleton<IBackgroundTaskQueue>(ctx =>
+{
+    if (!int.TryParse(builder.Configuration["QueueCapacity"], out var queueCapacity))
+        queueCapacity = 50;
+    return new BackgroundTaskQueue(queueCapacity);
+});
+
+//Неограниченная очередь
+//builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
 builder.Services.AddScoped<MailerService>();
 
 var app = builder.Build();
+
+//Запускаю очередь почтовых почтовых отправлений сразу после старта программы
+app.Services.GetService<MailQueueMonitor>()?.StartMonitorLoop();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

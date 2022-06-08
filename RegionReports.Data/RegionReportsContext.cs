@@ -54,12 +54,13 @@ namespace RegionReports.Data
         public RegionReportsContext(IConfiguration Configuration)
         {
             _configuration = Configuration;
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MsSqlConnectionString"));
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=RegionReport;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MsSqlConnectionString"));
+            //optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=RegionReport;Trusted_Connection=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

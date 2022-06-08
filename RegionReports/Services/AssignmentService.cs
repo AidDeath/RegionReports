@@ -8,10 +8,12 @@ namespace RegionReports.Services
     public class AssignmentService
     {
         private readonly IDbAccessor _database;
+        private readonly MailerService _mailer;
 
-        public AssignmentService(IDbAccessor database)
+        public AssignmentService(IDbAccessor database, MailerService mailer)
         {
             _database = database;
+            _mailer = mailer;
         }
 
         /// <summary>
@@ -35,10 +37,12 @@ namespace RegionReports.Services
 
             foreach (var user in usersToAssign)
             {
-                newGroup.Assignments.Add(new()
+                var asn = new ReportAssignment()
                 {
                     ReportUser = user
-                });
+                };
+                newGroup.Assignments.Add(asn);
+                _mailer.SendAssignmentMessage(asn);
             }
 
             if (request.AssignmentsGroups is null)

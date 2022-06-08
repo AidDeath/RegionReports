@@ -9,11 +9,13 @@ namespace RegionReports.Services
     {
         private readonly ILogger<SchedulerService> _logger;
         private readonly RegionReportsContext _dbContext;
+        private readonly MailQueueMonitor _mailMonitor;
 
-        public SchedulerService(ILogger<SchedulerService> logger, RegionReportsContext dbContext)
+        public SchedulerService(ILogger<SchedulerService> logger, RegionReportsContext dbContext, MailQueueMonitor mailMonitor)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _mailMonitor = mailMonitor;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -85,10 +87,13 @@ namespace RegionReports.Services
 
                     foreach (var user in request.ReportSchedule.Districts.Select(distr => distr.ReportUser))
                     {
-                        newGroup.Assignments.Add(new()
+                        var asn = new ReportAssignment()
                         {
-                            ReportUser = user,
-                        });
+                            ReportUser = user
+                        };
+                        newGroup.Assignments.Add(asn);
+                        _mailMonitor.AddAsnMessageToQueue(asn);
+                        
                     }
 
                     _dbContext.AssignmentGroups.Add(newGroup);
